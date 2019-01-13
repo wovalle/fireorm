@@ -4,4 +4,7 @@ import BaseFirestoreRepository, {
   getRepository,
 } from './BaseFirestoreRepository';
 
+// TODO: think better approach
+export interface ISubCollection<T> {}
+
 export { SubCollection, Collection, BaseFirestoreRepository, getRepository };
