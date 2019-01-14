@@ -13,6 +13,7 @@
     "@types/mocha": "^5.2.5",
     "@types/pluralize": "^0.0.29",
     "chai": "^4.2.0",
+    "firebase-admin": "^6.5.0",
     "mocha": "^5.2.0",
     "mock-cloud-firestore": "^0.9.0",
     "reflect-metadata": "^0.1.12",

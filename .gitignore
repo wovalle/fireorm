@@ -60,5 +60,5 @@ typings/
 # next.js build output
 .next
 
-firestore.json
+firestore.creds.json
 lib

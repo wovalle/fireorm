@@ -113,6 +113,11 @@ export default class BaseFirestoreRepository<T extends { id: string }>
     return obj;
   };
 
+  // TODO: have a smarter way to do this
+  private toObject = (obj: T): Object => {
+    return JSON.parse(JSON.stringify(obj));
+  };
+
   findById(id: string): Promise<T> {
     return this.firestoreCollection
       .doc(id)
@@ -137,7 +142,7 @@ export default class BaseFirestoreRepository<T extends { id: string }>
       ? this.firestoreCollection.doc(`${item.id}`)
       : this.firestoreCollection.doc();
 
-    await doc.set(item);
+    await doc.set(this.toObject(item));
 
     item.id = doc.id;
 
@@ -146,7 +151,7 @@ export default class BaseFirestoreRepository<T extends { id: string }>
 
   async update(item: T): Promise<T> {
     // TODO: handle errors
-    await this.firestoreCollection.doc(item.id).update(item);
+    await this.firestoreCollection.doc(item.id).update(this.toObject(item));
     return item;
   }
 
