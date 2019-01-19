@@ -13,6 +13,42 @@
       "cwd": "${workspaceRoot}",
       "runtimeArgs": ["-r", "ts-node/register"],
       "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch current file w/ mocha",
+      "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
+      "args": [
+        "--ui",
+        "tdd",
+        "--timeout",
+        "4000",
+        "--colors",
+        "--require",
+        "ts-node/register",
+        "${relativeFile}"
+      ],
+      "cwd": "${workspaceRoot}",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch tests w/ mocha",
+      "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
+      "args": [
+        "--ui",
+        "tdd",
+        "--timeout",
+        "4000",
+        "--colors",
+        "--require",
+        "ts-node/register",
+        "src/**/**/*.spec.ts"
+      ],
+      "cwd": "${workspaceRoot}",
+      "internalConsoleOptions": "openOnSessionStart"
     }
   ]
 }
