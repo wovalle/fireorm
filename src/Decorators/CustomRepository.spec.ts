@@ -1,16 +1,16 @@
 import CustomRepository from './CustomRepository';
 import { expect } from 'chai';
+import sinon from 'sinon';
 
 describe('CustomRepositoryDecorator', () => {
-  let globalRef: any = null;
   const metadataStorage = { repositories: [] };
   const repositories = metadataStorage.repositories;
+  let stub = null;
 
-  const getStorage: any = () => global;
   before(() => {
-    const globalObj = getStorage();
-    globalRef = globalObj;
-    globalObj.metadataStorage = metadataStorage;
+    stub = sinon
+      .stub(global as any, 'metadataStorage')
+      .returns(metadataStorage);
   });
 
   afterEach(() => {
@@ -18,7 +18,7 @@ describe('CustomRepositoryDecorator', () => {
   });
 
   after(() => {
-    global = globalRef;
+    stub.restore();
   });
 
   it('should register custom repositories', () => {

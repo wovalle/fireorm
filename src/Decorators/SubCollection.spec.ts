@@ -1,15 +1,14 @@
 import SubCollection from './SubCollection';
 import { expect } from 'chai';
+import sinon from 'sinon';
 
 describe('SubCollectionDecorator', () => {
-  let globalRef: any = null;
+  let stub = null;
   const metadataStorage = { subCollections: [] };
-
-  const getStorage: any = () => global;
   before(() => {
-    const globalObj = getStorage();
-    globalRef = globalObj;
-    globalObj.metadataStorage = metadataStorage;
+    stub = sinon
+      .stub(global as any, 'metadataStorage')
+      .returns(metadataStorage);
   });
 
   afterEach(() => {
@@ -17,9 +16,8 @@ describe('SubCollectionDecorator', () => {
   });
 
   after(() => {
-    global = globalRef;
+    stub.restore();
   });
-
   it('should register collections', () => {
     class SubEntity {}
     class Entity {

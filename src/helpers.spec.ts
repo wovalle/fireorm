@@ -8,14 +8,11 @@ import Collection from './Decorators/Collection';
 import BaseFirestoreRepository from './BaseFirestoreRepository';
 import { getRepository, getBaseRepository } from './helpers';
 
-describe.only('Helpers', () => {
-  let globalRef: any = null;
+describe('Helpers', () => {
   let firestore = null;
+  let stub = null;
   const metadataStorage = { collections: [], repositories: [] };
 
-  let stub = null;
-
-  const getStorage: any = () => global;
   before(() => {
     const firebase = new MockFirebase();
     stub = sinon
@@ -23,20 +20,13 @@ describe.only('Helpers', () => {
       .returns(metadataStorage);
 
     firestore = firebase.firestore();
-
-    const globalObj = getStorage();
-    globalRef = globalObj;
-    globalObj.metadataStorage = metadataStorage;
   });
 
   afterEach(() => {
     metadataStorage.repositories = [];
-    stub.restore();
   });
 
-  after(() => {
-    global = globalRef;
-  });
+  after(() => stub.restore());
 
   describe('getRepository', () => {
     it('should get custom repositories', () => {

@@ -1,24 +1,22 @@
 import Collection from './Collection';
 import { expect } from 'chai';
+import sinon from 'sinon';
 
 describe('CollectionDecorator', () => {
-  let globalRef: any = null;
+  let stub = null;
   const metadataStorage = { collections: [] };
 
-  const getStorage: any = () => global;
   before(() => {
-    const globalObj = getStorage();
-    globalRef = globalObj;
-    globalObj.metadataStorage = metadataStorage;
+    stub = sinon
+      .stub(global as any, 'metadataStorage')
+      .returns(metadataStorage);
   });
 
   afterEach(() => {
     metadataStorage.collections = [];
   });
 
-  after(() => {
-    global = globalRef;
-  });
+  after(() => stub.restore());
 
   it('should register collections', () => {
     @Collection('foo')

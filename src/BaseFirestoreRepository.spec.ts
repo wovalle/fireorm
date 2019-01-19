@@ -19,7 +19,7 @@ describe('BaseRepository', () => {
     userRep = new UserRepository(firestore, 'users');
   });
 
-  describe.only('findById', () => {
+  describe('findById', () => {
     it('must find by id', async () => {
       const roy = await userRep.findById('roy');
       expect(roy.id).to.equal('roy');
