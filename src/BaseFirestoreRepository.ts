@@ -113,6 +113,11 @@ export default class BaseFirestoreRepository<T extends { id: string }>
     return obj;
   };
 
+  // TODO: have a smarter way to do this
+  private toObject = (obj: T): Object => {
+    return { ...obj };
+  };
+
   findById(id: string): Promise<T> {
     return this.firestoreCollection
       .doc(id)
@@ -121,11 +126,9 @@ export default class BaseFirestoreRepository<T extends { id: string }>
   }
 
   async create(item: T): Promise<T> {
-    // TODO: Double operation here. Should construct T myself with ref.id?
-    // TODO: add tests
-
+    // TODO: add branching tests
     if (item.id) {
-      const found = await this.findById(`${item.id}`);
+      const found = await this.findById(item.id);
       if (found) {
         return Promise.reject(
           new Error('Trying to create an already existing document')
@@ -134,10 +137,10 @@ export default class BaseFirestoreRepository<T extends { id: string }>
     }
 
     const doc = item.id
-      ? this.firestoreCollection.doc(`${item.id}`)
+      ? this.firestoreCollection.doc(item.id)
       : this.firestoreCollection.doc();
 
-    await doc.set(item);
+    await doc.set(this.toObject(item));
 
     item.id = doc.id;
 
@@ -146,7 +149,7 @@ export default class BaseFirestoreRepository<T extends { id: string }>
 
   async update(item: T): Promise<T> {
     // TODO: handle errors
-    await this.firestoreCollection.doc(item.id).update(item);
+    await this.firestoreCollection.doc(item.id).update(this.toObject(item));
     return item;
   }
 
