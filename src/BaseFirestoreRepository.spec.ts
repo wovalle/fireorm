@@ -1,12 +1,12 @@
 import MockFirebase from 'mock-cloud-firestore';
-import BaseFirestoreRepository from '../src/BaseFirestoreRepository';
+import BaseFirestoreRepository from './BaseFirestoreRepository';
 import { getFixture, User } from '../test/fixture';
 import { expect } from 'chai';
 
 // TODO: explicitely enforce entities to extend {id: string} (IEntity)
 class UserRepository extends BaseFirestoreRepository<User> {}
 
-describe('Repository', () => {
+describe('BaseRepository', () => {
   let userRep: BaseFirestoreRepository<User> | null = null;
 
   beforeEach(() => {

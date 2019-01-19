@@ -1,5 +1,4 @@
-import { Collection, SubCollection } from '../src';
-import { IRepository } from '../src/types';
+import Collection from '../src/Decorators/Collection';
 
 export class Message {
   id: string;
