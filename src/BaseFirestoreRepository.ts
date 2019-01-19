@@ -203,18 +203,3 @@ export default class BaseFirestoreRepository<T extends { id: string }>
     );
   }
 }
-
-export function getRepository<T extends { id: string }>(
-  entity: { new (): T },
-  db: Firestore
-) {
-  const collection = getMetadataStorage().collections.find(
-    c => c.target === entity
-  );
-
-  if (!collection) {
-    throw new Error(`${entity.name} is not a valid collection.`);
-  }
-
-  return new BaseFirestoreRepository<T>(db, collection.name);
-}

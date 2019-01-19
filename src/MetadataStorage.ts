@@ -1,8 +1,9 @@
-// tslint:disable-next-line:no-import-side-effect
-import 'reflect-metadata';
+export interface IMetadataStorage {
+  get(): any;
+}
 
-export const storage = {
-  getGlobal: (): any => global,
+const globalStorage = {
+  get: (): any => global,
 };
 
 export interface CollectionMetadata {
@@ -16,14 +17,21 @@ export interface SubCollectionMetadata {
   entity: Function;
 }
 
-// TODO: create repository metadata storage
+export interface RepositoryMetadata {
+  target: Function;
+  entity: Function;
+}
+
 export class MetadataStorage {
   readonly collections: CollectionMetadata[] = [];
   readonly subCollections: SubCollectionMetadata[] = [];
+  readonly repositories: RepositoryMetadata[] = [];
 }
 
-export const getMetadataStorage = (): MetadataStorage => {
-  const global = storage.getGlobal();
+export const getMetadataStorage = (
+  storage: IMetadataStorage = globalStorage
+): MetadataStorage => {
+  const global = storage.get();
 
   if (!global.metadataStorage) global.metadataStorage = new MetadataStorage();
 

@@ -1,9 +1,6 @@
-import SubCollection from './Decorators/SubCollection';
-import Collection from './Decorators/Collection';
-import BaseFirestoreRepository, {
-  getRepository,
-} from './BaseFirestoreRepository';
-
+export * from './Decorators/SubCollection';
+export * from './Decorators/Collection';
+export * from './Decorators/CustomRepository';
+export * from './BaseFirestoreRepository';
 export * from './types';
-
-export { SubCollection, Collection, BaseFirestoreRepository, getRepository };
+export * from './helpers';
