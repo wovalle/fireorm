@@ -9,7 +9,7 @@ export default function SubCollection(
     getMetadataStorage().subCollections.push({
       entity,
       name: name || plural(propertyKey),
-      target: target.constructor,
+      parentEntity: target.constructor,
     });
   };
 }

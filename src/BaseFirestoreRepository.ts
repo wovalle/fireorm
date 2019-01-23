@@ -50,6 +50,7 @@ export default class BaseFirestoreRepository<T extends { id: string }>
   }
 
   private extractTFromDocSnap = (doc: DocumentSnapshot): T => {
+    // TODO: documents with only subcollections will return null, validate
     if (!doc.exists) {
       return null;
     }
@@ -72,15 +73,17 @@ export default class BaseFirestoreRepository<T extends { id: string }>
       }
 
       const subcollections = getMetadataStorage().subCollections.filter(
-        sc => sc.target === collection.target
+        sc => sc.parentEntity === collection.entity
       );
 
       subcollections.forEach(subCol => {
-        // tslint:disable-next-line:no-shadowed-variable
-        const T = subCol.entity;
-
         Object.assign(entity, {
-          [subCol.name]: getRepository(T as any, this.db, doc.id, subCol.name),
+          [subCol.name]: getRepository(
+            subCol.entity as any,
+            this.db,
+            doc.id,
+            subCol.name
+          ),
         });
       });
     }

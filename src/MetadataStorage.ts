@@ -7,12 +7,12 @@ const globalStorage = {
 };
 
 export interface CollectionMetadata {
-  target: Function;
+  entity: Function;
   name: string;
 }
 
 export interface SubCollectionMetadata {
-  target: Function;
+  parentEntity: Function;
   name: string;
   entity: Function;
 }

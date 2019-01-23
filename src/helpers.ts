@@ -9,20 +9,43 @@ export function getRepository<T extends { id: string }>(
   subColName?: string
 ) {
   // first check if there is a custom repository registered
-  const customRep = getMetadataStorage().repositories.find(
-    c => c.entity === entity
-  );
+  const rep = getMetadataStorage().repositories.find(c => c.entity === entity);
 
-  const collection = getMetadataStorage().collections.find(
-    c => c.target === entity
-  );
+  let collectionName = null;
 
-  if (!collection) {
-    throw new Error(`'${entity.name}' is not a valid collection.`);
+  if (docId) {
+    const subCollection = getMetadataStorage().subCollections.find(
+      c => c.entity === entity
+    );
+
+    if (!subCollection) {
+      throw new Error(`'${entity.name}' is not a valid subcollection.`);
+    }
+
+    const parentCollection = getMetadataStorage().collections.find(
+      c => c.entity === subCollection.parentEntity
+    );
+
+    if (!parentCollection) {
+      throw new Error(
+        `'${entity.name}' does not have a valid parent collection.`
+      );
+    }
+    collectionName = parentCollection.name;
+  } else {
+    const collection = getMetadataStorage().collections.find(
+      c => c.entity === entity
+    );
+
+    if (!collection) {
+      throw new Error(`'${entity.name}' is not a valid collection`);
+    }
+
+    collectionName = collection.name;
   }
 
-  if (customRep) {
-    return new (customRep.target as any)(db, collection.name);
+  if (rep) {
+    return new (rep.target as any)(db, collectionName, docId, subColName);
   }
 
   return getBaseRepository(entity, db, docId, subColName);
@@ -35,7 +58,7 @@ export function getBaseRepository<T extends { id: string }>(
   subColName?: string
 ) {
   const collection = getMetadataStorage().collections.find(
-    c => c.target === entity
+    c => c.entity === entity
   );
 
   if (!collection) {
