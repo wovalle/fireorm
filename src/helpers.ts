@@ -4,7 +4,9 @@ import BaseFirestoreRepository from './BaseFirestoreRepository';
 
 export function getRepository<T extends { id: string }>(
   entity: { new (): T },
-  db: Firestore
+  db: Firestore,
+  docId?: string,
+  subColName?: string
 ) {
   // first check if there is a custom repository registered
   const customRep = getMetadataStorage().repositories.find(
@@ -23,12 +25,14 @@ export function getRepository<T extends { id: string }>(
     return new (customRep.target as any)(db, collection.name);
   }
 
-  return getBaseRepository(entity, db);
+  return getBaseRepository(entity, db, docId, subColName);
 }
 
 export function getBaseRepository<T extends { id: string }>(
   entity: { new (): T },
-  db: Firestore
+  db: Firestore,
+  docId?: string,
+  subColName?: string
 ) {
   const collection = getMetadataStorage().collections.find(
     c => c.target === entity
@@ -38,5 +42,5 @@ export function getBaseRepository<T extends { id: string }>(
     throw new Error(`'${entity.name}' is not a valid collection.`);
   }
 
-  return new BaseFirestoreRepository<T>(db, collection.name);
+  return new BaseFirestoreRepository<T>(db, collection.name, docId, subColName);
 }

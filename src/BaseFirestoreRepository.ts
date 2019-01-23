@@ -16,18 +16,10 @@ import {
 
 import QueryBuilder from './QueryBuilder';
 import { getMetadataStorage } from './MetadataStorage';
+import { getRepository } from './helpers';
 
 export default class BaseFirestoreRepository<T extends { id: string }>
   implements IRepository<T>, IQueryBuilder<T> {
-  // TODO: Ordering
-  // TODO: pub/sub for realtime updates
-  // TODO: limit
-  // TODO: open transactions? (probably in uof)
-  // TODO: colname = classname unless param is passed
-  // TODO: @createdOnField, @updatedOnField
-  // TODO: register repository in metadata
-  // TODO: allow models with functions
-
   public collectionType: FirestoreCollectionType;
   private firestoreCollection: CollectionReference;
 
@@ -86,13 +78,9 @@ export default class BaseFirestoreRepository<T extends { id: string }>
       subcollections.forEach(subCol => {
         // tslint:disable-next-line:no-shadowed-variable
         const T = subCol.entity;
+
         Object.assign(entity, {
-          [subCol.name]: new BaseFirestoreRepository<T>(
-            this.db,
-            this.colName,
-            doc.id,
-            subCol.name
-          ),
+          [subCol.name]: getRepository(T as any, this.db, doc.id, subCol.name),
         });
       });
     }
