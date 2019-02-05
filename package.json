@@ -15,6 +15,7 @@
     "@types/sinon": "^7.0.4",
     "chai": "^4.2.0",
     "firebase-admin": "^6.5.0",
+    "gh-pages-deploy": "^0.5.1",
     "mocha": "^5.2.0",
     "mock-cloud-firestore": "^0.9.0",
     "reflect-metadata": "^0.1.12",
@@ -30,7 +31,8 @@
     "build:watch": "tsc -w",
     "test": "mocha --require ts-node/register src/*.spec.ts --recursively",
     "test:watch": "mocha --require ts-node/register src/*.spec.ts --watch-extensions ts --recursively -w",
-    "build:documentation": "typedoc --out docs --name fireorm --readme README.md --mode file --gaID UA-133856278-1"
+    "build:documentation": "typedoc --out docs --name fireorm --readme README.md --mode file --gaID UA-133856278-1 --excludeNotExported",
+    "deploy": "gh-pages-deploy"
   },
   "repository": {
     "type": "git",
@@ -46,5 +48,13 @@
   "bugs": {
     "url": "https://github.com/wovalle/fireorm/issues"
   },
-  "homepage": "https://github.com/wovalle/fireorm#readme"
+  "homepage": "https://wovalle.github.io/fireorm/",
+  "gh-pages-deploy": {
+    "staticpath": "docs",
+    "prep": [
+      "build:documentation"
+    ],
+    "commit": "Releasing version",
+    "noprompt": true
+  }
 }
