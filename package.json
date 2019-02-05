@@ -21,6 +21,7 @@
     "sinon": "^7.2.3",
     "ts-node": "^7.0.1",
     "tslint": "^5.12.0",
+    "typedoc": "^0.14.2",
     "typescript": "^3.2.2"
   },
   "scripts": {
@@ -28,7 +29,8 @@
     "build": "tsc",
     "build:watch": "tsc -w",
     "test": "mocha --require ts-node/register src/*.spec.ts --recursively",
-    "test:watch": "mocha --require ts-node/register src/*.spec.ts --watch-extensions ts --recursively -w"
+    "test:watch": "mocha --require ts-node/register src/*.spec.ts --watch-extensions ts --recursively -w",
+    "build:documentation": "typedoc --out docs --name fireorm --readme README.md --mode file --gaID UA-133856278-1"
   },
   "repository": {
     "type": "git",
