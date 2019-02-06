@@ -96,15 +96,40 @@ describe('BaseRepository', () => {
 
     it('must filter with whereGreaterOrEqualThan', async () => {
       const list = await userRep
-        .whereGreaterOrEqualThan('birthDate', new Date(1978, 2, 9))
+        .whereGreaterOrEqualThan('birthDate', new Date('1978-03-09'))
         .find();
       expect(list.length).to.equal(2);
     });
 
-    it('must filter with whereLessThan');
-    it('must filter with whereLessOrEqualThan');
-    it('must filter with whereArrayCointain');
-    it('must filter with two or more operators');
+    it('must filter with whereLessThan', async () => {
+      const list = await userRep
+        .whereLessThan('birthDate', new Date('1978-03-09'))
+        .find();
+      expect(list.length).to.equal(1);
+    });
+
+    it('must filter with whereLessOrEqualThan', async () => {
+      const list = await userRep
+        .whereLessOrEqualThan('birthDate', new Date('1978-03-09'))
+        .find();
+      expect(list.length).to.equal(2);
+    });
+
+    it('must filter with whereArrayCointain', async () => {
+      const list = await userRep
+        .whereArrayCointain('tags', 'geek')
+        .find();
+      expect(list.length).to.equal(1);
+      expect(list[0].id).to.equal('roy');
+    });
+    it('must filter with two or more operators', async () => {
+      const list = await userRep
+        .whereLessOrEqualThan('birthDate', new Date('1978-03-09'))
+        .whereArrayCointain('tags', 'nerd')
+        .find();
+      expect(list.length).to.equal(1);
+      expect(list[0].id).to.equal('moss');
+    });
   });
 
   // describe('must handle subcollections');

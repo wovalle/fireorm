@@ -12,6 +12,7 @@ export class User {
   firstName: string;
   lastName?: string;
   birthDate: Date;
+  tags: Array<string>
 }
 
 const getColFixture = () => {
@@ -21,6 +22,7 @@ const getColFixture = () => {
     firstName: 'Jen',
     lastName: 'Barber',
     birthDate: new Date('1978-03-09'),
+    tags: ['relationship-manager', 'heavy-smoker']
   });
 
   users.push({
@@ -28,12 +30,14 @@ const getColFixture = () => {
     firstName: 'Maurice',
     lastName: 'Moss',
     birthDate: new Date('1977-06-12'),
+    tags:['nerd', 'afro', 'youtuber']
   });
 
   users.push({
     id: 'roy',
     firstName: 'Roy',
     birthDate: new Date('1979-10-09'),
+    tags: ['geek', 'gamer', 'comics-reader']
   });
 
   return users.reduce((acc, cur) => {
