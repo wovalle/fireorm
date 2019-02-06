@@ -31,8 +31,8 @@
     "build:watch": "tsc -w",
     "test": "mocha --require ts-node/register src/*.spec.ts --recursively",
     "test:watch": "mocha --require ts-node/register src/*.spec.ts --watch-extensions ts --recursively -w",
-    "build:documentation": "typedoc --out docs --name fireorm --readme README.md --mode file --gaID UA-133856278-1 --excludeNotExported",
-    "deploy": "gh-pages-deploy"
+    "build:documentation": "typedoc --out docs --name fireorm --readme README.md --mode file --gaID UA-133856278-1 --excludeNotExported --exclude examples --exclude test",
+    "deploy:documentation": "gh-pages-deploy"
   },
   "repository": {
     "type": "git",
