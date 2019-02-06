@@ -117,7 +117,6 @@ export default class BaseFirestoreRepository<T extends { id: string }>
   }
 
   async create(item: T): Promise<T> {
-    // TODO: add branching tests
     if (item.id) {
       const found = await this.findById(item.id);
       if (found) {

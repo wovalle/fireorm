@@ -44,7 +44,8 @@ describe('BaseRepository', () => {
   });
 
   describe('create', () => {
-    it('must create item and return T', async () => {
+    it('should return T when an item is created');
+    it('must create items when id is passed', async () => {
       const entity = new Band();
       entity.id = 'perfect-circle';
       entity.name = 'A Perfect Circle';
@@ -53,6 +54,20 @@ describe('BaseRepository', () => {
 
       const band = await bandRepository.create(entity);
       expect(band.id).to.equal(entity.id);
+      expect(band.name).to.equal(entity.name);
+      expect(band.formationYear).to.equal(entity.formationYear);
+      expect(band.genres).to.equal(entity.genres);
+    });
+
+    it('must create items and assign a custom id if no id is passed', async () => {
+      const entity = new Band();
+      entity.name = 'The Pinapple Thief';
+      entity.formationYear = 1999;
+      entity.genres = ['progressive-rock'];
+
+      const band = await bandRepository.create(entity);
+      expect(typeof band.id).to.equal('string');
+      expect(band.id).not.to.be.undefined;
       expect(band.name).to.equal(entity.name);
       expect(band.formationYear).to.equal(entity.formationYear);
       expect(band.genres).to.equal(entity.genres);
