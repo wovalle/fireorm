@@ -79,6 +79,7 @@ describe('BaseRepository', () => {
     });
 
     it('must throw if item is not found', async () => {
+      //tslint:disable-next-line:rule1 no-void-expression
       expect(await bandRepository.delete('lol')).to.throw;
     });
   });

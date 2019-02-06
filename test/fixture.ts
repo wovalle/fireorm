@@ -11,6 +11,14 @@ export class BandEntity {
   albums: Array<Album>;
 }
 
+const getCollectionBoilerplate = (entity: string, hash: object) => ({
+  __collection__: {
+    [entity]: {
+      __doc__: hash,
+    },
+  },
+})
+
 const getColFixture = () => {
   const bands = new Array<BandEntity>();
 
@@ -57,13 +65,5 @@ const getColFixture = () => {
 
   return objectifyList(bands, ({albums, ...rest}) => ({...rest, ...getCollectionBoilerplate('albums', objectifyList(albums, a=>a))}))
 };
-
-const getCollectionBoilerplate = (entity: string, hash: object) => ({
-  __collection__: {
-    [entity]: {
-      __doc__: hash,
-    },
-  },
-})
 
 export const getFixture = () => getCollectionBoilerplate('bands', getColFixture());
