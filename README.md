@@ -5,21 +5,21 @@
 [![Typescript lang](https://img.shields.io/badge/Language-Typescript-Blue.svg)](https://www.typescriptlang.org)
 [![License](https://img.shields.io/npm/l/fireorm.svg?style=flat)](https://www.npmjs.com/package/fireorm)
 
-_:warning::heavy_exclamation_mark: Caution: This project is in **active** development. Documentation may not be totally up to date. APIs may change until stable_
+_:warning::heavy_exclamation_mark: Caution: This project is in **active** development. Documentation may not be totally up to date. APIs may change until 1.0._
 
 Fireorm is a tiny wrapper on top of firebase-admin that makes life easier when dealing with a Firestore database. Fireorm tries to ease the development of apps that rely on Firestore at the database layer by abstracting the access layer providing and familiar repository pattern. It basically helps us not worrying about Firestore details and focusing in what matters: adding cool new features!
 
-You can read more about the motivations and features of fireorm [on its introductory post](https://medium.com/p/ba7734644684).
+You can read more about the motivations and features of fireorm [on its introductory post](https://medium.com/p/ba7734644684). Also, the [API documentation](https://wovalle.github.io/fireorm) is available.
 
 ## Usage
 
 1. Install the npm package:
 
 ```bash
-yarn add typeorm
+yarn add typeorm  #or npm install typeorm 
 ```
 
-2. Initialize your firestore application ([documentation](https://firebase.google.com/docs/firestore/quickstart#initialize)):
+2. [Initialize](https://firebase.google.com/docs/firestore/quickstart#initialize) your firestore application:
 
 ```typescript
 import * as admin from 'firebase-admin';
@@ -37,7 +37,20 @@ firestore.settings({
 });
 ```
 
-3. Do cool stuff with fireorm!
+3. Create your firestore models!
+
+```typescript
+import { Collection } from 'fireorm';
+
+@Collection()
+class Todo {
+  id: string;
+  text: string;
+  done: Boolean;
+}
+```
+
+4. Do cool stuff with fireorm!
 
 ```typescript
 import { Collection, getRepository } from 'fireorm';
@@ -56,39 +69,33 @@ todo.text = "Check fireorm's Github Repository";
 todo.done = false;
 
 const todoDocument = await todoRepository.create(todo); // Create todo
-
 const mySuperTodoDocument = await todoRepository.findById(todoDocument.id); // Read todo
-
-mySuperTodoDocument.done = true;
 await todoRepository.update(mySuperTodoDocument); // Update todo
-
 await todoRepository.delete(mySuperTodoDocument.id); // Delete todo
 ```
-
-You can check the [API Documentation](https://wovalle.github.io/fireorm/) or a [tutorial](https://medium.com/p/ba7734644684).
 
 ## Development
 
 #### Initial Setup
 
 1.  Clone the project from github:
-    ```
-    git clone git@github.com:wovalle/fireorm.git
-    ```
+```bash
+git clone git@github.com:wovalle/fireorm.git
+```
 2.  Install the dependencies.
-    ```
-    yarn install
-    ```
+```bash
+yarn install # npm install
+```
 
 #### Testing
 
 You can run the tests with the following command:
 
-```
-yarn test
+```bash
+yarn test # or npm test
 ```
 
-Test files must follow the naming convention `*.test.ts` and run with [Mocha Test Runner](https://mochajs.org/).
+Test files must follow the naming convention `*.test.ts` and use [mocha](https://mochajs.org/) as the test runner.
 
 #### Release a new version
 
@@ -107,10 +114,10 @@ npm publish
 
 #### Update documentation
 
-- Fireorm uses [typedoc](https://typedoc.org/) to automatically generate API documentation, to run it:
+- Fireorm uses [typedoc](https://typedoc.org/) to automatically build the API documentation, to generate it:
 
 ```bash
-yarn build:documentation
+yarn build:documentation # or npm build:documentation 
 ```
 
 #### Deploy documentation
@@ -118,7 +125,7 @@ yarn build:documentation
 - API documentation is hosted in [Github Pages](https://pages.github.com/), to deploy a new version:
 
 ```bash
-yarn deploy:documentation
+yarn deploy:documentation # or npm deploy:documentation 
 ```
 
 ## Contributing
