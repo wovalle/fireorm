@@ -65,7 +65,7 @@ export default class QueryBuilder<T extends { id: string }>
     return this;
   }
 
-  whereArrayCointain(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
+  whereArrayContains(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
     this.queries.push({
       prop: prop.toString(),
       val,

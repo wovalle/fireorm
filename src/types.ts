@@ -35,7 +35,7 @@ export interface IQueryBuilder<T extends { id: string }> {
   whereGreaterOrEqualThan(prop: keyof T, val: IFirestoreVal): IQueryBuilder<T>;
   whereLessThan(prop: keyof T, val: IFirestoreVal): IQueryBuilder<T>;
   whereLessOrEqualThan(prop: keyof T, val: IFirestoreVal): IQueryBuilder<T>;
-  whereArrayCointain(prop: keyof T, val: IFirestoreVal): IQueryBuilder<T>;
+  whereArrayContains(prop: keyof T, val: IFirestoreVal): IQueryBuilder<T>;
   find(): Promise<T[]>;
 }
 

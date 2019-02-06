@@ -187,8 +187,8 @@ export default class BaseFirestoreRepository<T extends { id: string }>
     );
   }
 
-  whereArrayCointain(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
-    return new QueryBuilder<T>(this.firestoreCollection).whereArrayCointain(
+  whereArrayContains(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
+    return new QueryBuilder<T>(this.firestoreCollection).whereArrayContains(
       prop,
       val
     );
