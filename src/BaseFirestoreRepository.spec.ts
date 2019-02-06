@@ -49,8 +49,7 @@ describe('BaseRepository', () => {
       entity.id = 'perfect-circle';
       entity.name = 'A Perfect Circle';
       entity.formationYear = 1999;
-      entity.genres = ['alternative-rock', 'alternative-metal', 'hard-rock']
-
+      entity.genres = ['alternative-rock', 'alternative-metal', 'hard-rock'];
 
       const band = await bandRepository.create(entity);
       expect(band.id).to.equal(entity.id);
@@ -95,7 +94,9 @@ describe('BaseRepository', () => {
     });
 
     it('must filter with whereEqualTo', async () => {
-      const list = await bandRepository.whereEqualTo('name', 'Porcupine Tree').find();
+      const list = await bandRepository
+        .whereEqualTo('name', 'Porcupine Tree')
+        .find();
       expect(list.length).to.equal(1);
       expect(list[0].name).to.equal('Porcupine Tree');
     });
@@ -118,6 +119,7 @@ describe('BaseRepository', () => {
       const list = await bandRepository
         .whereLessThan('formationYear', 1983)
         .find();
+
       expect(list.length).to.equal(1);
     });
 
@@ -128,16 +130,16 @@ describe('BaseRepository', () => {
       expect(list.length).to.equal(2);
     });
 
-    it('must filter with whereArrayCointain', async () => {
+    it('must filter with whereArrayContains', async () => {
       const list = await bandRepository
-        .whereArrayCointain('genres', 'progressive-rock')
+        .whereArrayContains('genres', 'progressive-rock')
         .find();
       expect(list.length).to.equal(2);
     });
     it('must filter with two or more operators', async () => {
       const list = await bandRepository
         .whereLessOrEqualThan('formationYear', 1983)
-        .whereArrayCointain('genres', 'funk-rock')
+        .whereArrayContains('genres', 'funk-rock')
         .find();
       expect(list.length).to.equal(1);
       expect(list[0].id).to.equal('red-hot-chili-peppers');
@@ -153,7 +155,7 @@ describe('BaseRepository', () => {
 
     it('should be able to execute operations in the subcollection', async () => {
       const band = await bandRepository.findById('red-hot-chili-peppers');
-      const bestAlbum = await band.albums.findById('stadium-arcadium')
+      const bestAlbum = await band.albums.findById('stadium-arcadium');
       expect(bestAlbum.id).to.equal('stadium-arcadium');
     });
   });
