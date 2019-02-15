@@ -189,7 +189,7 @@ describe('BaseRepository', () => {
         const pt = await bandRepository.findById('porcupine-tree');
         const { releaseDate } = await pt.albums.findById('deadwing');
         expect(releaseDate).instanceOf(Date);
-        expect(releaseDate.toISOString()).to.equal('2005-03-25T00:00:00.000');
+        expect(releaseDate.toISOString()).to.equal('2005-03-25T00:00:00.000Z');
       });
     });
   });
