@@ -42,7 +42,7 @@ describe('Helpers', () => {
         }
       }
 
-      const rep = getRepository(Entity, firestore);
+      const rep = getRepository(Entity, firestore) as EntityRepo;
       expect(rep instanceof BaseFirestoreRepository).to.be.true;
       expect(rep.meaningOfLife()).to.eql(42);
     });

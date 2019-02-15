@@ -9,6 +9,7 @@ export class Band {
   id: string;
   name: string;
   formationYear: number;
+  lastShow: Date;
   genres: Array<string>;
   @SubCollection(Album)
   albums?: ISubCollection<Album>;
@@ -151,6 +152,7 @@ describe('BaseRepository', () => {
         .find();
       expect(list.length).to.equal(2);
     });
+
     it('must filter with two or more operators', async () => {
       const list = await bandRepository
         .whereLessOrEqualThan('formationYear', 1983)
@@ -160,6 +162,14 @@ describe('BaseRepository', () => {
       expect(list[0].id).to.equal('red-hot-chili-peppers');
     });
   });
+
+  describe('miscellanious', () => {
+    it('should correctly parse dates', async () => {
+      const pt = await bandRepository.findById('porcupine-tree');
+      expect(pt.lastShow).instanceOf(Date);
+      expect(pt.lastShow.toISOString()).to.equal("2010-10-14T00:00:00.000Z");
+    })
+  })
 
   describe('must handle subcollections', () => {
     it('should initialize subcollections', async () => {
@@ -173,5 +183,14 @@ describe('BaseRepository', () => {
       const bestAlbum = await band.albums.findById('stadium-arcadium');
       expect(bestAlbum.id).to.equal('stadium-arcadium');
     });
+
+    describe('miscellanious', () => {
+      it('should correctly parse dates', async () => {
+        const pt = await bandRepository.findById('porcupine-tree');
+        const deadwing = await pt.albums.findById('deadwing')
+        expect(deadwing.releaseDate).instanceOf(Date);
+        expect(deadwing.releaseDate.toISOString()).to.equal("2005-03-25T00:00:00.000Z");
+      })
+    })
   });
 });
