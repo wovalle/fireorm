@@ -1,8 +1,8 @@
-import MockFirebase from 'mock-cloud-firestore';
 import BaseFirestoreRepository from './BaseFirestoreRepository';
 import { getFixture, Album } from '../test/fixture';
 import { expect } from 'chai';
 import { Collection, SubCollection, ISubCollection } from '.';
+const MockFirebase = require('mock-cloud-firestore');
 
 @Collection('bands')
 export class Band {
@@ -167,9 +167,9 @@ describe('BaseRepository', () => {
     it('should correctly parse dates', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
       expect(pt.lastShow).instanceOf(Date);
-      expect(pt.lastShow.toISOString()).to.equal("2010-10-14T00:00:00.000Z");
-    })
-  })
+      expect(pt.lastShow.toISOString()).to.equal('2010-10-14T00:00:00.000Z');
+    });
+  });
 
   describe('must handle subcollections', () => {
     it('should initialize subcollections', async () => {
@@ -187,10 +187,10 @@ describe('BaseRepository', () => {
     describe('miscellanious', () => {
       it('should correctly parse dates', async () => {
         const pt = await bandRepository.findById('porcupine-tree');
-        const deadwing = await pt.albums.findById('deadwing')
-        expect(deadwing.releaseDate).instanceOf(Date);
-        expect(deadwing.releaseDate.toISOString()).to.equal("2005-03-25T00:00:00.000Z");
-      })
-    })
+        const { releaseDate } = await pt.albums.findById('deadwing');
+        expect(releaseDate).instanceOf(Date);
+        expect(releaseDate.toISOString()).to.equal('2005-03-25T00:00:00.000');
+      });
+    });
   });
 });

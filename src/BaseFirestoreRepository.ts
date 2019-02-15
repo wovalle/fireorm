@@ -6,12 +6,16 @@ import {
   IFirestoreVal,
   IQueryBuilder,
   FirestoreCollectionType,
+  IFireOrmQueryLine,
+  IQueryExecutor,
 } from './types';
 
 import {
   Firestore,
   DocumentSnapshot,
   CollectionReference,
+  WhereFilterOp,
+  QuerySnapshot,
 } from '@google-cloud/firestore';
 
 import QueryBuilder from './QueryBuilder';
@@ -19,7 +23,7 @@ import { getMetadataStorage } from './MetadataStorage';
 import { getRepository } from './helpers';
 
 export default class BaseFirestoreRepository<T extends { id: string }>
-  implements IRepository<T>, IQueryBuilder<T> {
+  implements IRepository<T>, IQueryBuilder<T>, IQueryExecutor<T> {
   public collectionType: FirestoreCollectionType;
   private firestoreCollection: CollectionReference;
 
@@ -91,6 +95,10 @@ export default class BaseFirestoreRepository<T extends { id: string }>
     return entity;
   };
 
+  private extractTFromColSnap = (q: QuerySnapshot): T[] => {
+    return q.docs.map(this.extractTFromDocSnap);
+  };
+
   private parseTimestamp = (obj: T): T => {
     Object.keys(obj).forEach(key => {
       if (!obj[key]) return;
@@ -149,47 +157,40 @@ export default class BaseFirestoreRepository<T extends { id: string }>
   }
 
   find(): Promise<T[]> {
-    return new QueryBuilder<T>(this.firestoreCollection).find();
+    return new QueryBuilder<T>(this).find();
+  }
+
+  execute(queries: Array<IFireOrmQueryLine>): Promise<T[]> {
+    return queries
+      .reduce((acc, cur) => {
+        const op = cur.operator as WhereFilterOp;
+        return acc.where(cur.prop, op, cur.val);
+      }, this.firestoreCollection)
+      .get()
+      .then(this.extractTFromColSnap);
   }
 
   whereEqualTo(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
-    return new QueryBuilder<T>(this.firestoreCollection).whereEqualTo(
-      prop,
-      val
-    );
+    return new QueryBuilder<T>(this).whereEqualTo(prop, val);
   }
 
   whereGreaterThan(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
-    return new QueryBuilder<T>(this.firestoreCollection).whereGreaterThan(
-      prop,
-      val
-    );
+    return new QueryBuilder<T>(this).whereGreaterThan(prop, val);
   }
 
   whereGreaterOrEqualThan(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
-    return new QueryBuilder<T>(
-      this.firestoreCollection
-    ).whereGreaterOrEqualThan(prop, val);
+    return new QueryBuilder<T>(this).whereGreaterOrEqualThan(prop, val);
   }
 
   whereLessThan(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
-    return new QueryBuilder<T>(this.firestoreCollection).whereLessThan(
-      prop,
-      val
-    );
+    return new QueryBuilder<T>(this).whereLessThan(prop, val);
   }
 
   whereLessOrEqualThan(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
-    return new QueryBuilder<T>(this.firestoreCollection).whereLessOrEqualThan(
-      prop,
-      val
-    );
+    return new QueryBuilder<T>(this).whereLessOrEqualThan(prop, val);
   }
 
   whereArrayContains(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
-    return new QueryBuilder<T>(this.firestoreCollection).whereArrayContains(
-      prop,
-      val
-    );
+    return new QueryBuilder<T>(this).whereArrayContains(prop, val);
   }
 }

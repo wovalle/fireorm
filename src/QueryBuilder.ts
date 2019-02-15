@@ -4,21 +4,16 @@ import {
   IFirestoreVal,
   FirestoreOperators,
   IQueryBuilderResult,
+  IQueryExecutor,
 } from './types';
-
-import {
-  WhereFilterOp,
-  QuerySnapshot,
-  CollectionReference,
-} from '@google-cloud/firestore';
 
 export default class QueryBuilder<T extends { id: string }>
   implements IQueryBuilder<T> {
+  protected queries: Array<IFireOrmQueryLine> = [];
+
   // TODO: validate not doing range fields in different
   // fields if the indexes are not created
-  constructor(protected firestoreCollection: CollectionReference) {}
-
-  protected queries: Array<IFireOrmQueryLine> = [];
+  constructor(protected executor: IQueryExecutor<T>) {}
 
   whereEqualTo(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
     this.queries.push({
@@ -74,28 +69,7 @@ export default class QueryBuilder<T extends { id: string }>
     return this;
   }
 
-  getQuery(): IQueryBuilderResult {
-    return this.queries;
-  }
-
-  // TODO: this isn't the place for this
-  private extractTFromColSnap(q: QuerySnapshot): T[] {
-    return q.docs
-      .map(d => d.data() as T)
-      .map(t => {
-        // HACK: id sanity check
-        t.id = `${t.id}`;
-        return t;
-      });
-  }
-
   find(): Promise<T[]> {
-    return this.queries
-      .reduce((acc, cur) => {
-        const op = cur.operator as WhereFilterOp;
-        return acc.where(cur.prop, op, cur.val);
-      }, this.firestoreCollection)
-      .get()
-      .then(this.extractTFromColSnap);
+    return this.executor.execute(this.queries);
   }
 }
