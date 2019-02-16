@@ -1,3 +1,5 @@
+import { IEntity } from './types';
+
 export interface IMetadataStorage {
   get(): any;
 }
@@ -25,7 +27,7 @@ export interface RepositoryMetadata {
 export class MetadataStorage {
   readonly collections: CollectionMetadata[] = [];
   readonly subCollections: SubCollectionMetadata[] = [];
-  readonly repositories: RepositoryMetadata[] = [];
+  readonly repositories: Map<IEntity, RepositoryMetadata> = new Map();
 }
 
 export const getMetadataStorage = (

@@ -1,9 +1,10 @@
 import { Firestore } from '@google-cloud/firestore';
 import { getMetadataStorage } from './MetadataStorage';
 import BaseFirestoreRepository from './BaseFirestoreRepository';
+import { IEntity } from './types';
 
-export function getRepository<T extends { id: string }>(
-  entity: { new (): T },
+export function getRepository(
+  entity: IEntity,
   db: Firestore,
   docId?: string,
   subColName?: string
@@ -11,8 +12,8 @@ export function getRepository<T extends { id: string }>(
   return _getRepository(entity, 'default', db, docId, subColName);
 }
 
-export function getCustomRepository<T extends { id: string }>(
-  entity: { new (): T },
+export function getCustomRepository(
+  entity: IEntity,
   db: Firestore,
   docId?: string,
   subColName?: string
@@ -20,8 +21,8 @@ export function getCustomRepository<T extends { id: string }>(
   return _getRepository(entity, 'custom', db, docId, subColName);
 }
 
-export function getBaseRepository<T extends { id: string }>(
-  entity: { new (): T },
+export function getBaseRepository(
+  entity: IEntity,
   db: Firestore,
   docId?: string,
   subColName?: string
@@ -31,16 +32,14 @@ export function getBaseRepository<T extends { id: string }>(
 
 type RepositoryType = 'default' | 'base' | 'custom';
 
-function _getRepository<T extends { id: string }>(
-  entity: { new (): T },
+function _getRepository<T extends IEntity>(
+  entity: IEntity,
   repositoryType: RepositoryType,
   db: Firestore,
   docId?: string,
   subColName?: string
-) {
-  const repository = getMetadataStorage().repositories.find(
-    c => c.entity === entity
-  );
+): BaseFirestoreRepository<T> {
+  const repository = getMetadataStorage().repositories.get(entity);
 
   if (repositoryType === 'custom' && !repository) {
     throw new Error(`'${entity.name}' does not have a custom repository.`);
