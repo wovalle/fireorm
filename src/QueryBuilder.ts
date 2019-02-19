@@ -3,11 +3,11 @@ import {
   IFireOrmQueryLine,
   IFirestoreVal,
   FirestoreOperators,
-  IQueryBuilderResult,
   IQueryExecutor,
+  IEntity,
 } from './types';
 
-export default class QueryBuilder<T extends { id: string }>
+export default class QueryBuilder<T extends IEntity>
   implements IQueryBuilder<T> {
   protected queries: Array<IFireOrmQueryLine> = [];
 
