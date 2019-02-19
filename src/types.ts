@@ -47,6 +47,5 @@ export type ISubCollection<T extends { id: string }> = IRepository<T> &
   IQueryBuilder<T>;
 
 export interface IEntity {
-  new ();
   id: string;
 }

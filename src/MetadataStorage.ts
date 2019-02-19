@@ -1,4 +1,5 @@
 import { IEntity } from './types';
+import { Firestore } from '@google-cloud/firestore';
 
 export interface IMetadataStorage {
   get(): any;
@@ -27,7 +28,11 @@ export interface RepositoryMetadata {
 export class MetadataStorage {
   readonly collections: CollectionMetadata[] = [];
   readonly subCollections: SubCollectionMetadata[] = [];
-  readonly repositories: Map<IEntity, RepositoryMetadata> = new Map();
+  readonly repositories: Map<
+    { new (): IEntity },
+    RepositoryMetadata
+  > = new Map();
+  public firestoreRef: Firestore = null;
 }
 
 export const getMetadataStorage = (
@@ -35,7 +40,17 @@ export const getMetadataStorage = (
 ): MetadataStorage => {
   const global = storage.get();
 
-  if (!global.metadataStorage) global.metadataStorage = new MetadataStorage();
+  if (!global.metadataStorage) {
+    global.metadataStorage = new MetadataStorage();
+  }
 
   return global.metadataStorage;
+};
+
+export const Initialize = (
+  firestore: Firestore,
+  storage: IMetadataStorage = globalStorage
+): void => {
+  const metadataStorage = getMetadataStorage(storage);
+  metadataStorage.firestoreRef = firestore;
 };

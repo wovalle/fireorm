@@ -1,7 +1,7 @@
 import BaseFirestoreRepository from './BaseFirestoreRepository';
 import { getFixture, Album } from '../test/fixture';
 import { expect } from 'chai';
-import { Collection, SubCollection, ISubCollection } from '.';
+import { Collection, SubCollection, ISubCollection, Initialize } from '.';
 const MockFirebase = require('mock-cloud-firestore');
 
 @Collection('bands')
@@ -15,7 +15,6 @@ export class Band {
   albums?: ISubCollection<Album>;
 }
 
-// TODO: explicitely enforce entities to extend {id: string} (IEntity)
 class BandRepository extends BaseFirestoreRepository<Band> {}
 
 describe('BaseRepository', () => {
@@ -28,7 +27,8 @@ describe('BaseRepository', () => {
     });
 
     const firestore = firebase.firestore();
-    bandRepository = new BandRepository(firestore, 'bands');
+    Initialize(firestore);
+    bandRepository = new BandRepository('bands');
   });
 
   describe('findById', () => {

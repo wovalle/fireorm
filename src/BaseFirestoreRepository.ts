@@ -8,6 +8,7 @@ import {
   FirestoreCollectionType,
   IFireOrmQueryLine,
   IQueryExecutor,
+  IEntity,
 } from './types';
 
 import {
@@ -20,36 +21,36 @@ import {
 
 import QueryBuilder from './QueryBuilder';
 import { getMetadataStorage } from './MetadataStorage';
-import { getRepository } from './helpers';
+import { GetRepository } from './helpers';
 
-export default class BaseFirestoreRepository<T extends { id: string }>
+export default class BaseFirestoreRepository<T extends IEntity>
   implements IRepository<T>, IQueryBuilder<T>, IQueryExecutor<T> {
   public collectionType: FirestoreCollectionType;
   private firestoreCollection: CollectionReference;
 
-  constructor(db: Firestore, colName: string);
-  constructor(
-    db: Firestore,
-    colName: string,
-    docId: string,
-    subColName: string
-  );
+  constructor(colName: string);
+  constructor(colName: string, docId: string, subColName: string);
 
   constructor(
-    protected db: Firestore,
     protected colName: string,
     protected docId?: string,
     protected subColName?: string
   ) {
+    const { firestoreRef } = getMetadataStorage();
+
+    if (!firestoreRef) {
+      throw new Error('Firestore must be initialized first');
+    }
+
     if (this.docId) {
       this.collectionType = FirestoreCollectionType.subcollection;
-      this.firestoreCollection = this.db
+      this.firestoreCollection = firestoreRef
         .collection(this.colName)
         .doc(this.docId)
         .collection(this.subColName);
     } else {
       this.collectionType = FirestoreCollectionType.collection;
-      this.firestoreCollection = this.db.collection(this.colName);
+      this.firestoreCollection = firestoreRef.collection(this.colName);
     }
   }
 
@@ -82,9 +83,8 @@ export default class BaseFirestoreRepository<T extends { id: string }>
 
       subcollections.forEach(subCol => {
         Object.assign(entity, {
-          [subCol.name]: getRepository(
+          [subCol.name]: GetRepository(
             subCol.entity as any,
-            this.db,
             doc.id,
             subCol.name
           ),

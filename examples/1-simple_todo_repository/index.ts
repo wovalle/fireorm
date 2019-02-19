@@ -1,5 +1,5 @@
 import * as admin from 'firebase-admin';
-import { getRepository, Collection } from '../../src';
+import { GetRepository, Collection, Initialize } from '../../src';
 
 const serviceAccount = require('../firestore.creds.json');
 
@@ -12,15 +12,16 @@ const firestore = admin.firestore();
 firestore.settings({
   timestampsInSnapshots: true,
 });
+Initialize(firestore);
 
 @Collection('todos')
 class Todo {
-  id: string = '';
+  id: string;
   text: string;
   done: Boolean;
 }
 
-const todoRepository = getRepository(Todo, firestore);
+const todoRepository = GetRepository(Todo);
 
 const run = async () => {
   // Create a todo
