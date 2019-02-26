@@ -19,18 +19,18 @@ describe('QueryBuilder', () => {
   beforeEach(() => {
     executor = new FakeExecutor();
   });
-  it('must build query', () => {
+  it('must build query', async () => {
     const queryBuilder = new QueryBuilder<Test>(executor);
-    queryBuilder.whereEqualTo('id', '1').find();
+    await queryBuilder.whereEqualTo('id', '1').find();
     expect(executor.queries.length).to.eql(1);
     expect(executor.queries[0].operator).to.eql(FirestoreOperators.equal);
     expect(executor.queries[0].prop).to.eql('id');
     expect(executor.queries[0].val).to.eql('1');
   });
 
-  it('must pipe queries', () => {
+  it('must pipe queries', async () => {
     const queryBuilder = new QueryBuilder<Test>(executor);
-    queryBuilder
+    await queryBuilder
       .whereEqualTo('id', '0')
       .whereEqualTo('id', '1')
       .whereEqualTo('id', '2')
