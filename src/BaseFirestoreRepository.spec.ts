@@ -1,20 +1,20 @@
-import MockFirebase from 'mock-cloud-firestore';
 import BaseFirestoreRepository from './BaseFirestoreRepository';
 import { getFixture, Album } from '../test/fixture';
 import { expect } from 'chai';
-import { Collection, SubCollection, ISubCollection } from '.';
+import { Collection, SubCollection, ISubCollection, Initialize } from '.';
+const MockFirebase = require('mock-cloud-firestore');
 
 @Collection('bands')
 export class Band {
   id: string;
   name: string;
   formationYear: number;
+  lastShow: Date;
   genres: Array<string>;
   @SubCollection(Album)
   albums?: ISubCollection<Album>;
 }
 
-// TODO: explicitely enforce entities to extend {id: string} (IEntity)
 class BandRepository extends BaseFirestoreRepository<Band> {}
 
 describe('BaseRepository', () => {
@@ -27,7 +27,8 @@ describe('BaseRepository', () => {
     });
 
     const firestore = firebase.firestore();
-    bandRepository = new BandRepository(firestore, 'bands');
+    Initialize(firestore);
+    bandRepository = new BandRepository('bands');
   });
 
   describe('findById', () => {
@@ -151,6 +152,7 @@ describe('BaseRepository', () => {
         .find();
       expect(list.length).to.equal(2);
     });
+
     it('must filter with two or more operators', async () => {
       const list = await bandRepository
         .whereLessOrEqualThan('formationYear', 1983)
@@ -158,6 +160,14 @@ describe('BaseRepository', () => {
         .find();
       expect(list.length).to.equal(1);
       expect(list[0].id).to.equal('red-hot-chili-peppers');
+    });
+  });
+
+  describe('miscellanious', () => {
+    it('should correctly parse dates', async () => {
+      const pt = await bandRepository.findById('porcupine-tree');
+      expect(pt.lastShow).instanceOf(Date);
+      expect(pt.lastShow.toISOString()).to.equal('2010-10-14T00:00:00.000Z');
     });
   });
 
@@ -172,6 +182,15 @@ describe('BaseRepository', () => {
       const band = await bandRepository.findById('red-hot-chili-peppers');
       const bestAlbum = await band.albums.findById('stadium-arcadium');
       expect(bestAlbum.id).to.equal('stadium-arcadium');
+    });
+
+    describe('miscellanious', () => {
+      it('should correctly parse dates', async () => {
+        const pt = await bandRepository.findById('porcupine-tree');
+        const { releaseDate } = await pt.albums.findById('deadwing');
+        expect(releaseDate).instanceOf(Date);
+        expect(releaseDate.toISOString()).to.equal('2005-03-25T00:00:00.000Z');
+      });
     });
   });
 });

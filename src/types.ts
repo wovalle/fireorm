@@ -39,6 +39,10 @@ export interface IQueryBuilder<T extends { id: string }> {
   find(): Promise<T[]>;
 }
 
+export interface IQueryExecutor<T> {
+  execute(queries: IFireOrmQueryLine[]): Promise<T[]>;
+}
+
 export type ISubCollection<T extends { id: string }> = IRepository<T> &
   IQueryBuilder<T>;
 

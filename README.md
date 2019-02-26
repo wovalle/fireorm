@@ -16,13 +16,14 @@ You can read more about the motivations and features of fireorm [on its introduc
 1. Install the npm package:
 
 ```bash
-yarn add typeorm  #or npm install typeorm 
+yarn add typeorm  #or npm install typeorm
 ```
 
 2. [Initialize](https://firebase.google.com/docs/firestore/quickstart#initialize) your firestore application:
 
 ```typescript
 import * as admin from 'firebase-admin';
+import * as fireorm from 'fireorm';
 
 const serviceAccount = require('../firestore.creds.json');
 
@@ -35,6 +36,7 @@ const firestore = admin.firestore();
 firestore.settings({
   timestampsInSnapshots: true,
 });
+fireorm.Initialize(firestore);
 ```
 
 3. Create your firestore models!
@@ -79,10 +81,13 @@ await todoRepository.delete(mySuperTodoDocument.id); // Delete todo
 #### Initial Setup
 
 1.  Clone the project from github:
+
 ```bash
 git clone git@github.com:wovalle/fireorm.git
 ```
+
 2.  Install the dependencies.
+
 ```bash
 yarn install # npm install
 ```
@@ -117,7 +122,7 @@ npm publish
 - Fireorm uses [typedoc](https://typedoc.org/) to automatically build the API documentation, to generate it:
 
 ```bash
-yarn build:documentation # or npm build:documentation 
+yarn build:documentation # or npm build:documentation
 ```
 
 #### Deploy documentation
@@ -125,7 +130,7 @@ yarn build:documentation # or npm build:documentation
 - API documentation is hosted in [Github Pages](https://pages.github.com/), to deploy a new version:
 
 ```bash
-yarn deploy:documentation # or npm deploy:documentation 
+yarn deploy:documentation # or npm deploy:documentation
 ```
 
 ## Contributing

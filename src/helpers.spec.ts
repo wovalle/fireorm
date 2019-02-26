@@ -1,12 +1,13 @@
 import { expect } from 'chai';
-import MockFirebase from 'mock-cloud-firestore';
-import sinon from 'sinon';
+import * as sinon from 'sinon';
+const MockFirebase = require('mock-cloud-firestore');
 
 import CustomRepository from './Decorators/CustomRepository';
 import Collection from './Decorators/Collection';
 
 import BaseFirestoreRepository from './BaseFirestoreRepository';
-import { getRepository, getBaseRepository } from './helpers';
+import { GetRepository, GetBaseRepository } from './helpers';
+import { Initialize } from './MetadataStorage';
 
 describe('Helpers', () => {
   let firestore = null;
@@ -20,6 +21,7 @@ describe('Helpers', () => {
       .returns(metadataStorage);
 
     firestore = firebase.firestore();
+    Initialize(firestore);
   });
 
   afterEach(() => {
@@ -28,7 +30,7 @@ describe('Helpers', () => {
 
   after(() => stub.restore());
 
-  describe('getRepository', () => {
+  describe('GetRepository', () => {
     it('should get custom repositories', () => {
       @Collection()
       class Entity {
@@ -42,7 +44,7 @@ describe('Helpers', () => {
         }
       }
 
-      const rep = getRepository(Entity, firestore);
+      const rep = GetRepository(Entity) as EntityRepo;
       expect(rep instanceof BaseFirestoreRepository).to.be.true;
       expect(rep.meaningOfLife()).to.eql(42);
     });
@@ -52,7 +54,7 @@ describe('Helpers', () => {
         id: string;
       }
 
-      const rep = getRepository(Entity, firestore);
+      const rep = GetRepository(Entity);
       expect(rep instanceof BaseFirestoreRepository).to.be.true;
     });
     it('should throw if trying to get an unexistent collection', () => {
@@ -60,12 +62,12 @@ describe('Helpers', () => {
         id: string;
       }
 
-      expect(() => getRepository(Entity, firestore)).to.throw(
+      expect(() => GetRepository(Entity)).to.throw(
         "'Entity' is not a valid collection"
       );
     });
   });
-  describe('getBaseRepository', () => {
+  describe('GetBaseRepository', () => {
     it('should get base repository even if a custom one is registered', () => {
       @Collection()
       class Entity {
@@ -79,7 +81,7 @@ describe('Helpers', () => {
         }
       }
 
-      const rep = getBaseRepository(Entity, firestore);
+      const rep = GetBaseRepository(Entity);
       expect(rep instanceof BaseFirestoreRepository).to.be.true;
       expect(rep['meaningOfLife']).to.be.undefined;
     });
@@ -89,7 +91,7 @@ describe('Helpers', () => {
         id: string;
       }
 
-      expect(() => getRepository(Entity, firestore)).to.throw(
+      expect(() => GetRepository(Entity)).to.throw(
         "'Entity' is not a valid collection"
       );
     });

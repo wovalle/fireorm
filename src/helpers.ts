@@ -1,32 +1,29 @@
-import { Firestore } from '@google-cloud/firestore';
 import { getMetadataStorage } from './MetadataStorage';
 import BaseFirestoreRepository from './BaseFirestoreRepository';
+import { IEntity } from './types';
 
-export function getRepository<T extends { id: string }>(
-  entity: { new (): T },
-  db: Firestore,
+export function GetRepository(
+  entity: { new (): IEntity },
   docId?: string,
   subColName?: string
 ) {
-  return _getRepository(entity, 'default', db, docId, subColName);
+  return _getRepository(entity, 'default', docId, subColName);
 }
 
-export function getCustomRepository<T extends { id: string }>(
-  entity: { new (): T },
-  db: Firestore,
+export function GetCustomRepository(
+  entity: { new (): IEntity },
   docId?: string,
   subColName?: string
 ) {
-  return _getRepository(entity, 'custom', db, docId, subColName);
+  return _getRepository(entity, 'custom', docId, subColName);
 }
 
-export function getBaseRepository<T extends { id: string }>(
-  entity: { new (): T },
-  db: Firestore,
+export function GetBaseRepository(
+  entity: { new (): IEntity },
   docId?: string,
   subColName?: string
 ) {
-  return _getRepository(entity, 'base', db, docId, subColName);
+  return _getRepository(entity, 'base', docId, subColName);
 }
 
 type RepositoryType = 'default' | 'base' | 'custom';
@@ -34,13 +31,21 @@ type RepositoryType = 'default' | 'base' | 'custom';
 function _getRepository<T extends { id: string }>(
   entity: { new (): T },
   repositoryType: RepositoryType,
-  db: Firestore,
   docId?: string,
   subColName?: string
-) {
-  const repository = getMetadataStorage().repositories.find(
-    c => c.entity === entity
-  );
+): BaseFirestoreRepository<T> {
+  const {
+    firestoreRef,
+    repositories,
+    subCollections,
+    collections,
+  } = getMetadataStorage();
+
+  if (!firestoreRef) {
+    throw new Error('Firestore must be initialized first');
+  }
+
+  const repository = repositories.get(entity);
 
   if (repositoryType === 'custom' && !repository) {
     throw new Error(`'${entity.name}' does not have a custom repository.`);
@@ -50,15 +55,13 @@ function _getRepository<T extends { id: string }>(
 
   // If docId exists, this is a subcollection. Get parent collection name
   if (docId) {
-    const subCollection = getMetadataStorage().subCollections.find(
-      c => c.entity === entity
-    );
+    const subCollection = subCollections.find(c => c.entity === entity);
 
     if (!subCollection) {
       throw new Error(`'${entity.name}' is not a valid subcollection.`);
     }
 
-    const parentCollection = getMetadataStorage().collections.find(
+    const parentCollection = collections.find(
       c => c.entity === subCollection.parentEntity
     );
 
@@ -69,9 +72,7 @@ function _getRepository<T extends { id: string }>(
     }
     collectionName = parentCollection.name;
   } else {
-    const collection = getMetadataStorage().collections.find(
-      c => c.entity === entity
-    );
+    const collection = collections.find(c => c.entity === entity);
 
     if (!collection) {
       throw new Error(`'${entity.name}' is not a valid collection`);
@@ -84,18 +85,8 @@ function _getRepository<T extends { id: string }>(
     repositoryType === 'custom' ||
     (repositoryType === 'default' && repository)
   ) {
-    return new (repository.target as any)(
-      db,
-      collectionName,
-      docId,
-      subColName
-    );
+    return new (repository.target as any)(collectionName, docId, subColName);
   } else {
-    return new BaseFirestoreRepository<T>(
-      db,
-      collectionName,
-      docId,
-      subColName
-    );
+    return new BaseFirestoreRepository<T>(collectionName, docId, subColName);
   }
 }
