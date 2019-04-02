@@ -11,3 +11,7 @@ Just an simple example of how to use repositories.
 ### Example 2: Custom repositories
 
 An example of how to extend repositories to add custom methods.
+
+### Example 3: Subcollections
+
+An example in how to do CRUD operations to SubCollections.

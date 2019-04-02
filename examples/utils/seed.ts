@@ -1,4 +1,4 @@
-import { Band } from './entities';
+import { Band, Album, FullBand } from './entities';
 
 export const getInitialData = () => {
   return [
@@ -51,4 +51,24 @@ export const getInitialSeed = () => {
       entity.formationYear = b.formationYear;
       return entity;
     });
+};
+
+export const getInitialSeedWithSubcollections = () => {
+  return getInitialData().map(({ albums, ...b }) => {
+    const albumsEntities = albums.map(a => {
+      const album = new Album();
+      album.id = a.id;
+      album.name = a.name;
+      album.year = a.year;
+      return album;
+    });
+
+    const band = new FullBand();
+    band.id = b.id;
+    band.name = b.name;
+    band.genres = b.genres;
+    band.formationYear = b.formationYear;
+
+    return { band, albums: albumsEntities };
+  });
 };
