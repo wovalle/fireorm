@@ -13,6 +13,10 @@ export class Band {
   genres: Array<string>;
   @SubCollection(Album)
   albums?: ISubCollection<Album>;
+
+  getLastShowYear() {
+    return this.lastShow.getFullYear();
+  }
 }
 
 class BandRepository extends BaseFirestoreRepository<Band> {}
@@ -67,7 +71,16 @@ describe('BaseRepository', () => {
       expect(pt.id).to.equal('porcupine-tree');
       expect(pt.name).to.equal('Porcupine Tree');
     });
-    it('must return T'); // TODO: Right now roy instanceof User === false, investigate
+    /*
+      Because of the useful generic type reflection of typescript this
+      test is not stable. Might be a good idea to revisit later.
+     */
+    it('must return T');
+    it('must have proper getters', async () => {
+      const pt = await bandRepository.findById('porcupine-tree');
+      expect(pt.getLastShowYear()).to.eql(2010);
+    });
+
     it('return null if not found', async () => {
       const sw = await bandRepository.findById('steven-wilson');
       expect(sw).to.be.null;
