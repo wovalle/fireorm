@@ -12,7 +12,6 @@ import {
 } from './types';
 
 import {
-  Firestore,
   DocumentSnapshot,
   CollectionReference,
   WhereFilterOp,
