@@ -72,6 +72,7 @@ export default class BaseFirestoreRepository<T extends IEntity>
       Here we're casting to any because plainToClass returns a type
       that cannot be implicitly casted to T, might revisit later.
     */
+    // tslint:disable-next-line:no-unnecessary-type-assertion
     const entity = plainToClass(
       collection.entity as any,
       this.parseTimestamp(doc.data() as T)
