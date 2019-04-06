@@ -9,12 +9,8 @@ const globalStorage = {
   get: (): any => global,
 };
 
-interface Constructable<T> {
-  new (): T;
-}
-
 export interface CollectionMetadata {
-  entity: Constructable<Function>;
+  entity: Function;
   name: string;
 }
 

@@ -1,4 +1,4 @@
-import QueryBuilder from "./QueryBuilder";
+import QueryBuilder from './QueryBuilder';
 
 // TODO: separate Read/Write interfaces to achieve readonly?
 export interface IRepository<T extends { id: string }> {
@@ -32,7 +32,7 @@ export interface IFireOrmQueryLine {
 
 export type IQueryBuilderResult = IFireOrmQueryLine[];
 
-export interface IQueryBuilder<T extends { id: string }> {
+export interface IQueryBuilder<T extends IEntity> {
   whereEqualTo(prop: keyof T, val: IFirestoreVal): IQueryBuilder<T>;
   whereGreaterThan(prop: keyof T, val: IFirestoreVal): IQueryBuilder<T>;
   whereGreaterOrEqualThan(prop: keyof T, val: IFirestoreVal): IQueryBuilder<T>;
@@ -46,7 +46,7 @@ export interface IQueryExecutor<T> {
   execute(queries: IFireOrmQueryLine[], limitVal?: number): Promise<T[]>;
 }
 
-export type ISubCollection<T extends { id: string }> = IRepository<T> &
+export type ISubCollection<T extends IEntity> = IRepository<T> &
   IQueryBuilder<T>;
 
 export interface IEntity {

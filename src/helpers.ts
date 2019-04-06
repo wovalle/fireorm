@@ -28,7 +28,7 @@ export function GetBaseRepository<T extends IEntity>(
 
 type RepositoryType = 'default' | 'base' | 'custom';
 
-function _getRepository<T extends { id: string }>(
+function _getRepository<T extends IEntity>(
   entity: { new (): T },
   repositoryType: RepositoryType,
   docId?: string,
