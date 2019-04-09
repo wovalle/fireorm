@@ -1,6 +1,6 @@
 import BaseFirestoreRepository from './BaseFirestoreRepository';
 import { getFixture, Album } from '../test/fixture';
-import { expect, assert } from 'chai';
+import { expect } from 'chai';
 import { Collection, SubCollection, ISubCollection, Initialize } from '.';
 const MockFirebase = require('mock-cloud-firestore');
 
