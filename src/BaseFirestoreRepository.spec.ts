@@ -1,6 +1,6 @@
 import BaseFirestoreRepository from './BaseFirestoreRepository';
 import { getFixture, Album } from '../test/fixture';
-import { expect } from 'chai';
+import { expect, assert } from 'chai';
 import { Collection, SubCollection, ISubCollection, Initialize } from '.';
 const MockFirebase = require('mock-cloud-firestore');
 
@@ -45,7 +45,17 @@ describe('BaseRepository', () => {
   });
 
   describe('create', () => {
-    it('should return T when an item is created');
+    it('should return T when an item is created', async () => {
+      const entity = new Band();
+      entity.id = 'perfect-circle';
+      entity.name = 'A Perfect Circle';
+      entity.formationYear = 1999;
+      entity.genres = ['alternative-rock', 'alternative-metal', 'hard-rock'];
+
+      const band = await bandRepository.create(entity);
+      expect(band).to.be.an.instanceof(Band);
+    });
+
     it('must create items when id is passed', async () => {
       const entity = new Band();
       entity.id = 'perfect-circle';
