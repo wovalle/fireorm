@@ -40,7 +40,7 @@ export interface IQueryBuilder<T extends { id: string }> {
 }
 
 export interface IQueryExecutor<T> {
-  execute(queries: IFireOrmQueryLine[]): Promise<T[]>;
+  execute(queries: IFireOrmQueryLine[], limitVal?: number): Promise<T[]>;
 }
 
 export type ISubCollection<T extends { id: string }> = IRepository<T> &

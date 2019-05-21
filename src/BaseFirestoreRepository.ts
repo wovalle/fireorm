@@ -155,18 +155,28 @@ export default class BaseFirestoreRepository<T extends IEntity>
     await this.firestoreCollection.doc(id).delete();
   }
 
+  limit(limit: number) {
+    return this.firestoreCollection
+      .limit(limit)
+      .get()
+      .then(this.extractTFromColSnap);
+  }
+
   find(): Promise<T[]> {
     return new QueryBuilder<T>(this).find();
   }
 
-  execute(queries: Array<IFireOrmQueryLine>): Promise<T[]> {
-    return queries
+  execute(queries: Array<IFireOrmQueryLine>, limitVal?: number): Promise<T[]> {
+    let query = queries
       .reduce((acc, cur) => {
         const op = cur.operator as WhereFilterOp;
         return acc.where(cur.prop, op, cur.val);
-      }, this.firestoreCollection)
-      .get()
-      .then(this.extractTFromColSnap);
+      }, this.firestoreCollection);
+      if (limitVal) {
+        query = query.limit(limitVal)
+      }
+      return query.get()
+        .then(this.extractTFromColSnap);
   }
 
   whereEqualTo(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {

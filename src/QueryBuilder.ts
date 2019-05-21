@@ -10,6 +10,7 @@ import {
 export default class QueryBuilder<T extends IEntity>
   implements IQueryBuilder<T> {
   protected queries: Array<IFireOrmQueryLine> = [];
+  protected limitVal: number;
 
   // TODO: validate not doing range fields in different
   // fields if the indexes are not created
@@ -69,7 +70,12 @@ export default class QueryBuilder<T extends IEntity>
     return this;
   }
 
+  limit(limit: number): QueryBuilder<T> {
+    this.limitVal = limit;
+    return this;
+  }
+
   find(): Promise<T[]> {
-    return this.executor.execute(this.queries);
+    return this.executor.execute(this.queries, this.limitVal);
   }
 }

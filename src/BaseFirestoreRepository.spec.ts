@@ -31,6 +31,23 @@ describe('BaseRepository', () => {
     bandRepository = new BandRepository('bands');
   });
 
+  describe('limit', () => {
+    it('must limit the documents in a collection', async () => {
+      const twoBands = await bandRepository.limit(2);
+      console.log(twoBands.length);
+      expect(twoBands.length).to.equal(2);
+    });
+
+    it('must limit the results of a query', async () => {
+      const eightiesBands = await bandRepository
+        .whereGreaterOrEqualThan('formationYear', 1980)
+        .limit(1)
+        .find();
+      console.log(eightiesBands);
+      expect(eightiesBands.length).to.equal(1);
+    });
+  })
+
   describe('findById', () => {
     it('must find by id', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
