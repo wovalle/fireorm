@@ -44,6 +44,14 @@ describe('BaseRepository', () => {
         .find();
       expect(eightiesBands.length).to.equal(1);
     });
+
+    it('must not throw any exceptions if a query with no results is limited', async () => {
+      const oldBands = await bandRepository
+        .whereLessOrEqualThan('formationYear', 1930)
+        .limit(4)
+        .find();
+      expect(oldBands.length).to.equal(0);
+    })
   })
 
   describe('findById', () => {
