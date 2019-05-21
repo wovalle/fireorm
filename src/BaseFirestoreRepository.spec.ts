@@ -207,7 +207,7 @@ describe('BaseRepository', () => {
       expect(bestAlbum.id).to.equal('stadium-arcadium');
     });
 
-    describe('miscellanious', () => {
+    describe('miscellaneous', () => {
       it('should correctly parse dates', async () => {
         const pt = await bandRepository.findById('porcupine-tree');
         const { releaseDate } = await pt.albums.findById('deadwing');
