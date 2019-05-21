@@ -155,7 +155,7 @@ export default class BaseFirestoreRepository<T extends IEntity>
     await this.firestoreCollection.doc(id).delete();
   }
 
-  limit(limit: number) {
+  limit(limit: number): Promise<T[]> {
     return this.firestoreCollection
       .limit(limit)
       .get()
