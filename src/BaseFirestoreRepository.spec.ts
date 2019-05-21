@@ -34,7 +34,6 @@ describe('BaseRepository', () => {
   describe('limit', () => {
     it('must limit the documents in a collection', async () => {
       const twoBands = await bandRepository.limit(2);
-      console.log(twoBands.length);
       expect(twoBands.length).to.equal(2);
     });
 
@@ -43,7 +42,6 @@ describe('BaseRepository', () => {
         .whereGreaterOrEqualThan('formationYear', 1980)
         .limit(1)
         .find();
-      console.log(eightiesBands);
       expect(eightiesBands.length).to.equal(1);
     });
   })
