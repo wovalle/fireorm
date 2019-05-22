@@ -18,6 +18,15 @@
         "review",
         "test"
       ]
+    },
+    {
+      "login": "mamodom",
+      "name": "Maximo Dominguez",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/5097424?v=4",
+      "profile": "https://github.com/mamodom",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
