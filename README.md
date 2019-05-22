@@ -148,7 +148,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore -->
-<table><tr><td align="center"><a href="http://twitter.com/wovalle"><img src="https://avatars0.githubusercontent.com/u/7854116?v=4" width="100px;" alt="Willy Ovalle"/><br /><sub><b>Willy Ovalle</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=wovalle" title="Code">💻</a></td></tr></table>
+<table><tr><td align="center"><a href="http://twitter.com/wovalle"><img src="https://avatars0.githubusercontent.com/u/7854116?v=4" width="100px;" alt="Willy Ovalle"/><br /><sub><b>Willy Ovalle</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=wovalle" title="Code">💻</a> <a href="https://github.com/wovalle/fireorm/issues?q=author%3Awovalle" title="Bug reports">🐛</a> <a href="#blog-wovalle" title="Blogposts">📝</a> <a href="https://github.com/wovalle/fireorm/commits?author=wovalle" title="Documentation">📖</a> <a href="#example-wovalle" title="Examples">💡</a> <a href="#ideas-wovalle" title="Ideas, Planning, & Feedback">🤔</a> <a href="#infra-wovalle" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#review-wovalle" title="Reviewed Pull Requests">👀</a> <a href="https://github.com/wovalle/fireorm/commits?author=wovalle" title="Tests">⚠️</a></td></tr></table>
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
