@@ -2,9 +2,21 @@ language: node_js
 node_js:
   - '10'
 
-script:
-  - yarn build
-  - yarn lint
-  - yarn test
+stages:
+  - compile
+  - test
+  - deploy
+
+jobs:
+  include:
+    - stage: compile
+      script: yarn build
+
+    - stage: test
+      script: yarn lint
+      script: yarn test
+
+    - stage: deploy
+      script: npx semantic-release
 
 cache: yarn
