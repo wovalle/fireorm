@@ -1,0 +1,28 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "wovalle",
+      "name": "Willy Ovalle",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/7854116?v=4",
+      "profile": "http://twitter.com/wovalle",
+      "contributions": [
+        "code",
+        "doc",
+        "example",
+        "ideas",
+        "review",
+        "test"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "fireorm",
+  "projectOwner": "wovalle",
+  "repoType": "github",
+  "repoHost": "https://github.com"
+}
