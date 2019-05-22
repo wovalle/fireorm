@@ -33,7 +33,7 @@ describe('BaseRepository', () => {
 
   describe('limit', () => {
     it('must limit the documents in a collection', async () => {
-      const twoBands = await bandRepository.limit(2);
+      const twoBands = await bandRepository.limit(2).find();
       expect(twoBands.length).to.equal(2);
     });
 
@@ -56,7 +56,7 @@ describe('BaseRepository', () => {
     it('must limit subcollections', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
       const albumsSubColl = pt.albums;
-      const albumsLimited = await albumsSubColl.limit(2);
+      const albumsLimited = await albumsSubColl.limit(2).find();
       expect(albumsLimited.length).to.equal(2);
     });
   })

@@ -155,11 +155,8 @@ export default class BaseFirestoreRepository<T extends IEntity>
     await this.firestoreCollection.doc(id).delete();
   }
 
-  limit(limit: number): Promise<T[]> {
-    return this.firestoreCollection
-      .limit(limit)
-      .get()
-      .then(this.extractTFromColSnap);
+  limit(limitVal: number): QueryBuilder<T> {
+    return new QueryBuilder<T>(this).limit(limitVal);;
   }
 
   find(): Promise<T[]> {

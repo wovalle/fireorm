@@ -70,8 +70,8 @@ export default class QueryBuilder<T extends IEntity>
     return this;
   }
 
-  limit(limit: number): QueryBuilder<T> {
-    this.limitVal = limit;
+  limit(limitVal: number): QueryBuilder<T> {
+    this.limitVal = limitVal;
     return this;
   }
 
