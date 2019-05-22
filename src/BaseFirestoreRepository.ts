@@ -1,5 +1,6 @@
 // tslint:disable-next-line:no-import-side-effect
 import 'reflect-metadata';
+import { plainToClass } from 'class-transformer';
 
 import {
   IRepository,
@@ -59,23 +60,29 @@ export default class BaseFirestoreRepository<T extends IEntity>
       return null;
     }
 
-    const entity = this.parseTimestamp(doc.data() as T);
+    const collection = getMetadataStorage().collections.find(
+      c => c.name === this.colName
+    );
 
-    // TODO: This wont be required after implementing https://github.com/typestack/class-transformer
-    entity.id = `${doc.id}`;
+    if (!collection) {
+      throw new Error(`There is no collection called ${this.colName}`);
+    }
 
-    //If you're a subcollection, you don't have to check for other subcollections
-    // TODO: Write tests
-    // TODO: remove subcollections when saving to db
+    /*
+      Here we're casting to any because plainToClass returns a type
+      that cannot be implicitly casted to T, might revisit later.
+    */
+    // tslint:disable-next-line:no-unnecessary-type-assertion
+    const entity = plainToClass(
+      collection.entity as any,
+      this.parseTimestamp(doc.data() as T)
+    ) as any;
+
+    /*
+      If we're retreiving a Collection, we have to check if we have
+      subcollections registered. If so, set the repositories.
+    */
     if (this.collectionType === FirestoreCollectionType.collection) {
-      const collection = getMetadataStorage().collections.find(
-        c => c.name === this.colName
-      );
-
-      if (!collection) {
-        throw new Error(`There is no collection called ${this.colName}`);
-      }
-
       const subcollections = getMetadataStorage().subCollections.filter(
         sc => sc.parentEntity === collection.entity
       );

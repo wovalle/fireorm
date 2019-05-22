@@ -5,6 +5,7 @@
   "main": "lib/src/index.js",
   "types": "lib/src/index.d.ts",
   "dependencies": {
+    "class-transformer": "^0.2.0",
     "pluralize": "^7.0.0"
   },
   "devDependencies": {

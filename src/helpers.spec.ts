@@ -45,7 +45,7 @@ describe('Helpers', () => {
       }
 
       const rep = GetRepository(Entity) as EntityRepo;
-      expect(rep instanceof BaseFirestoreRepository).to.be.true;
+      expect(rep).to.be.instanceOf(BaseFirestoreRepository);
       expect(rep.meaningOfLife()).to.eql(42);
     });
     it('should get base repositories if custom are not registered', () => {
@@ -55,7 +55,7 @@ describe('Helpers', () => {
       }
 
       const rep = GetRepository(Entity);
-      expect(rep instanceof BaseFirestoreRepository).to.be.true;
+      expect(rep).to.be.instanceOf(BaseFirestoreRepository);
     });
     it('should throw if trying to get an unexistent collection', () => {
       class Entity {
@@ -82,7 +82,7 @@ describe('Helpers', () => {
       }
 
       const rep = GetBaseRepository(Entity);
-      expect(rep instanceof BaseFirestoreRepository).to.be.true;
+      expect(rep).to.be.instanceOf(BaseFirestoreRepository);
       expect(rep['meaningOfLife']).to.be.undefined;
     });
 
