@@ -51,7 +51,14 @@ describe('BaseRepository', () => {
         .limit(4)
         .find();
       expect(oldBands.length).to.equal(0);
-    })
+    });
+
+    it('must limit subcollections', async () => {
+      const pt = await bandRepository.findById('porcupine-tree');
+      const albumsSubColl = pt.albums;
+      const albumsLimited = await albumsSubColl.limit(2);
+      expect(albumsLimited.length).to.equal(2);
+    });
   })
 
   describe('findById', () => {
