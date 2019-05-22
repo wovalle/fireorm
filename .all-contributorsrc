@@ -11,7 +11,15 @@
       "avatar_url": "https://avatars0.githubusercontent.com/u/7854116?v=4",
       "profile": "http://twitter.com/wovalle",
       "contributions": [
-        "code"
+        "code",
+        "bug",
+        "blog",
+        "doc",
+        "example",
+        "ideas",
+        "infra",
+        "review",
+        "test"
       ]
     }
   ],
