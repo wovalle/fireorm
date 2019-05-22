@@ -5,7 +5,10 @@ node_js:
 stages:
   - compile
   - test
-  - deploy
+  - name: deploy
+    if: branch = master
+  - name: test-deploy
+    if: branch = chore/semantic-release
 
 jobs:
   include:
@@ -15,6 +18,9 @@ jobs:
     - stage: test
       script: yarn lint
       script: yarn test
+
+    - stage: test-deploy
+      script: npx semantic-release --dry-run --branch chore/semantic-release
 
     - stage: deploy
       script: npx semantic-release
