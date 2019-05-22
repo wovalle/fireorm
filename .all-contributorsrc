@@ -1,0 +1,23 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "jonesnc",
+      "name": "Nathan Jones",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/1293145?v=4",
+      "profile": "https://github.com/jonesnc",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "fireorm",
+  "projectOwner": "wovalle",
+  "repoType": "github",
+  "repoHost": "https://github.com"
+}
