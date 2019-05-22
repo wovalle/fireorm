@@ -12,12 +12,9 @@
       "profile": "http://twitter.com/wovalle",
       "contributions": [
         "code",
-        "bug",
-        "blog",
         "doc",
         "example",
         "ideas",
-        "infra",
         "review",
         "test"
       ]
