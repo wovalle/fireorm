@@ -1,7 +1,9 @@
 # fireorm🔥
-[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors)[![Build Status](https://travis-ci.com/wovalle/fireorm.svg?token=KsyisFHzgCusk2sapuJe&branch=master)](https://travis-ci.com/wovalle/fireorm)
+
 [![NPM Version](https://img.shields.io/npm/v/fireorm.svg?style=flat)](https://www.npmjs.com/package/fireorm)
+[![Build Status](https://travis-ci.com/wovalle/fireorm.svg?token=KsyisFHzgCusk2sapuJe&branch=master)](https://travis-ci.com/wovalle/fireorm)
 [![Typescript lang](https://img.shields.io/badge/Language-Typescript-Blue.svg)](https://www.typescriptlang.org)
+[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors)
 [![License](https://img.shields.io/npm/l/fireorm.svg?style=flat)](https://www.npmjs.com/package/fireorm)
 
 _:warning::heavy_exclamation_mark: Caution: This project is in **active** development. Documentation may not be totally up to date. APIs may change until 1.0._
@@ -77,7 +79,7 @@ await todoRepository.delete(mySuperTodoDocument.id); // Delete todo
 
 ## Development
 
-#### Initial Setup
+### Initial Setup
 
 1.  Clone the project from github:
 
@@ -91,7 +93,7 @@ git clone git@github.com:wovalle/fireorm.git
 yarn install # npm install
 ```
 
-#### Testing
+### Testing
 
 You can run the tests with the following command:
 
@@ -101,7 +103,13 @@ yarn test # or npm test
 
 Test files must follow the naming convention `*.test.ts` and use [mocha](https://mochajs.org/) as the test runner.
 
-#### Release a new version
+### Release a new version
+
+This repo uses [Sematic Release](https://github.com/semantic-release/semantic-release) to automatically release new versions as soon as they land on master.
+
+<details>
+  <summary>Manual Release</summary>
+  If, by any reason, a manual release must be done, these are the instructions:
 
 - To release a new version to npm, first we have to create a new tag:
 
@@ -116,7 +124,15 @@ git push --follow-tags
 npm publish
 ```
 
-#### Update documentation
+- To deploy the documentation
+
+```bash
+yarn deploy:documentation # or npm deploy:documentation
+```
+
+</details>
+
+### Documentation
 
 - Fireorm uses [typedoc](https://typedoc.org/) to automatically build the API documentation, to generate it:
 
@@ -124,21 +140,11 @@ npm publish
 yarn build:documentation # or npm build:documentation
 ```
 
-#### Deploy documentation
-
-- API documentation is hosted in [Github Pages](https://pages.github.com/), to deploy a new version:
-
-```bash
-yarn deploy:documentation # or npm deploy:documentation
-```
+Documentation is automatically deployed on each commit to master and is hosted in [Github Pages](https://pages.github.com/) in this [link](https://wovalle.github.io/fireorm).
 
 ## Contributing
 
-Have a bug or a feature request? Please search [the issues](https://github.com/wovalle/fireorm/issues) to prevent duplication. If you couldn't what you were looking for, [proceed to open a new one](https://github.com/wovalle/fireorm/issues/new). Pull requests are welcome but they must be accomp
-
-# License
-
-MIT © [Willy Ovalle](https://github.com/wovalle). See [LICENSE](https://github.com/wovalle/fireorm/blob/master/LICENSE) for details.
+Have a bug or a feature request? Please search [the issues](https://github.com/wovalle/fireorm/issues) to prevent duplication. If you couldn't what you were looking for, [proceed to open a new one](https://github.com/wovalle/fireorm/issues/new). Pull requests are welcome!
 
 ## Contributors
 
@@ -151,3 +157,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+
+## License
+
+MIT © [Willy Ovalle](https://github.com/wovalle). See [LICENSE](https://github.com/wovalle/fireorm/blob/master/LICENSE) for details.
