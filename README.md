@@ -14,13 +14,13 @@ You can read more about the motivations and features of fireorm [on its introduc
 
 ## Usage
 
-1. Install the npm package:
+1.  Install the npm package:
 
 ```bash
 yarn add typeorm  #or npm install typeorm
 ```
 
-2. [Initialize](https://firebase.google.com/docs/firestore/quickstart#initialize) your firestore application:
+2.  [Initialize](https://firebase.google.com/docs/firestore/quickstart#initialize) your firestore application:
 
 ```typescript
 import * as admin from 'firebase-admin';
@@ -40,7 +40,7 @@ firestore.settings({
 fireorm.Initialize(firestore);
 ```
 
-3. Create your firestore models!
+3.  Create your firestore models!
 
 ```typescript
 import { Collection } from 'fireorm';
@@ -53,7 +53,7 @@ class Todo {
 }
 ```
 
-4. Do cool stuff with fireorm!
+4.  Do cool stuff with fireorm!
 
 ```typescript
 import { Collection, getRepository } from 'fireorm';
@@ -151,6 +151,7 @@ Have a bug or a feature request? Please search [the issues](https://github.com/w
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+
 <!-- prettier-ignore -->
 <table><tr><td align="center"><a href="http://twitter.com/wovalle"><img src="https://avatars0.githubusercontent.com/u/7854116?v=4" width="100px;" alt="Willy Ovalle"/><br /><sub><b>Willy Ovalle</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=wovalle" title="Code">💻</a> <a href="https://github.com/wovalle/fireorm/commits?author=wovalle" title="Documentation">📖</a> <a href="#example-wovalle" title="Examples">💡</a> <a href="#ideas-wovalle" title="Ideas, Planning, & Feedback">🤔</a> <a href="#review-wovalle" title="Reviewed Pull Requests">👀</a> <a href="https://github.com/wovalle/fireorm/commits?author=wovalle" title="Tests">⚠️</a></td><td align="center"><a href="https://github.com/mamodom"><img src="https://avatars3.githubusercontent.com/u/5097424?v=4" width="100px;" alt="Maximo Dominguez"/><br /><sub><b>Maximo Dominguez</b></sub></a><br /><a href="#ideas-mamodom" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/wovalle/fireorm/commits?author=mamodom" title="Code">💻</a></td><td align="center"><a href="https://github.com/jonesnc"><img src="https://avatars0.githubusercontent.com/u/1293145?v=4" width="100px;" alt="Nathan Jones"/><br /><sub><b>Nathan Jones</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=jonesnc" title="Code">💻</a></td></tr></table>
 

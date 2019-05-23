@@ -20,6 +20,7 @@
     "mocha": "^5.2.0",
     "mock-cloud-firestore": "^0.9.0",
     "reflect-metadata": "^0.1.13",
+    "remark-cli": "^6.0.1",
     "semantic-release": "^15.13.12",
     "sinon": "^7.2.4",
     "ts-node": "^7.0.1",
@@ -29,6 +30,7 @@
   },
   "scripts": {
     "lint": "tslint --project tsconfig.json",
+    "lint:md": "remark README.md -o README.md",
     "build": "tsc",
     "build:watch": "tsc -w",
     "test": "mocha --require ts-node/register src/*.spec.ts --recursively",
