@@ -1,7 +1,9 @@
 # fireorm🔥
-[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors)[![Build Status](https://travis-ci.com/wovalle/fireorm.svg?token=KsyisFHzgCusk2sapuJe&branch=master)](https://travis-ci.com/wovalle/fireorm)
+
 [![NPM Version](https://img.shields.io/npm/v/fireorm.svg?style=flat)](https://www.npmjs.com/package/fireorm)
+[![Build Status](https://travis-ci.com/wovalle/fireorm.svg?token=KsyisFHzgCusk2sapuJe&branch=master)](https://travis-ci.com/wovalle/fireorm)
 [![Typescript lang](https://img.shields.io/badge/Language-Typescript-Blue.svg)](https://www.typescriptlang.org)
+[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors)
 [![License](https://img.shields.io/npm/l/fireorm.svg?style=flat)](https://www.npmjs.com/package/fireorm)
 
 _:warning::heavy_exclamation_mark: Caution: This project is in **active** development. Documentation may not be totally up to date. APIs may change until 1.0._
@@ -12,13 +14,13 @@ You can read more about the motivations and features of fireorm [on its introduc
 
 ## Usage
 
-1. Install the npm package:
+1.  Install the npm package:
 
 ```bash
 yarn add typeorm  #or npm install typeorm
 ```
 
-2. [Initialize](https://firebase.google.com/docs/firestore/quickstart#initialize) your firestore application:
+2.  [Initialize](https://firebase.google.com/docs/firestore/quickstart#initialize) your firestore application:
 
 ```typescript
 import * as admin from 'firebase-admin';
@@ -38,7 +40,7 @@ firestore.settings({
 fireorm.Initialize(firestore);
 ```
 
-3. Create your firestore models!
+3.  Create your firestore models!
 
 ```typescript
 import { Collection } from 'fireorm';
@@ -51,7 +53,7 @@ class Todo {
 }
 ```
 
-4. Do cool stuff with fireorm!
+4.  Do cool stuff with fireorm!
 
 ```typescript
 import { Collection, getRepository } from 'fireorm';
@@ -77,7 +79,7 @@ await todoRepository.delete(mySuperTodoDocument.id); // Delete todo
 
 ## Development
 
-#### Initial Setup
+### Initial Setup
 
 1.  Clone the project from github:
 
@@ -91,7 +93,7 @@ git clone git@github.com:wovalle/fireorm.git
 yarn install # npm install
 ```
 
-#### Testing
+### Testing
 
 You can run the tests with the following command:
 
@@ -101,53 +103,63 @@ yarn test # or npm test
 
 Test files must follow the naming convention `*.test.ts` and use [mocha](https://mochajs.org/) as the test runner.
 
-#### Release a new version
+### Release a new version
 
-- To release a new version to npm, first we have to create a new tag:
+This repo uses [Sematic Release](https://github.com/semantic-release/semantic-release) to automatically release new versions as soon as they land on master.
+
+<details>
+  <summary>Manual Release</summary>
+  If, by any reason, a manual release must be done, these are the instructions:
+
+-   To release a new version to npm, first we have to create a new tag:
 
 ```bash
 npm version [ major | minor | patch ] -m "Relasing version"
 git push --follow-tags
 ```
 
-- Then we can publish the package to npm registry:
+-   Then we can publish the package to npm registry:
 
 ```bash
 npm publish
 ```
 
-#### Update documentation
-
-- Fireorm uses [typedoc](https://typedoc.org/) to automatically build the API documentation, to generate it:
-
-```bash
-yarn build:documentation # or npm build:documentation
-```
-
-#### Deploy documentation
-
-- API documentation is hosted in [Github Pages](https://pages.github.com/), to deploy a new version:
+-   To deploy the documentation
 
 ```bash
 yarn deploy:documentation # or npm deploy:documentation
 ```
 
+</details>
+
+### Documentation
+
+-   Fireorm uses [typedoc](https://typedoc.org/) to automatically build the API documentation, to generate it:
+
+```bash
+yarn build:documentation # or npm build:documentation
+```
+
+Documentation is automatically deployed on each commit to master and is hosted in [Github Pages](https://pages.github.com/) in this [link](https://wovalle.github.io/fireorm).
+
 ## Contributing
 
-Have a bug or a feature request? Please search [the issues](https://github.com/wovalle/fireorm/issues) to prevent duplication. If you couldn't what you were looking for, [proceed to open a new one](https://github.com/wovalle/fireorm/issues/new). Pull requests are welcome but they must be accomp
-
-# License
-
-MIT © [Willy Ovalle](https://github.com/wovalle). See [LICENSE](https://github.com/wovalle/fireorm/blob/master/LICENSE) for details.
+Have a bug or a feature request? Please search [the issues](https://github.com/wovalle/fireorm/issues) to prevent duplication. If you couldn't what you were looking for, [proceed to open a new one](https://github.com/wovalle/fireorm/issues/new). Pull requests are welcome!
 
 ## Contributors
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+
 <!-- prettier-ignore -->
+
 <table><tr><td align="center"><a href="http://twitter.com/wovalle"><img src="https://avatars0.githubusercontent.com/u/7854116?v=4" width="100px;" alt="Willy Ovalle"/><br /><sub><b>Willy Ovalle</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=wovalle" title="Code">💻</a> <a href="https://github.com/wovalle/fireorm/commits?author=wovalle" title="Documentation">📖</a> <a href="#example-wovalle" title="Examples">💡</a> <a href="#ideas-wovalle" title="Ideas, Planning, & Feedback">🤔</a> <a href="#review-wovalle" title="Reviewed Pull Requests">👀</a> <a href="https://github.com/wovalle/fireorm/commits?author=wovalle" title="Tests">⚠️</a></td><td align="center"><a href="https://github.com/mamodom"><img src="https://avatars3.githubusercontent.com/u/5097424?v=4" width="100px;" alt="Maximo Dominguez"/><br /><sub><b>Maximo Dominguez</b></sub></a><br /><a href="#ideas-mamodom" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/wovalle/fireorm/commits?author=mamodom" title="Code">💻</a></td><td align="center"><a href="https://github.com/jonesnc"><img src="https://avatars0.githubusercontent.com/u/1293145?v=4" width="100px;" alt="Nathan Jones"/><br /><sub><b>Nathan Jones</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=jonesnc" title="Code">💻</a></td></tr></table>
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+
+## License
+
+MIT © [Willy Ovalle](https://github.com/wovalle). See [LICENSE](https://github.com/wovalle/fireorm/blob/master/LICENSE) for details.
