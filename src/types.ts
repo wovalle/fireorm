@@ -2,7 +2,7 @@ import QueryBuilder from './QueryBuilder';
 
 // TODO: separate Read/Write interfaces to achieve readonly?
 export interface IRepository<T extends { id: string }> {
-  limit(limit: number): QueryBuilder<T>;
+  limit(limitVal: number): QueryBuilder<T>;
   findById(id: string): Promise<T>;
   create(item: T): Promise<T>;
   update(item: T): Promise<T>;
