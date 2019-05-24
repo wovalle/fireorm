@@ -19,8 +19,9 @@ jobs:
         - yarn test
 
     - stage: deploy
-      script: 
-        - npx semantic-release
-        - npm run deploy:documentation
+      script:
+        - yarn build
+        - yarn semantic-release
+        - yarn deploy:documentation
 
 cache: yarn

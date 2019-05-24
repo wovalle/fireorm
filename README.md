@@ -17,7 +17,7 @@ You can read more about the motivations and features of fireorm [on its introduc
 1.  Install the npm package:
 
 ```bash
-yarn add typeorm  #or npm install typeorm
+yarn add fireorm  #or npm install fireorm
 ```
 
 2.  [Initialize](https://firebase.google.com/docs/firestore/quickstart#initialize) your firestore application:
@@ -29,13 +29,13 @@ import * as fireorm from 'fireorm';
 const serviceAccount = require('../firestore.creds.json');
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: `https://${serviceAccount.project_id}.firebaseio.com`,
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: `https://${serviceAccount.project_id}.firebaseio.com`,
 });
 
 const firestore = admin.firestore();
 firestore.settings({
-  timestampsInSnapshots: true,
+    timestampsInSnapshots: true,
 });
 fireorm.Initialize(firestore);
 ```
@@ -47,9 +47,9 @@ import { Collection } from 'fireorm';
 
 @Collection()
 class Todo {
-  id: string;
-  text: string;
-  done: Boolean;
+    id: string;
+    text: string;
+    done: Boolean;
 }
 ```
 
@@ -60,9 +60,9 @@ import { Collection, getRepository } from 'fireorm';
 
 @Collection()
 class Todo {
-  id: string;
-  text: string;
-  done: Boolean;
+    id: string;
+    text: string;
+    done: Boolean;
 }
 
 const todoRepository = getRepository(Todo, firestore);
