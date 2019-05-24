@@ -11,8 +11,7 @@ export class Band {
   formationYear: number;
   lastShow: Date;
   genres: Array<string>;
-  @SubCollection(Album)
-  albums?: ISubCollection<Album>;
+  @SubCollection(Album) albums?: ISubCollection<Album>;
 
   getLastShowYear() {
     return this.lastShow.getFullYear();
@@ -31,7 +30,7 @@ describe('BaseRepository', () => {
   beforeEach(() => {
     const fixture = Object.assign({}, getFixture());
     const firebase = new MockFirebase(fixture, {
-      isNaiveSnapshotListenerEnabled: false,
+      isNaiveSnapshotListenerEnabled: false
     });
 
     const firestore = firebase.firestore();
@@ -67,7 +66,63 @@ describe('BaseRepository', () => {
       const albumsLimited = await albumsSubColl.limit(2).find();
       expect(albumsLimited.length).to.equal(2);
     });
-  })
+  });
+
+  describe('orderByAscending', () => {
+    it('must order simple where* filter results', async () => {
+      const bands = await bandRepository
+        .orderByAscending('formationYear')
+        .find();
+      expect(bands[0].id).to.equal('pink-floyd');
+    });
+
+    it('must order the objects in a subcollection', async () => {
+      const pt = await bandRepository.findById('porcupine-tree');
+      const albumsSubColl = pt.albums;
+      const discographyNewestFirst = await albumsSubColl
+        .orderByAscending('releaseDate')
+        .find();
+      expect(discographyNewestFirst[0].id).to.equal('lightbulb-sun');
+    });
+
+    it('must be chainable with where* filters', async () => {
+      const pt = await bandRepository.findById('porcupine-tree');
+      const albumsSubColl = pt.albums;
+      const discographyNewestFirst = await albumsSubColl
+        .whereGreaterOrEqualThan('releaseDate', new Date('2001-01-01'))
+        .orderByAscending('releaseDate')
+        .find();
+      expect(discographyNewestFirst[0].id).to.equal('in-absentia');
+    });
+  });
+
+  describe('orderByDescending', () => {
+    it('must order simple where* filter results', async () => {
+      const bands = await bandRepository
+        .orderByDescending('formationYear')
+        .find();
+      expect(bands[0].id).to.equal('porcupine-tree');
+    });
+
+    it('must order the objects in a subcollection', async () => {
+      const pt = await bandRepository.findById('porcupine-tree');
+      const albumsSubColl = pt.albums;
+      const discographyNewestFirst = await albumsSubColl
+        .orderByDescending('releaseDate')
+        .find();
+      expect(discographyNewestFirst[0].id).to.equal('fear-blank-planet');
+    });
+
+    it('must be chainable with where* filters', async () => {
+      const pt = await bandRepository.findById('porcupine-tree');
+      const albumsSubColl = pt.albums;
+      const discographyNewestFirst = await albumsSubColl
+        .whereGreaterOrEqualThan('releaseDate', new Date('2001-01-01'))
+        .orderByDescending('releaseDate')
+        .find();
+      expect(discographyNewestFirst[0].id).to.equal('fear-blank-planet');
+    });
+  });
 
   describe('findById', () => {
     it('must find by id', async () => {
@@ -97,7 +152,7 @@ describe('BaseRepository', () => {
       entity.id = 'rush';
       entity.name = 'Rush';
       entity.formationYear = 1968;
-      entity.genres = ['progressive-rock', 'hard-rock', 'heavy-metal'];
+      entity.genres = [ 'progressive-rock', 'hard-rock', 'heavy-metal' ];
 
       const band = await bandRepository.create(entity);
       expect(band).to.be.instanceOf(Band);
@@ -109,7 +164,7 @@ describe('BaseRepository', () => {
       entity.id = 'perfect-circle';
       entity.name = 'A Perfect Circle';
       entity.formationYear = 1999;
-      entity.genres = ['alternative-rock', 'alternative-metal', 'hard-rock'];
+      entity.genres = [ 'alternative-rock', 'alternative-metal', 'hard-rock' ];
 
       const band = await bandRepository.create(entity);
       expect(band.id).to.equal(entity.id);
@@ -122,7 +177,7 @@ describe('BaseRepository', () => {
       const entity = new Band();
       entity.name = 'The Pinapple Thief';
       entity.formationYear = 1999;
-      entity.genres = ['progressive-rock'];
+      entity.genres = [ 'progressive-rock' ];
 
       const band = await bandRepository.create(entity);
       expect(typeof band.id).to.equal('string');
@@ -163,7 +218,7 @@ describe('BaseRepository', () => {
         .whereArrayContains('genres', 'progressive-rock')
         .find();
 
-      progressiveRockBands.forEach(b => {
+      progressiveRockBands.forEach((b) => {
         expect(b.getPopularGenre()).to.eql(b.genres[0]);
       });
     });

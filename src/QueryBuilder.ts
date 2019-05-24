@@ -1,16 +1,20 @@
 import {
   IQueryBuilder,
   IFireOrmQueryLine,
+  IFireOrmOrderBy,
   IFirestoreVal,
   FirestoreOperators,
   IQueryExecutor,
   IEntity,
 } from './types';
 
+import { FieldPath } from '@google-cloud/firestore';
+
 export default class QueryBuilder<T extends IEntity>
   implements IQueryBuilder<T> {
   protected queries: Array<IFireOrmQueryLine> = [];
   protected limitVal: number;
+  protected orderByObj: IFireOrmOrderBy;
 
   // TODO: validate not doing range fields in different
   // fields if the indexes are not created
@@ -75,7 +79,23 @@ export default class QueryBuilder<T extends IEntity>
     return this;
   }
 
+  orderByAscending(prop: keyof T & string): QueryBuilder<T> {
+    this.orderByObj = {
+      fieldPath: new FieldPath(prop),
+      directionStr: 'asc'
+    }
+    return this;
+  }
+
+  orderByDescending(prop: keyof T & string): QueryBuilder<T> {
+    this.orderByObj = {
+      fieldPath: new FieldPath(prop),
+      directionStr: 'desc'
+    }
+    return this;
+  }
+
   find(): Promise<T[]> {
-    return this.executor.execute(this.queries, this.limitVal);
+    return this.executor.execute(this.queries, this.limitVal, this.orderByObj);
   }
 }

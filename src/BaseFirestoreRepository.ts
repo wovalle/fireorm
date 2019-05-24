@@ -8,6 +8,7 @@ import {
   IQueryBuilder,
   FirestoreCollectionType,
   IFireOrmQueryLine,
+  IFireOrmOrderBy,
   IQueryExecutor,
   IEntity,
 } from './types';
@@ -166,18 +167,32 @@ export default class BaseFirestoreRepository<T extends IEntity>
     return new QueryBuilder<T>(this).limit(limitVal);;
   }
 
+  orderByAscending(prop: keyof T & string): QueryBuilder<T> {
+    return new QueryBuilder<T>(this).orderByAscending(prop);
+  }
+
+  orderByDescending(prop: keyof T & string): QueryBuilder<T> {
+    return new QueryBuilder<T>(this).orderByDescending(prop);
+  }
+
   find(): Promise<T[]> {
     return new QueryBuilder<T>(this).find();
   }
 
-  execute(queries: Array<IFireOrmQueryLine>, limitVal?: number): Promise<T[]> {
+  execute(queries: Array<IFireOrmQueryLine>, limitVal?: number, orderByObj?: IFireOrmOrderBy): Promise<T[]> {
     let query = queries
       .reduce((acc, cur) => {
         const op = cur.operator as WhereFilterOp;
         return acc.where(cur.prop, op, cur.val);
       }, this.firestoreCollection);
       if (limitVal) {
-        query = query.limit(limitVal)
+        query = query.limit(limitVal);
+      }
+      if (orderByObj) {
+        query = query.orderBy(
+          orderByObj.fieldPath,
+          orderByObj.directionStr
+        );
       }
       return query.get()
         .then(this.extractTFromColSnap);

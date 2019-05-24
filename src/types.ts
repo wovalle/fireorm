@@ -1,8 +1,11 @@
 import QueryBuilder from './QueryBuilder';
+import { OrderByDirection, FieldPath } from '@google-cloud/firestore';
 
 // TODO: separate Read/Write interfaces to achieve readonly?
 export interface IRepository<T extends { id: string }> {
   limit(limit: number): QueryBuilder<T>;
+  orderByAscending(prop: keyof T): QueryBuilder<T>;
+  orderByDescending(prop: keyof T): QueryBuilder<T>;
   findById(id: string): Promise<T>;
   create(item: T): Promise<T>;
   update(item: T): Promise<T>;
@@ -30,6 +33,11 @@ export interface IFireOrmQueryLine {
   operator: FirestoreOperators;
 }
 
+export interface IFireOrmOrderBy {
+  fieldPath: FieldPath;
+  directionStr: OrderByDirection;
+}
+
 export type IQueryBuilderResult = IFireOrmQueryLine[];
 
 export interface IQueryBuilder<T extends IEntity> {
@@ -39,11 +47,13 @@ export interface IQueryBuilder<T extends IEntity> {
   whereLessThan(prop: keyof T, val: IFirestoreVal): IQueryBuilder<T>;
   whereLessOrEqualThan(prop: keyof T, val: IFirestoreVal): IQueryBuilder<T>;
   whereArrayContains(prop: keyof T, val: IFirestoreVal): IQueryBuilder<T>;
+  orderByAscending(prop: keyof T & string): IQueryBuilder<T>;
+  orderByDescending(prop: keyof T & string): IQueryBuilder<T>;
   find(): Promise<T[]>;
 }
 
 export interface IQueryExecutor<T> {
-  execute(queries: IFireOrmQueryLine[], limitVal?: number): Promise<T[]>;
+  execute(queries: IFireOrmQueryLine[], limitVal?: number, orderByObj?: IFireOrmOrderBy): Promise<T[]>;
 }
 
 export type ISubCollection<T extends IEntity> = IRepository<T> &
