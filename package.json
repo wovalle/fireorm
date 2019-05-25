@@ -63,5 +63,12 @@
   },
   "peerDependencies": {
     "reflect-metadata": "^0.1.13"
-  }
+  },
+  "files": [
+    "/lib",
+    "!**/*.map",
+    "!**/*.spec.*",
+    "!**/examples/**",
+    "!**/test/**"
+  ]
 }
