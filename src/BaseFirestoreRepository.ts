@@ -185,14 +185,14 @@ export default class BaseFirestoreRepository<T extends IEntity>
         const op = cur.operator as WhereFilterOp;
         return acc.where(cur.prop, op, cur.val);
       }, this.firestoreCollection);
-      if (limitVal) {
-        query = query.limit(limitVal);
-      }
       if (orderByObj) {
         query = query.orderBy(
           orderByObj.fieldPath,
           orderByObj.directionStr
         );
+      }
+      if (limitVal) {
+        query = query.limit(limitVal);
       }
       return query.get()
         .then(this.extractTFromColSnap);

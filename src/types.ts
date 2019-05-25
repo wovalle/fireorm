@@ -20,12 +20,12 @@ export enum FirestoreOperators {
   greaterThan = '>',
   lessThanEqual = '<=',
   greaterThanEqual = '>=',
-  arrayContains = 'array-contains',
+  arrayContains = 'array-contains'
 }
 
 export enum FirestoreCollectionType {
   collection,
-  subcollection,
+  subcollection
 }
 export interface IFireOrmQueryLine {
   prop: string;
@@ -53,7 +53,11 @@ export interface IQueryBuilder<T extends IEntity> {
 }
 
 export interface IQueryExecutor<T> {
-  execute(queries: IFireOrmQueryLine[], limitVal?: number, orderByObj?: IFireOrmOrderBy): Promise<T[]>;
+  execute(
+    queries: IFireOrmQueryLine[],
+    limitVal?: number,
+    orderByObj?: IFireOrmOrderBy
+  ): Promise<T[]>;
 }
 
 export type ISubCollection<T extends IEntity> = IRepository<T> &

@@ -69,7 +69,7 @@ describe('BaseRepository', () => {
   });
 
   describe('orderByAscending', () => {
-    it('must order simple where* filter results', async () => {
+    it('must order repository objects', async () => {
       const bands = await bandRepository
         .orderByAscending('formationYear')
         .find();
@@ -94,10 +94,19 @@ describe('BaseRepository', () => {
         .find();
       expect(discographyNewestFirst[0].id).to.equal('in-absentia');
     });
+
+    it('must be chainable with limit', async () => {
+      const bands = await bandRepository
+        .orderByAscending('formationYear')
+        .limit(2)
+        .find();
+      const lastBand = bands[bands.length - 1];
+      expect(lastBand.id).to.equal('red-hot-chili-peppers');
+    });
   });
 
   describe('orderByDescending', () => {
-    it('must order simple where* filter results', async () => {
+    it('must order repository objects', async () => {
       const bands = await bandRepository
         .orderByDescending('formationYear')
         .find();
@@ -121,6 +130,15 @@ describe('BaseRepository', () => {
         .orderByDescending('releaseDate')
         .find();
       expect(discographyNewestFirst[0].id).to.equal('fear-blank-planet');
+    });
+
+    it('must be chainable with limit', async () => {
+      const bands = await bandRepository
+        .orderByDescending('formationYear')
+        .limit(2)
+        .find();
+      const lastBand = bands[bands.length - 1];
+      expect(lastBand.id).to.equal('red-hot-chili-peppers');
     });
   });
 
