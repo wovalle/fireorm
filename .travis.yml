@@ -3,16 +3,12 @@ node_js:
   - '10'
 
 stages:
-  - compile
   - test
   - name: deploy
     if: branch = master
 
 jobs:
   include:
-    - stage: compile
-      script: yarn build
-
     - stage: test
       script:
         - yarn lint
