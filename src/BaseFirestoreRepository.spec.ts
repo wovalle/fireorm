@@ -30,7 +30,7 @@ describe('BaseRepository', () => {
   beforeEach(() => {
     const fixture = Object.assign({}, getFixture());
     const firebase = new MockFirebase(fixture, {
-      isNaiveSnapshotListenerEnabled: false
+      isNaiveSnapshotListenerEnabled: false,
     });
 
     const firestore = firebase.firestore();
@@ -170,7 +170,7 @@ describe('BaseRepository', () => {
       entity.id = 'rush';
       entity.name = 'Rush';
       entity.formationYear = 1968;
-      entity.genres = [ 'progressive-rock', 'hard-rock', 'heavy-metal' ];
+      entity.genres = ['progressive-rock', 'hard-rock', 'heavy-metal'];
 
       const band = await bandRepository.create(entity);
       expect(band).to.be.instanceOf(Band);
@@ -182,7 +182,7 @@ describe('BaseRepository', () => {
       entity.id = 'perfect-circle';
       entity.name = 'A Perfect Circle';
       entity.formationYear = 1999;
-      entity.genres = [ 'alternative-rock', 'alternative-metal', 'hard-rock' ];
+      entity.genres = ['alternative-rock', 'alternative-metal', 'hard-rock'];
 
       const band = await bandRepository.create(entity);
       expect(band.id).to.equal(entity.id);
@@ -195,7 +195,7 @@ describe('BaseRepository', () => {
       const entity = new Band();
       entity.name = 'The Pinapple Thief';
       entity.formationYear = 1999;
-      entity.genres = [ 'progressive-rock' ];
+      entity.genres = ['progressive-rock'];
 
       const band = await bandRepository.create(entity);
       expect(typeof band.id).to.equal('string');
@@ -236,7 +236,7 @@ describe('BaseRepository', () => {
         .whereArrayContains('genres', 'progressive-rock')
         .find();
 
-      progressiveRockBands.forEach((b) => {
+      progressiveRockBands.forEach(b => {
         expect(b.getPopularGenre()).to.eql(b.genres[0]);
       });
     });

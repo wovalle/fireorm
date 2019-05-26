@@ -8,7 +8,7 @@ import {
   IEntity,
 } from './types';
 
-import { FieldPath } from '@google-cloud/firestore';
+import { OrderByDirection, FieldPath } from '@google-cloud/firestore';
 
 export default class QueryBuilder<T extends IEntity>
   implements IQueryBuilder<T> {
@@ -81,17 +81,17 @@ export default class QueryBuilder<T extends IEntity>
 
   orderByAscending(prop: keyof T & string): QueryBuilder<T> {
     this.orderByObj = {
-      fieldPath: new FieldPath(prop),
-      directionStr: 'asc'
-    }
+      fieldPath: prop,
+      directionStr: 'asc',
+    };
     return this;
   }
 
   orderByDescending(prop: keyof T & string): QueryBuilder<T> {
     this.orderByObj = {
-      fieldPath: new FieldPath(prop),
-      directionStr: 'desc'
-    }
+      fieldPath: prop,
+      directionStr: 'desc',
+    };
     return this;
   }
 

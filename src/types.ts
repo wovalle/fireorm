@@ -4,8 +4,8 @@ import { OrderByDirection, FieldPath } from '@google-cloud/firestore';
 // TODO: separate Read/Write interfaces to achieve readonly?
 export interface IRepository<T extends { id: string }> {
   limit(limit: number): QueryBuilder<T>;
-  orderByAscending(prop: keyof T): QueryBuilder<T>;
-  orderByDescending(prop: keyof T): QueryBuilder<T>;
+  orderByAscending(prop: keyof T & string): QueryBuilder<T>;
+  orderByDescending(prop: keyof T & string): QueryBuilder<T>;
   findById(id: string): Promise<T>;
   create(item: T): Promise<T>;
   update(item: T): Promise<T>;
@@ -20,12 +20,12 @@ export enum FirestoreOperators {
   greaterThan = '>',
   lessThanEqual = '<=',
   greaterThanEqual = '>=',
-  arrayContains = 'array-contains'
+  arrayContains = 'array-contains',
 }
 
 export enum FirestoreCollectionType {
   collection,
-  subcollection
+  subcollection,
 }
 export interface IFireOrmQueryLine {
   prop: string;
@@ -34,7 +34,7 @@ export interface IFireOrmQueryLine {
 }
 
 export interface IFireOrmOrderBy {
-  fieldPath: FieldPath;
+  fieldPath: string;
   directionStr: OrderByDirection;
 }
 
