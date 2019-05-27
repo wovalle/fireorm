@@ -19,6 +19,5 @@ jobs:
       script:
         - yarn build
         - yarn semantic-release
-        - yarn deploy:documentation
 
 cache: yarn
