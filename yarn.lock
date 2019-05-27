@@ -133,6 +133,15 @@
   dependencies:
     find-up "^2.1.0"
 
+"@commitlint/travis-cli@^7.6.1":
+  version "7.6.1"
+  resolved "https://registry.yarnpkg.com/@commitlint/travis-cli/-/travis-cli-7.6.1.tgz#9e6d011c2f02d0dd057ad96e00c0e43ecf29712f"
+  integrity sha512-oDtO0T0BIJs+nXxubdSaPRVni4RZ9SQA2N7gPDfsSzEVJZMqp23FOX/IO/K3dJS49Q9dbK6wqBl8jmSlva8r1w==
+  dependencies:
+    "@commitlint/cli" "^7.6.1"
+    babel-runtime "6.26.0"
+    execa "0.9.0"
+
 "@firebase/app-types@0.3.2":
   version "0.3.2"
   resolved "https://registry.yarnpkg.com/@firebase/app-types/-/app-types-0.3.2.tgz#a92dc544290e2893bd8c02a81e684dae3d8e7c85"
@@ -1955,6 +1964,19 @@ esprima@^4.0.0, esprima@~4.0.0:
 esutils@^2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/esutils/-/esutils-2.0.2.tgz#0abf4f1caa5bcb1f7a9d8acc6dea4faaa04bac9b"
+
+execa@0.9.0:
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/execa/-/execa-0.9.0.tgz#adb7ce62cf985071f60580deb4a88b9e34712d01"
+  integrity sha512-BbUMBiX4hqiHZUA5+JujIjNb6TyAlp2D5KLheMjMluwOuzcnylDL4AxZYLLn1n2AGB49eSWwyKvvEQoRpnAtmA==
+  dependencies:
+    cross-spawn "^5.0.1"
+    get-stream "^3.0.0"
+    is-stream "^1.1.0"
+    npm-run-path "^2.0.0"
+    p-finally "^1.0.0"
+    signal-exit "^3.0.0"
+    strip-eof "^1.0.0"
 
 execa@^0.7.0:
   version "0.7.0"
