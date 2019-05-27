@@ -1,7 +1,7 @@
 {
   "name": "fireorm",
   "description": "ORM for Firestore",
-  "version": "0.4.0",
+  "version": "0.0.0-development",
   "author": "Willy Ovalle <willyovalle16@gmail.com>",
   "homepage": "https://wovalle.github.io/fireorm/",
   "license": "ISC",
@@ -23,9 +23,9 @@
     "build": "tsc",
     "build:documentation": "typedoc --out docs --name fireorm --readme README.md --mode file --gaID UA-133856278-1 --excludeNotExported --exclude examples --exclude test",
     "build:watch": "tsc -w",
-    "deploy:documentation": "gh-pages-deploy",
     "lint": "tslint --project tsconfig.json",
     "lint:md": "remark README.md -o README.md",
+    "release": "semantic-release",
     "test": "mocha --require ts-node/register src/*.spec.ts --recursively",
     "test:watch": "mocha --require ts-node/register src/*.spec.ts --watch-extensions ts --recursively -w"
   },
@@ -38,13 +38,13 @@
     "@commitlint/config-conventional": "^7.6.0",
     "@commitlint/travis-cli": "^7.6.1",
     "@google-cloud/firestore": "^0.19.0",
+    "@qiwi/semantic-release-gh-pages-plugin": "^1.9.1",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.5",
     "@types/pluralize": "^0.0.29",
     "@types/sinon": "^7.0.6",
     "chai": "^4.2.0",
     "firebase-admin": "^6.5.0",
-    "gh-pages-deploy": "^0.5.1",
     "husky": "^2.3.0",
     "mocha": "^5.2.0",
     "mock-cloud-firestore": "^0.9.0",
@@ -72,17 +72,19 @@
       "@commitlint/config-conventional"
     ]
   },
-  "gh-pages-deploy": {
-    "staticpath": "docs",
-    "prep": [
-      "build:documentation"
-    ],
-    "commit": "Releasing version",
-    "noprompt": true
-  },
   "husky": {
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
+  },
+  "release": {
+    "branch": "master",
+    "plugins": [
+      "@semantic-release/npm",
+      "@semantic-release/github",
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@qiwi/semantic-release-gh-pages-plugin"
+    ]
   }
 }
