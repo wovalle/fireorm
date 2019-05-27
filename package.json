@@ -9,6 +9,8 @@
     "pluralize": "^7.0.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^7.6.1",
+    "@commitlint/config-conventional": "^7.6.0",
     "@google-cloud/firestore": "^0.19.0",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.5",
@@ -17,6 +19,7 @@
     "chai": "^4.2.0",
     "firebase-admin": "^6.5.0",
     "gh-pages-deploy": "^0.5.1",
+    "husky": "^2.3.0",
     "mocha": "^5.2.0",
     "mock-cloud-firestore": "^0.9.0",
     "reflect-metadata": "^0.1.13",
@@ -64,11 +67,14 @@
   "peerDependencies": {
     "reflect-metadata": "^0.1.13"
   },
-  "files": [
-    "/lib",
-    "!**/*.map",
-    "!**/*.spec.*",
-    "!**/examples/**",
-    "!**/test/**"
-  ]
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  }
 }
