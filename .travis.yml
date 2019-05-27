@@ -12,7 +12,7 @@ jobs:
     - stage: test
       script:
         - yarn lint
-        - commitlint-travis
+        # - commitlint-travis
         - yarn test
 
     - stage: deploy
