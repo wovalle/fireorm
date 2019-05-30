@@ -1,5 +1,5 @@
 import QueryBuilder from './QueryBuilder';
-import { OrderByDirection, FieldPath } from '@google-cloud/firestore';
+import { OrderByDirection } from '@google-cloud/firestore';
 
 // TODO: separate Read/Write interfaces to achieve readonly?
 export interface IRepository<T extends { id: string }> {
@@ -33,7 +33,7 @@ export interface IFireOrmQueryLine {
   operator: FirestoreOperators;
 }
 
-export interface IFireOrmOrderBy {
+export interface IOrderByParams {
   fieldPath: string;
   directionStr: OrderByDirection;
 }
@@ -56,7 +56,7 @@ export interface IQueryExecutor<T> {
   execute(
     queries: IFireOrmQueryLine[],
     limitVal?: number,
-    orderByObj?: IFireOrmOrderBy
+    orderByObj?: IOrderByParams
   ): Promise<T[]>;
 }
 

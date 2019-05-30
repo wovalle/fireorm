@@ -8,7 +8,7 @@ import {
   IQueryBuilder,
   FirestoreCollectionType,
   IFireOrmQueryLine,
-  IFireOrmOrderBy,
+  IOrderByParams,
   IQueryExecutor,
   IEntity,
 } from './types';
@@ -182,7 +182,7 @@ export default class BaseFirestoreRepository<T extends IEntity>
   execute(
     queries: Array<IFireOrmQueryLine>,
     limitVal?: number,
-    orderByObj?: IFireOrmOrderBy
+    orderByObj?: IOrderByParams
   ): Promise<T[]> {
     let query = queries.reduce((acc, cur) => {
       const op = cur.operator as WhereFilterOp;

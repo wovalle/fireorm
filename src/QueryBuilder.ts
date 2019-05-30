@@ -1,20 +1,19 @@
 import {
   IQueryBuilder,
   IFireOrmQueryLine,
-  IFireOrmOrderBy,
+  IOrderByParams,
   IFirestoreVal,
   FirestoreOperators,
   IQueryExecutor,
   IEntity,
 } from './types';
 
-import { OrderByDirection, FieldPath } from '@google-cloud/firestore';
 
 export default class QueryBuilder<T extends IEntity>
   implements IQueryBuilder<T> {
   protected queries: Array<IFireOrmQueryLine> = [];
   protected limitVal: number;
-  protected orderByObj: IFireOrmOrderBy;
+  protected orderByObj: IOrderByParams;
 
   // TODO: validate not doing range fields in different
   // fields if the indexes are not created
