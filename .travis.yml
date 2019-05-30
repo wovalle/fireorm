@@ -3,25 +3,21 @@ node_js:
   - '10'
 
 stages:
-  - compile
   - test
   - name: deploy
     if: branch = master
 
 jobs:
   include:
-    - stage: compile
-      script: yarn build
-
     - stage: test
       script:
         - yarn lint
+        # - commitlint-travis
         - yarn test
 
     - stage: deploy
       script:
         - yarn build
         - yarn semantic-release
-        - yarn deploy:documentation
 
 cache: yarn

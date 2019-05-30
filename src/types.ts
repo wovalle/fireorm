@@ -3,7 +3,7 @@ import { OrderByDirection } from '@google-cloud/firestore';
 
 // TODO: separate Read/Write interfaces to achieve readonly?
 export interface IRepository<T extends { id: string }> {
-  limit(limit: number): QueryBuilder<T>;
+  limit(limitVal: number): QueryBuilder<T>;
   orderByAscending(prop: keyof T & string): QueryBuilder<T>;
   orderByDescending(prop: keyof T & string): QueryBuilder<T>;
   findById(id: string): Promise<T>;

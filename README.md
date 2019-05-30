@@ -29,13 +29,13 @@ import * as fireorm from 'fireorm';
 const serviceAccount = require('../firestore.creds.json');
 
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: `https://${serviceAccount.project_id}.firebaseio.com`,
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: `https://${serviceAccount.project_id}.firebaseio.com`,
 });
 
 const firestore = admin.firestore();
 firestore.settings({
-    timestampsInSnapshots: true,
+  timestampsInSnapshots: true,
 });
 fireorm.Initialize(firestore);
 ```
@@ -47,9 +47,9 @@ import { Collection } from 'fireorm';
 
 @Collection()
 class Todo {
-    id: string;
-    text: string;
-    done: Boolean;
+  id: string;
+  text: string;
+  done: Boolean;
 }
 ```
 
@@ -60,9 +60,9 @@ import { Collection, getRepository } from 'fireorm';
 
 @Collection()
 class Todo {
-    id: string;
-    text: string;
-    done: Boolean;
+  id: string;
+  text: string;
+  done: Boolean;
 }
 
 const todoRepository = getRepository(Todo, firestore);
@@ -102,6 +102,10 @@ yarn test # or npm test
 ```
 
 Test files must follow the naming convention `*.test.ts` and use [mocha](https://mochajs.org/) as the test runner.
+
+### Committing
+
+This repo uses [Conventional Commits](https://www.conventionalcommits.org/) as the commit messages convention.
 
 ### Release a new version
 
