@@ -18,6 +18,7 @@ jobs:
     - stage: deploy
       script:
         - yarn build
+        - yarn build:documentation
         - yarn semantic-release
 
 cache: yarn
