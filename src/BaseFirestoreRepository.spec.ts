@@ -103,6 +103,16 @@ describe('BaseRepository', () => {
       const lastBand = bands[bands.length - 1];
       expect(lastBand.id).to.equal('red-hot-chili-peppers');
     });
+
+    it('must throw an Error if an orderBy* function is called more than once in the same expression', async () => {
+      const pt = await bandRepository.findById('porcupine-tree');
+      const albumsSubColl = pt.albums;
+      expect(() => {
+        albumsSubColl
+          .orderByAscending('releaseDate')
+          .orderByDescending('releaseDate');
+      }).to.throw;
+    });
   });
 
   describe('orderByDescending', () => {
@@ -139,6 +149,16 @@ describe('BaseRepository', () => {
         .find();
       const lastBand = bands[bands.length - 1];
       expect(lastBand.id).to.equal('red-hot-chili-peppers');
+    });
+
+    it('must throw an Error if an orderBy* function is called more than once in the same expression', async () => {
+      const pt = await bandRepository.findById('porcupine-tree');
+      const albumsSubColl = pt.albums;
+      expect(() => {
+        albumsSubColl
+          .orderByAscending('releaseDate')
+          .orderByDescending('releaseDate');
+      }).to.throw;
     });
   });
 
