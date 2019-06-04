@@ -11,7 +11,8 @@ export class Band {
   formationYear: number;
   lastShow: Date;
   genres: Array<string>;
-  @SubCollection(Album) albums?: ISubCollection<Album>;
+  @SubCollection(Album)
+  albums?: ISubCollection<Album>;
 
   getLastShowYear() {
     return this.lastShow.getFullYear();
