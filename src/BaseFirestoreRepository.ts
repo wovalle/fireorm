@@ -8,6 +8,7 @@ import {
   IQueryBuilder,
   FirestoreCollectionType,
   IFireOrmQueryLine,
+  IOrderByParams,
   IQueryExecutor,
   IEntity,
 } from './types';
@@ -163,24 +164,37 @@ export default class BaseFirestoreRepository<T extends IEntity>
   }
 
   limit(limitVal: number): QueryBuilder<T> {
-    return new QueryBuilder<T>(this).limit(limitVal);;
+    return new QueryBuilder<T>(this).limit(limitVal);
+  }
+
+  orderByAscending(prop: keyof T & string): QueryBuilder<T> {
+    return new QueryBuilder<T>(this).orderByAscending(prop);
+  }
+
+  orderByDescending(prop: keyof T & string): QueryBuilder<T> {
+    return new QueryBuilder<T>(this).orderByDescending(prop);
   }
 
   find(): Promise<T[]> {
     return new QueryBuilder<T>(this).find();
   }
 
-  execute(queries: Array<IFireOrmQueryLine>, limitVal?: number): Promise<T[]> {
-    let query = queries
-      .reduce((acc, cur) => {
-        const op = cur.operator as WhereFilterOp;
-        return acc.where(cur.prop, op, cur.val);
-      }, this.firestoreCollection);
-      if (limitVal) {
-        query = query.limit(limitVal)
-      }
-      return query.get()
-        .then(this.extractTFromColSnap);
+  execute(
+    queries: Array<IFireOrmQueryLine>,
+    limitVal?: number,
+    orderByObj?: IOrderByParams
+  ): Promise<T[]> {
+    let query = queries.reduce((acc, cur) => {
+      const op = cur.operator as WhereFilterOp;
+      return acc.where(cur.prop, op, cur.val);
+    }, this.firestoreCollection);
+    if (orderByObj) {
+      query = query.orderBy(orderByObj.fieldPath, orderByObj.directionStr);
+    }
+    if (limitVal) {
+      query = query.limit(limitVal);
+    }
+    return query.get().then(this.extractTFromColSnap);
   }
 
   whereEqualTo(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
