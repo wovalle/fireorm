@@ -60,6 +60,9 @@
   "peerDependencies": {
     "reflect-metadata": "^0.1.13"
   },
+  "resolutions": {
+    "@google-cloud/firestore": "2.2.1"
+  },
   "files": [
     "/lib",
     "!**/*.map",

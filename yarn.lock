@@ -219,18 +219,7 @@
     retry-request "^4.0.0"
     teeny-request "^3.11.3"
 
-"@google-cloud/firestore@^2.0.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@google-cloud/firestore/-/firestore-2.1.0.tgz#a236f0f7f5da95ffc7cf00c7d95de3fd04be25b7"
-  integrity sha512-MENTNlRXtJb9BxP8Lp8Sb5qNulIG1uP7QBPwoZ/fU93I4HbSXi3M2SshWdrNxXBxYUWBH15m9TrBPREUNCF1Zw==
-  dependencies:
-    bun "^0.0.12"
-    deep-equal "^1.0.1"
-    functional-red-black-tree "^1.0.1"
-    google-gax "^1.0.0"
-    through2 "^3.0.0"
-
-"@google-cloud/firestore@^2.2.1":
+"@google-cloud/firestore@2.2.1", "@google-cloud/firestore@^2.0.0", "@google-cloud/firestore@^2.2.1":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@google-cloud/firestore/-/firestore-2.2.1.tgz#83388613a2df1478dfdf6ad5e266e668b772dea4"
   integrity sha512-SGVbN91OPPGBc1UsK2UenM4nWLPd6LuecC3oxflafx7SdUvN79kk/GYAMmPOI6KDAZPByM+DEEFV7ejx6XZ7HQ==
