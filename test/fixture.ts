@@ -2,6 +2,7 @@ export class Album {
   id: string;
   name: string;
   releaseDate: Date;
+  comment?: string;
 }
 export class BandEntity {
   id: string;
