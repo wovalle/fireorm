@@ -1,0 +1,20 @@
+export default function OneToMany<T, T2 = () => keyof T>(entity: T, lambda: T2): Function {
+  return function(entity: Function) {};
+}
+
+export class Album {
+  id: string;
+  name: string;
+  year: number;
+}
+
+export class Band {
+  id: string;
+  name: string;
+  formationYear: number;
+  genres: Array<string>;
+
+  @OneToMany(Band, a => a.)
+  albums: ISubCollection<Album>;
+}
+

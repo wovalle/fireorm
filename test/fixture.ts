@@ -18,6 +18,11 @@ export class Band {
   genres: Array<string>;
 }
 
+export class BandMembers {
+  id: string;
+  name: string;
+}
+
 export const getInitialData = () => {
   return [
     {

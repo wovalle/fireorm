@@ -4,11 +4,42 @@ import { expect } from 'chai';
 import { Collection, SubCollection, ISubCollection, Initialize } from '.';
 import { Type } from './';
 import { MetadataStorage } from './MetadataStorage';
+import { InstanstiableIEntity } from './types';
 const MockFirebase = require('mock-cloud-firestore');
 
 const store = { metadataStorage: new MetadataStorage() };
 Initialize(null, store);
 
+const meta = {
+  relationships: {},
+};
+
+export default function OneToMany(
+  entity: InstanstiableIEntity,
+  primaryKey: string,
+  foreignKey: string
+): Function {
+  return function(target: Function, propertyKey: string, c: any) {
+    console.log({ target, propertyKey, c });
+    const primaryEntity = target.name;
+    const foreignEntity = entity.name;
+    const relName = [primaryEntity, foreignEntity]
+      .sort((a, b) => a.localeCompare(b))
+      .join('_');
+
+    meta.relationships[relName] = {
+      primaryEntity,
+      primaryKey,
+      foreignEntity,
+      foreignKey,
+    };
+  };
+}
+@Collection('user')
+export class User {
+  id: string;
+  name: string;
+}
 @Collection('bands')
 class Band {
   id: string;
@@ -23,6 +54,9 @@ class Band {
 
   @SubCollection(Album)
   albums?: ISubCollection<Album>;
+
+  @OneToMany(User, 'id', 'bandId')
+  members: Array<User>;
 
   getLastShowYear() {
     return this.lastShow.getFullYear();
@@ -447,6 +481,13 @@ describe('BaseRepository', () => {
         expect(releaseDate).instanceOf(Date);
         expect(releaseDate.toISOString()).to.equal('2005-03-25T00:00:00.000Z');
       });
+    });
+  });
+
+  describe.skip('relationships', () => {
+    it('must handle one OneToOne relationships', async () => {
+      const band = await bandRepository.findById('pink-floyd');
+      expect(band.members.length).to.equal(2);
     });
   });
 });
