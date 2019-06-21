@@ -323,7 +323,7 @@ describe('BaseRepository', () => {
     });
   });
 
-  describe('miscellanious', () => {
+  describe('miscellaneous', () => {
     it('should correctly parse dates', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
       expect(pt.lastShow).to.be.instanceOf(Date);
@@ -342,6 +342,60 @@ describe('BaseRepository', () => {
       const band = await bandRepository.findById('red-hot-chili-peppers');
       const bestAlbum = await band.albums.findById('stadium-arcadium');
       expect(bestAlbum.id).to.equal('stadium-arcadium');
+    });
+
+    it('should be able to create subcollections', async () => {
+      const entity = new Band();
+      entity.id = '30-seconds-to-mars';
+      entity.name = '30 Seconds To Mars';
+      entity.formationYear = 1998;
+      entity.genres = ['alternative-rock'];
+
+      await bandRepository.create(entity);
+
+      // TODO: revisit this line after https://github.com/wovalle/fireorm/issues/51
+      const band = await bandRepository.findById('30-seconds-to-mars');
+
+      const firstAlbum = new Album();
+      firstAlbum.id = '30-seconds-to-mars';
+      firstAlbum.name = '30 Seconds to Mars';
+      firstAlbum.releaseDate = new Date('2002-07-22');
+
+      const secondAlbum = new Album();
+      secondAlbum.id = 'a-beautiful-lie';
+      secondAlbum.name = 'A Beautiful Lie';
+      secondAlbum.releaseDate = new Date('2005-07-30');
+
+      const thirdAlbum = new Album();
+      thirdAlbum.id = 'this-is-war';
+      thirdAlbum.name = 'This Is War';
+      thirdAlbum.releaseDate = new Date('2009-12-08');
+
+      await band.albums.create(firstAlbum);
+      await band.albums.create(secondAlbum);
+      await band.albums.create(thirdAlbum);
+
+      const albums = await band.albums.find();
+      expect(albums.length).to.eql(3);
+    });
+
+    it('should be able to update subcollections', async () => {
+      const pt = await bandRepository.findById('porcupine-tree');
+      const album = await pt.albums.findById('fear-blank-planet');
+      album.comment = 'Anesthethize is top 3 IMHO';
+
+      await pt.albums.update(album);
+
+      const updatedAlbum = await pt.albums.findById('fear-blank-planet');
+      expect(updatedAlbum.comment).to.eql('Anesthethize is top 3 IMHO');
+    });
+
+    it('should be able to delete subcollections', async () => {
+      const pt = await bandRepository.findById('porcupine-tree');
+      await pt.albums.delete('fear-blank-planet');
+
+      const updatedBandAlbums = await pt.albums.find();
+      expect(updatedBandAlbums.length).to.eql(3);
     });
 
     describe('miscellaneous', () => {
