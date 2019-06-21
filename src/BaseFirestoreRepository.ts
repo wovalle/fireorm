@@ -76,7 +76,7 @@ export default class BaseFirestoreRepository<T extends IEntity>
     // tslint:disable-next-line:no-unnecessary-type-assertion
     const entity = plainToClass(
       collection.entity as any,
-      this.parseTimestamp(doc.data() as T)
+      this.transformFirestoreTypes(doc.data() as T)
     ) as any;
 
     /*
@@ -106,13 +106,16 @@ export default class BaseFirestoreRepository<T extends IEntity>
     return q.docs.map(this.extractTFromDocSnap);
   };
 
-  private parseTimestamp = (obj: T): T => {
+  private transformFirestoreTypes = (obj: T): T => {
     Object.keys(obj).forEach(key => {
       if (!obj[key]) return;
       if (typeof obj[key] === 'object' && 'toDate' in obj[key]) {
         obj[key] = obj[key].toDate();
+      } else if (obj[key].constructor.name === 'GeoPoint') {
+        const { latitude, longitude } = obj[key];
+        obj[key] = { latitude, longitude };
       } else if (typeof obj[key] === 'object') {
-        this.parseTimestamp(obj[key]);
+        this.transformFirestoreTypes(obj[key]);
       }
     });
 
