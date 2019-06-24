@@ -1,14 +1,22 @@
+import { GeoPoint } from "@google-cloud/firestore";
+
+export class Coordinates {
+  latitude: number;
+  longitude: number;
+}
 export class Album {
   id: string;
   name: string;
   releaseDate: Date;
   comment?: string;
 }
+
 export class BandEntity {
   id: string;
   name: string;
   formationYear: number;
   lastShow: Date;
+  lastShowCoordinates?: GeoPoint;
   genres: Array<string>;
   albums: Array<Album>;
 }
@@ -29,6 +37,7 @@ const getColFixture = () => {
     name: 'Porcupine Tree',
     formationYear: 1987,
     lastShow: new Date('2010-10-14'),
+    lastShowCoordinates: new GeoPoint(51.5009088, -0.1795547),
     genres: ['psychedelic-rock', 'progressive-rock', 'progressive-metal'],
     albums: [
       {
