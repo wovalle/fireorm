@@ -2,7 +2,7 @@ import BaseFirestoreRepository from './BaseFirestoreRepository';
 import { getFixture, Album, Coordinates } from '../test/fixture';
 import { expect } from 'chai';
 import { Collection, SubCollection, ISubCollection, Initialize } from '.';
-import { Type } from 'class-transformer';
+import { Type } from './';
 const MockFirebase = require('mock-cloud-firestore');
 
 @Collection('bands')
