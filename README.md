@@ -77,6 +77,14 @@ await todoRepository.update(mySuperTodoDocument); // Update todo
 await todoRepository.delete(mySuperTodoDocument.id); // Delete todo
 ```
 
+### Firebase Complex Data Types
+
+Firestore has support for [complex data types](https://firebase.google.com/docs/firestore/manage-data/data-types) such as GeoPoint and Reference. Full handling of complex data types is [being handled in this issue](https://github.com/wovalle/fireorm/issues/58). Temporarily, Fireorm will export [Class Transformer's @Type](https://github.com/typestack/class-transformer#working-with-nested-objects) decorator. It receives a lamda where you have to return the type you want to cast to. [See GeoPoint Example](https://github.com/wovalle/fireorm/blob/master/src/BaseFirestoreRepository.spec.ts#L338-L344).
+
+#### Limitations:
+
+If you want to cast GeoPoints to your custom class, it must have `latitude: number` and `longitude: number` as public class fields. Hopefully this won't be a limitation in v1.
+
 ## Development
 
 ### Initial Setup
@@ -115,20 +123,20 @@ This repo uses [Sematic Release](https://github.com/semantic-release/semantic-re
   <summary>Manual Release</summary>
   If, by any reason, a manual release must be done, these are the instructions:
 
--   To release a new version to npm, first we have to create a new tag:
+- To release a new version to npm, first we have to create a new tag:
 
 ```bash
 npm version [ major | minor | patch ] -m "Relasing version"
 git push --follow-tags
 ```
 
--   Then we can publish the package to npm registry:
+- Then we can publish the package to npm registry:
 
 ```bash
 npm publish
 ```
 
--   To deploy the documentation
+- To deploy the documentation
 
 ```bash
 yarn deploy:documentation # or npm deploy:documentation
@@ -138,7 +146,7 @@ yarn deploy:documentation # or npm deploy:documentation
 
 ### Documentation
 
--   Fireorm uses [typedoc](https://typedoc.org/) to automatically build the API documentation, to generate it:
+- Fireorm uses [typedoc](https://typedoc.org/) to automatically build the API documentation, to generate it:
 
 ```bash
 yarn build:documentation # or npm build:documentation
@@ -157,7 +165,6 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 
 <!-- prettier-ignore -->
-
 <table><tr><td align="center"><a href="http://twitter.com/wovalle"><img src="https://avatars0.githubusercontent.com/u/7854116?v=4" width="100px;" alt="Willy Ovalle"/><br /><sub><b>Willy Ovalle</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=wovalle" title="Code">💻</a> <a href="https://github.com/wovalle/fireorm/commits?author=wovalle" title="Documentation">📖</a> <a href="#example-wovalle" title="Examples">💡</a> <a href="#ideas-wovalle" title="Ideas, Planning, & Feedback">🤔</a> <a href="#review-wovalle" title="Reviewed Pull Requests">👀</a> <a href="https://github.com/wovalle/fireorm/commits?author=wovalle" title="Tests">⚠️</a></td><td align="center"><a href="https://github.com/mamodom"><img src="https://avatars3.githubusercontent.com/u/5097424?v=4" width="100px;" alt="Maximo Dominguez"/><br /><sub><b>Maximo Dominguez</b></sub></a><br /><a href="#ideas-mamodom" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/wovalle/fireorm/commits?author=mamodom" title="Code">💻</a></td><td align="center"><a href="https://github.com/jonesnc"><img src="https://avatars0.githubusercontent.com/u/1293145?v=4" width="100px;" alt="Nathan Jones"/><br /><sub><b>Nathan Jones</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=jonesnc" title="Code">💻</a></td></tr></table>
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
