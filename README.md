@@ -81,7 +81,7 @@ await todoRepository.delete(mySuperTodoDocument.id); // Delete todo
 
 Firestore has support for [complex data types](https://firebase.google.com/docs/firestore/manage-data/data-types) such as GeoPoint and Reference. Full handling of complex data types is [being handled in this issue](https://github.com/wovalle/fireorm/issues/58). Temporarily, Fireorm will export [Class Transformer's @Type](https://github.com/typestack/class-transformer#working-with-nested-objects) decorator. It receives a lamda where you have to return the type you want to cast to. [See GeoPoint Example](https://github.com/wovalle/fireorm/blob/master/src/BaseFirestoreRepository.spec.ts#L338-L344).
 
-#### Limitations:
+#### Limitations
 
 If you want to cast GeoPoints to your custom class, it must have `latitude: number` and `longitude: number` as public class fields. Hopefully this won't be a limitation in v1.
 
