@@ -1,7 +1,8 @@
 import BaseFirestoreRepository from './BaseFirestoreRepository';
-import { getFixture, Album } from '../test/fixture';
+import { getFixture, Album, Coordinates } from '../test/fixture';
 import { expect } from 'chai';
 import { Collection, SubCollection, ISubCollection, Initialize } from '.';
+import { Type } from './';
 const MockFirebase = require('mock-cloud-firestore');
 
 @Collection('bands')
@@ -10,7 +11,12 @@ export class Band {
   name: string;
   formationYear: number;
   lastShow: Date;
+
+  // Todo create fireorm bypass decorator
+  @Type(() => Coordinates)
+  lastShowCoordinates: Coordinates;
   genres: Array<string>;
+
   @SubCollection(Album)
   albums?: ISubCollection<Album>;
 
@@ -328,6 +334,12 @@ describe('BaseRepository', () => {
       const pt = await bandRepository.findById('porcupine-tree');
       expect(pt.lastShow).to.be.instanceOf(Date);
       expect(pt.lastShow.toISOString()).to.equal('2010-10-14T00:00:00.000Z');
+    });
+    it('should correctly parse geopoints', async () => {
+      const pt = await bandRepository.findById('porcupine-tree');
+      expect(pt.lastShowCoordinates).to.be.instanceOf(Coordinates);
+      expect(pt.lastShowCoordinates.latitude).to.equal(51.5009088);
+      expect(pt.lastShowCoordinates.longitude).to.equal(-0.1795547);
     });
   });
 

@@ -8,3 +8,6 @@ export * from './helpers';
 export { Initialize } from './MetadataStorage';
 
 export { Collection, SubCollection, CustomRepository, BaseFirestoreRepository };
+
+// Temporary while https://github.com/wovalle/fireorm/issues/58 is being fixed
+export { Type } from 'class-transformer';
