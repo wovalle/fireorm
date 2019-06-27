@@ -85,7 +85,6 @@ export default class BaseFirestoreRepository<T extends IEntity>
   };
 
   private extractTFromDocSnap = (doc: DocumentSnapshot): T => {
-    // TODO: documents with only subcollections will return null, validate
     if (!doc.exists) {
       return null;
     }
