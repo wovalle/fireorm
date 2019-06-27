@@ -172,14 +172,11 @@ describe('BaseRepository', () => {
   describe('findById', () => {
     it('must find by id', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
+      expect(pt).instanceOf(Band);
       expect(pt.id).to.equal('porcupine-tree');
       expect(pt.name).to.equal('Porcupine Tree');
     });
-    /*
-      <Sarcasm>Because of the useful generic type reflection of typescript</Sarcasm> 
-      this test is not stable. Might be a good idea to revisit later.
-     */
-    it('must return T');
+
     it('must have proper getters', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
       expect(pt.getLastShowYear()).to.eql(2010);
