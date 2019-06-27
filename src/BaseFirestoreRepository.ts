@@ -3,6 +3,16 @@ import 'reflect-metadata';
 import { plainToClass } from 'class-transformer';
 
 import {
+  DocumentSnapshot,
+  CollectionReference,
+  WhereFilterOp,
+  QuerySnapshot,
+} from '@google-cloud/firestore';
+
+import QueryBuilder from './QueryBuilder';
+import { GetRepository } from './helpers';
+
+import {
   IRepository,
   IFirestoreVal,
   IQueryBuilder,
@@ -14,46 +24,65 @@ import {
 } from './types';
 
 import {
-  DocumentSnapshot,
-  CollectionReference,
-  WhereFilterOp,
-  QuerySnapshot,
-} from '@google-cloud/firestore';
-
-import QueryBuilder from './QueryBuilder';
-import { getMetadataStorage } from './MetadataStorage';
-import { GetRepository } from './helpers';
+  getMetadataStorage,
+  CollectionMetadata,
+  SubCollectionMetadata,
+} from './MetadataStorage';
 
 export default class BaseFirestoreRepository<T extends IEntity>
   implements IRepository<T>, IQueryBuilder<T>, IQueryExecutor<T> {
   public collectionType: FirestoreCollectionType;
-  private firestoreCollection: CollectionReference;
+  private readonly firestoreColRef: CollectionReference;
+  private readonly colMetadata: CollectionMetadata;
+  private readonly subColMetadata: SubCollectionMetadata[];
 
   constructor(colName: string);
   constructor(colName: string, docId: string, subColName: string);
 
   constructor(
-    protected colName: string,
-    protected docId?: string,
-    protected subColName?: string
+    protected readonly colName: string,
+    protected readonly docId?: string,
+    protected readonly subColName?: string
   ) {
-    const { firestoreRef } = getMetadataStorage();
+    const { firestoreRef, collections, subCollections } = getMetadataStorage();
 
     if (!firestoreRef) {
       throw new Error('Firestore must be initialized first');
     }
 
+    this.colMetadata = collections.find(c => c.name === this.colName);
+
+    if (!this.colMetadata) {
+      throw new Error(`There is no metadata stored for "${this.colName}"`);
+    }
+
+    this.subColMetadata = subCollections.filter(
+      sc => sc.parentEntity === this.colMetadata.entity
+    );
+
     if (this.docId) {
       this.collectionType = FirestoreCollectionType.subcollection;
-      this.firestoreCollection = firestoreRef
+      this.firestoreColRef = firestoreRef
         .collection(this.colName)
         .doc(this.docId)
         .collection(this.subColName);
     } else {
       this.collectionType = FirestoreCollectionType.collection;
-      this.firestoreCollection = firestoreRef.collection(this.colName);
+      this.firestoreColRef = firestoreRef.collection(this.colName);
     }
   }
+
+  private initializeSubCollections = (entity: T) => {
+    this.subColMetadata.forEach(subCol => {
+      Object.assign(entity, {
+        [subCol.name]: GetRepository(
+          subCol.entity as any,
+          entity.id,
+          subCol.name
+        ),
+      });
+    });
+  };
 
   private extractTFromDocSnap = (doc: DocumentSnapshot): T => {
     // TODO: documents with only subcollections will return null, validate
@@ -61,42 +90,13 @@ export default class BaseFirestoreRepository<T extends IEntity>
       return null;
     }
 
-    const collection = getMetadataStorage().collections.find(
-      c => c.name === this.colName
-    );
-
-    if (!collection) {
-      throw new Error(`There is no collection called ${this.colName}`);
-    }
-
-    /*
-      Here we're casting to any because plainToClass returns a type
-      that cannot be implicitly casted to T, might revisit later.
-    */
-    // tslint:disable-next-line:no-unnecessary-type-assertion
     const entity = plainToClass(
-      collection.entity as any,
+      this.colMetadata.entity as any,
       this.transformFirestoreTypes(doc.data() as T)
-    ) as any;
+    ) as T;
 
-    /*
-      If we're retreiving a Collection, we have to check if we have
-      subcollections registered. If so, set the repositories.
-    */
     if (this.collectionType === FirestoreCollectionType.collection) {
-      const subcollections = getMetadataStorage().subCollections.filter(
-        sc => sc.parentEntity === collection.entity
-      );
-
-      subcollections.forEach(subCol => {
-        Object.assign(entity, {
-          [subCol.name]: GetRepository(
-            subCol.entity as any,
-            doc.id,
-            subCol.name
-          ),
-        });
-      });
+      this.initializeSubCollections(entity);
     }
 
     return entity;
@@ -128,7 +128,7 @@ export default class BaseFirestoreRepository<T extends IEntity>
   };
 
   findById(id: string): Promise<T> {
-    return this.firestoreCollection
+    return this.firestoreColRef
       .doc(id)
       .get()
       .then(this.extractTFromDocSnap);
@@ -144,7 +144,7 @@ export default class BaseFirestoreRepository<T extends IEntity>
       }
     }
 
-    const doc = this.firestoreCollection.doc(item.id || undefined);
+    const doc = this.firestoreColRef.doc(item.id || undefined);
 
     if (!item.id) {
       item.id = doc.id;
@@ -152,18 +152,22 @@ export default class BaseFirestoreRepository<T extends IEntity>
 
     await doc.set(this.toObject(item));
 
+    if (this.collectionType === FirestoreCollectionType.collection) {
+      this.initializeSubCollections(item);
+    }
+
     return item;
   }
 
   async update(item: T): Promise<T> {
     // TODO: handle errors
-    await this.firestoreCollection.doc(item.id).update(this.toObject(item));
+    await this.firestoreColRef.doc(item.id).update(this.toObject(item));
     return item;
   }
 
   async delete(id: string): Promise<void> {
     // TODO: handle errors
-    await this.firestoreCollection.doc(id).delete();
+    await this.firestoreColRef.doc(id).delete();
   }
 
   limit(limitVal: number): QueryBuilder<T> {
@@ -190,7 +194,7 @@ export default class BaseFirestoreRepository<T extends IEntity>
     let query = queries.reduce((acc, cur) => {
       const op = cur.operator as WhereFilterOp;
       return acc.where(cur.prop, op, cur.val);
-    }, this.firestoreCollection);
+    }, this.firestoreColRef);
     if (orderByObj) {
       query = query.orderBy(orderByObj.fieldPath, orderByObj.directionStr);
     }

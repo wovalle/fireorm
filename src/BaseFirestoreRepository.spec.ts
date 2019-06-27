@@ -347,6 +347,7 @@ describe('BaseRepository', () => {
       expect(pt.lastShow).to.be.instanceOf(Date);
       expect(pt.lastShow.toISOString()).to.equal('2010-10-14T00:00:00.000Z');
     });
+
     it('should correctly parse geopoints', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
       expect(pt.lastShowCoordinates).to.be.instanceOf(Coordinates);
@@ -369,16 +370,13 @@ describe('BaseRepository', () => {
     });
 
     it('should be able to create subcollections', async () => {
-      const entity = new Band();
-      entity.id = '30-seconds-to-mars';
-      entity.name = '30 Seconds To Mars';
-      entity.formationYear = 1998;
-      entity.genres = ['alternative-rock'];
+      const band = new Band();
+      band.id = '30-seconds-to-mars';
+      band.name = '30 Seconds To Mars';
+      band.formationYear = 1998;
+      band.genres = ['alternative-rock'];
 
-      await bandRepository.create(entity);
-
-      // TODO: revisit this line after https://github.com/wovalle/fireorm/issues/51
-      const band = await bandRepository.findById('30-seconds-to-mars');
+      await bandRepository.create(band);
 
       const firstAlbum = new Album();
       firstAlbum.id = '30-seconds-to-mars';
