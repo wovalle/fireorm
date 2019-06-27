@@ -139,18 +139,18 @@ export default class BaseFirestoreRepository<T extends IEntity>
       const found = await this.findById(item.id);
       if (found) {
         return Promise.reject(
-          new Error('Trying to create an already existing document')
+          new Error(`A document with id ${item.id} already exists.`)
         );
       }
     }
 
-    const doc = item.id
-      ? this.firestoreCollection.doc(item.id)
-      : this.firestoreCollection.doc();
+    const doc = this.firestoreCollection.doc(item.id || undefined);
+
+    if (!item.id) {
+      item.id = doc.id;
+    }
 
     await doc.set(this.toObject(item));
-
-    item.id = doc.id;
 
     return item;
   }
