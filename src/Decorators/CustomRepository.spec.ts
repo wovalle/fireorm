@@ -1,36 +1,32 @@
-// import CustomRepository from './CustomRepository';
-// import { expect } from 'chai';
-// import sinon from 'sinon';
+import CustomRepository from './CustomRepository';
+import { expect } from 'chai';
+import { MetadataStorage, Initialize } from '../MetadataStorage';
 
-// describe('CustomRepositoryDecorator', () => {
-//   const metadataStorage = { repositories: [] };
-//   const repositories = metadataStorage.repositories;
-//   let stub = null;
+describe('CustomRepositoryDecorator', () => {
+  let store = { metadataStorage: new MetadataStorage() };
 
-//   before(() => {
-//     stub = sinon
-//       .stub(global as any, 'metadataStorage')
-//       .returns(metadataStorage);
-//   });
+  before(() => {
+    Initialize(null, store);
+  });
 
-//   afterEach(() => {
-//     metadataStorage.repositories = [];
-//   });
+  beforeEach(() => {
+    store.metadataStorage = new MetadataStorage();
+  });
 
-//   after(() => {
-//     stub.restore();
-//   });
+  it('should register custom repositories', () => {
+    class Entity {
+      id: string;
+    }
 
-//   it('should register custom repositories', () => {
-//     class Entity {}
+    @CustomRepository(Entity)
+    class EntityRepo {}
 
-//     @CustomRepository(Entity)
-//     class EntityRepo {}
+    const repository = store.metadataStorage.repositories.get(Entity);
+    expect(store.metadataStorage.repositories.size).to.eql(1);
+    expect(repository.entity).to.eql(Entity);
+    expect(repository.target).to.eql(EntityRepo);
+  });
 
-//     expect(repositories.length).to.eql(1);
-//     expect(repositories[0].entity).to.eql(Entity);
-//     expect(repositories[0].target).to.eql(EntityRepo.constructor);
-//   });
-
-//   it('should enforce that custom repository inherits from BaseRepository');
-// });
+  it('should enforce that custom repository inherits from BaseRepository');
+  it('should only register a repository once');
+});

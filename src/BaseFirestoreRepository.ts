@@ -44,21 +44,23 @@ export default class BaseFirestoreRepository<T extends IEntity>
     protected readonly docId?: string,
     protected readonly subColName?: string
   ) {
-    const { firestoreRef, collections, subCollections } = getMetadataStorage();
+    const {
+      firestoreRef,
+      getCollection,
+      getSubCollectionsFromParent,
+    } = getMetadataStorage();
 
     if (!firestoreRef) {
       throw new Error('Firestore must be initialized first');
     }
 
-    this.colMetadata = collections.find(c => c.name === this.colName);
+    this.colMetadata = getCollection(this.colName);
 
     if (!this.colMetadata) {
       throw new Error(`There is no metadata stored for "${this.colName}"`);
     }
 
-    this.subColMetadata = subCollections.filter(
-      sc => sc.parentEntity === this.colMetadata.entity
-    );
+    this.subColMetadata = getSubCollectionsFromParent(this.colMetadata.entity);
 
     if (this.docId) {
       this.collectionType = FirestoreCollectionType.subcollection;

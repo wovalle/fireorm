@@ -5,6 +5,6 @@ export default function CustomRepository(entity: {
   new (): IEntity;
 }): Function {
   return function(target: Function) {
-    getMetadataStorage().repositories.set(entity, { entity, target });
+    getMetadataStorage().setRepository({ entity, target });
   };
 }
