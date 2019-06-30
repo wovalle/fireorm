@@ -26,8 +26,8 @@
     "lint": "tslint --project tsconfig.json",
     "lint:md": "remark README.md -o README.md",
     "release": "semantic-release",
-    "test": "mocha --require ts-node/register src/*.spec.ts --recursively",
-    "test:watch": "mocha --require ts-node/register src/*.spec.ts --watch-extensions ts --recursively -w"
+    "test": "mocha --require ts-node/register --extension ts --recursive src",
+    "test:watch": "mocha --require ts-node/register --watch-extensions ts --recursive -w src"
   },
   "dependencies": {
     "class-transformer": "^0.2.0",

@@ -23,7 +23,7 @@
         "--ui",
         "bdd",
         "--timeout",
-        "4000",
+        "0",
         "--colors",
         "--require",
         "ts-node/register",
@@ -43,7 +43,7 @@
         "--ui",
         "bdd",
         "--timeout",
-        "4000",
+        "0",
         "--colors",
         "src/**/**/*.spec.ts"
       ],
