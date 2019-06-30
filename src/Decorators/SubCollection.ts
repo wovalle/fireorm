@@ -6,7 +6,7 @@ export default function SubCollection(
   name?: string
 ): Function {
   return function(target: Function, propertyKey: string) {
-    getMetadataStorage().subCollections.push({
+    getMetadataStorage().setSubCollection({
       entity,
       name: name || plural(propertyKey),
       parentEntity: target.constructor,

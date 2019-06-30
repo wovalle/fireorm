@@ -3,35 +3,39 @@ import { getFixture, Album, Coordinates } from '../test/fixture';
 import { expect } from 'chai';
 import { Collection, SubCollection, ISubCollection, Initialize } from '.';
 import { Type } from './';
+import { MetadataStorage } from './MetadataStorage';
 const MockFirebase = require('mock-cloud-firestore');
 
-@Collection('bands')
-export class Band {
-  id: string;
-  name: string;
-  formationYear: number;
-  lastShow: Date;
-
-  // Todo create fireorm bypass decorator
-  @Type(() => Coordinates)
-  lastShowCoordinates: Coordinates;
-  genres: Array<string>;
-
-  @SubCollection(Album)
-  albums?: ISubCollection<Album>;
-
-  getLastShowYear() {
-    return this.lastShow.getFullYear();
-  }
-
-  getPopularGenre() {
-    return this.genres[0];
-  }
-}
-
-class BandRepository extends BaseFirestoreRepository<Band> {}
-
 describe('BaseRepository', () => {
+  let store = { metadataStorage: new MetadataStorage() };
+  Initialize(null, store);
+
+  @Collection('bands')
+  class Band {
+    id: string;
+    name: string;
+    formationYear: number;
+    lastShow: Date;
+
+    // Todo create fireorm bypass decorator
+    @Type(() => Coordinates)
+    lastShowCoordinates: Coordinates;
+    genres: Array<string>;
+
+    @SubCollection(Album)
+    albums?: ISubCollection<Album>;
+
+    getLastShowYear() {
+      return this.lastShow.getFullYear();
+    }
+
+    getPopularGenre() {
+      return this.genres[0];
+    }
+  }
+
+  class BandRepository extends BaseFirestoreRepository<Band> {}
+
   let bandRepository: BaseFirestoreRepository<Band> | null = null;
 
   beforeEach(() => {
@@ -41,7 +45,7 @@ describe('BaseRepository', () => {
     });
 
     const firestore = firebase.firestore();
-    Initialize(firestore);
+    Initialize(firestore, store);
     bandRepository = new BandRepository('bands');
   });
 

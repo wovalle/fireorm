@@ -66,3 +66,5 @@ export type ISubCollection<T extends IEntity> = IRepository<T> &
 export interface IEntity {
   id: string;
 }
+
+export type InstanstiableIEntity = { new (): IEntity };

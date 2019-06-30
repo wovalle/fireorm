@@ -1,38 +1,52 @@
 import Collection from './Collection';
 import { expect } from 'chai';
-import sinon from 'sinon';
+import { MetadataStorage, Initialize } from '../MetadataStorage';
 
 describe('CollectionDecorator', () => {
-  let stub = null;
-  const metadataStorage = { collections: [] };
+  let store = { metadataStorage: new MetadataStorage() };
 
   before(() => {
-    stub = sinon
-      .stub(global as any, 'metadataStorage')
-      .returns(metadataStorage);
+    Initialize(null, store);
   });
 
-  afterEach(() => {
-    metadataStorage.collections = [];
+  beforeEach(() => {
+    store.metadataStorage = new MetadataStorage();
   });
-
-  after(() => stub.restore());
 
   it('should register collections', () => {
     @Collection('foo')
-    class Entity {}
+    class Entity {
+      id: string;
+    }
 
-    expect(metadataStorage.collections.length).to.eql(1);
-    expect(metadataStorage.collections[0].name).to.eql('foo');
-    expect(metadataStorage.collections[0].target).to.eql(Entity);
+    const collection = store.metadataStorage.getCollection('foo');
+    expect(store.metadataStorage.collections.length).to.eql(1);
+    expect(collection.name).to.eql('foo');
+    expect(collection.entity).to.eql(Entity);
   });
 
   it('should register collections with default name', () => {
     @Collection()
-    class Entity {}
+    class Entity {
+      id: string;
+    }
 
-    expect(metadataStorage.collections.length).to.eql(1);
-    expect(metadataStorage.collections[0].name).to.eql('Entities');
-    expect(metadataStorage.collections[0].target).to.eql(Entity);
+    const collection = store.metadataStorage.getCollection('Entities');
+    expect(store.metadataStorage.collections.length).to.eql(1);
+    expect(collection.name).to.eql('Entities');
+    expect(collection.entity).to.eql(Entity);
+  });
+
+  it('should register collections with default name', () => {
+    @Collection()
+    @Collection()
+    class Entity {
+      id: string;
+    }
+
+    const collection = store.metadataStorage.getCollection('Entities');
+    expect(store.metadataStorage.collections.length).to.eql(1);
+    expect(collection.name).to.eql('Entities');
+    expect(collection.entity).to.eql(Entity);
   });
 });
