@@ -37,7 +37,7 @@ describe('CollectionDecorator', () => {
     expect(collection.entity).to.eql(Entity);
   });
 
-  it('should register collections with default name', () => {
+  it('should register collections once', () => {
     @Collection()
     @Collection()
     class Entity {
