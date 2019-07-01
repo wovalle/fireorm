@@ -29,7 +29,18 @@ import {
   SubCollectionMetadata,
 } from './MetadataStorage';
 
+/**
+ * Dummy class created with the sole purpose to be able to
+ * check if other classes are instances of BaseFirestoreRepository.
+ * Typescript is not capable to check instances of generics.
+ *
+ * @export
+ * @class BaseRepository
+ */
+export class BaseRepository {}
+
 export default class BaseFirestoreRepository<T extends IEntity>
+  extends BaseRepository
   implements IRepository<T>, IQueryBuilder<T>, IQueryExecutor<T> {
   public collectionType: FirestoreCollectionType;
   private readonly firestoreColRef: CollectionReference;
@@ -44,6 +55,7 @@ export default class BaseFirestoreRepository<T extends IEntity>
     protected readonly docId?: string,
     protected readonly subColName?: string
   ) {
+    super();
     const {
       firestoreRef,
       getCollection,

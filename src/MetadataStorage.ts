@@ -1,5 +1,5 @@
-import { InstanstiableIEntity } from './types';
 import { Firestore } from '@google-cloud/firestore';
+import { BaseRepository } from './BaseFirestoreRepository';
 let store: IMetadataStore = null;
 
 export interface IMetadataStore {
@@ -60,11 +60,25 @@ export class MetadataStorage {
     this.subCollections.push(subCol);
   };
 
-  public getRepository = (param: string | InstanstiableIEntity) => {
+  public getRepository = (param: Function) => {
     return this.repositories.get(param);
   };
 
   public setRepository = (repo: RepositoryMetadata) => {
+    const savedRepo = this.getRepository(repo.entity);
+
+    if (savedRepo && repo.target !== savedRepo.target) {
+      throw new Error(
+        'Cannot register a custom repository twice with two different targets'
+      );
+    }
+
+    if (!(repo.target.prototype instanceof BaseRepository)) {
+      throw new Error(
+        'Cannot register a custom repository on a class that does not inherit from BaseFirestoreRepository'
+      );
+    }
+
     this.repositories.set(repo.entity, repo);
   };
 
