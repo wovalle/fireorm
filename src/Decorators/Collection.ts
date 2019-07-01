@@ -1,9 +1,11 @@
 import { getMetadataStorage } from '../MetadataStorage';
 import { plural } from 'pluralize';
 
-export default function Collection(name?: string): Function {
+export default function Collection(entityName?: string): Function {
   return function(entity: Function) {
-    name = name || plural(entity.name);
-    getMetadataStorage().setCollection({ name, entity });
+    getMetadataStorage().setCollection({
+      name: entityName || plural(entity.name),
+      entity,
+    });
   };
 }

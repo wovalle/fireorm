@@ -7,7 +7,7 @@ import { MetadataStorage } from './MetadataStorage';
 const MockFirebase = require('mock-cloud-firestore');
 
 describe('BaseRepository', () => {
-  let store = { metadataStorage: new MetadataStorage() };
+  const store = { metadataStorage: new MetadataStorage() };
   Initialize(null, store);
 
   @Collection('bands')
