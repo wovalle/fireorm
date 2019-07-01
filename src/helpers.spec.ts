@@ -6,16 +6,14 @@ import Collection from './Decorators/Collection';
 import BaseFirestoreRepository from './BaseFirestoreRepository';
 import { GetRepository, GetBaseRepository } from './helpers';
 import { Initialize, MetadataStorage } from './MetadataStorage';
+import { Firestore } from '@google-cloud/firestore';
 
-describe.skip('Helpers', () => {
-  let store = { metadataStorage: new MetadataStorage() };
-
-  before(() => {
-    Initialize(null, store);
-  });
+describe('Helpers', () => {
+  let store = null;
 
   beforeEach(() => {
-    store.metadataStorage = new MetadataStorage();
+    store = { metadataStorage: new MetadataStorage() };
+    Initialize(new Firestore(), store);
   });
 
   it('GetRepository: should get custom repositories', () => {
