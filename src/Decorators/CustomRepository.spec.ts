@@ -3,14 +3,11 @@ import { expect } from 'chai';
 import { MetadataStorage, Initialize } from '../MetadataStorage';
 
 describe('CustomRepositoryDecorator', () => {
-  let store = { metadataStorage: new MetadataStorage() };
-
-  before(() => {
-    Initialize(null, store);
-  });
+  const store = { metadataStorage: new MetadataStorage() };
 
   beforeEach(() => {
     store.metadataStorage = new MetadataStorage();
+    Initialize(null, store);
   });
 
   it('should register custom repositories', () => {
