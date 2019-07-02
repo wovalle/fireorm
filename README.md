@@ -5,6 +5,7 @@
 [![Typescript lang](https://img.shields.io/badge/Language-Typescript-Blue.svg)](https://www.typescriptlang.org)
 [![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors)
 [![License](https://img.shields.io/npm/l/fireorm.svg?style=flat)](https://www.npmjs.com/package/fireorm)
+[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/fireorm/community)
 
 _:warning::heavy_exclamation_mark: Caution: This project is in **active** development. Documentation may not be totally up to date. APIs may change until 1.0._
 
