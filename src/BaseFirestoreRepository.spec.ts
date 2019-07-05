@@ -77,6 +77,10 @@ describe('BaseRepository', () => {
       const albumsLimited = await albumsSubColl.limit(2).find();
       expect(albumsLimited.length).to.equal(2);
     });
+
+    it('must throw an exception if limit call more than once', async () => {
+      expect(() => bandRepository.limit(2).limit(2).find()).to.throw();
+    });
   });
 
   describe('orderByAscending', () => {
