@@ -79,7 +79,7 @@ describe('BaseRepository', () => {
     });
 
     it('must throw an exception if limit call more than once', async () => {
-      expect(()=> bandRepository.limit(2).limit(2).find()).to.throw();
+      expect(() => bandRepository.limit(2).limit(2).find()).to.throw();
     });
   });
 
