@@ -4,10 +4,11 @@ import { expect } from 'chai';
 import { Collection, SubCollection, ISubCollection, Initialize } from '.';
 import { Type } from './';
 import { MetadataStorage } from './MetadataStorage';
+
 const MockFirebase = require('mock-cloud-firestore');
 
 describe('BaseRepository', () => {
-  const store = { metadataStorage: new MetadataStorage() };
+  const store = {metadataStorage: new MetadataStorage()};
   Initialize(null, store);
 
   @Collection('bands')
@@ -34,7 +35,8 @@ describe('BaseRepository', () => {
     }
   }
 
-  class BandRepository extends BaseFirestoreRepository<Band> {}
+  class BandRepository extends BaseFirestoreRepository<Band> {
+  }
 
   let bandRepository: BaseFirestoreRepository<Band> | null = null;
 
@@ -79,7 +81,7 @@ describe('BaseRepository', () => {
     });
 
     it('must throw an exception if limit call more than once', async () => {
-      expect(()=> bandRepository.limit(2).limit(2).find()).to.throw();
+      expect(() => bandRepository.limit(2).limit(2).find()).to.throw();
     });
   });
 
@@ -285,7 +287,7 @@ describe('BaseRepository', () => {
       });
     });
 
-    it("must return same list if where filter doesn't apply", async () => {
+    it('must return same list if where filter doesn\'t apply', async () => {
       const list = await bandRepository
         .whereGreaterOrEqualThan('formationYear', 1983)
         .find();
@@ -428,7 +430,7 @@ describe('BaseRepository', () => {
     describe('miscellaneous', () => {
       it('should correctly parse dates', async () => {
         const pt = await bandRepository.findById('porcupine-tree');
-        const { releaseDate } = await pt.albums.findById('deadwing');
+        const {releaseDate} = await pt.albums.findById('deadwing');
         expect(releaseDate).instanceOf(Date);
         expect(releaseDate.toISOString()).to.equal('2005-03-25T00:00:00.000Z');
       });
