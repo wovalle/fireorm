@@ -73,6 +73,10 @@ export default class QueryBuilder<T extends IEntity>
   }
 
   limit(limitVal: number): QueryBuilder<T> {
+    if (this.limitVal) {
+      throw new Error('A limit function cannot be called more than once in the same query expression');
+    }
+
     this.limitVal = limitVal;
     return this;
   }
