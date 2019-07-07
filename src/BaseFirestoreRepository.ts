@@ -206,4 +206,27 @@ export default class BaseFirestoreRepository<T extends IEntity>
   whereArrayContains(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
     return new QueryBuilder<T>(this).whereArrayContains(prop, val);
   }
+
+  filterByString(prop: string, val: string): Promise<T[]> {
+    return this.firestoreCollection
+      .orderBy(prop)
+      .startAt(val.toLowerCase())
+      .endAt(val.toLowerCase() + "\uf8ff")
+      .get()
+      .then(this.extractTFromColSnap);
+  }
 }
+
+
+// await db.collection('restaurants').orderBy("lowName")
+//   .startAt(this.search.toLowerCase()).endAt(this.search.toLowerCase() + "\uf8ff").get()
+//   .then(snapshot => {
+//     snapshot.docs.forEach(doc => {
+//
+//       let item = doc.data()
+//       item.id = doc.id
+//       this.desserts.push(item);
+//     })
+//   })
+//   // .catch(err => console.log(err.response.data))
+//   .finally(() => this.loading = false);
