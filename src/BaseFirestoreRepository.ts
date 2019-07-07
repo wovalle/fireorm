@@ -241,4 +241,12 @@ export default class BaseFirestoreRepository<T extends IEntity>
   whereArrayContains(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
     return new QueryBuilder<T>(this).whereArrayContains(prop, val);
   }
+  filterBySubstring(prop: string, val: string): Promise<T[]> {
+    return this.firestoreColRef
+      .orderBy(prop)
+      .startAt(val.toLowerCase())
+      .endAt(val.toLowerCase() + "\uf8ff")
+      .get()
+      .then(this.extractTFromColSnap);
+  }
 }

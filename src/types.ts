@@ -6,6 +6,7 @@ export interface IRepository<T extends { id: string }> {
   limit(limitVal: number): QueryBuilder<T>;
   orderByAscending(prop: keyof T & string): QueryBuilder<T>;
   orderByDescending(prop: keyof T & string): QueryBuilder<T>;
+  filterBySubstring(prop: string, val: string): Promise<T[]>;
   findById(id: string): Promise<T>;
   create(item: T): Promise<T>;
   update(item: T): Promise<T>;
