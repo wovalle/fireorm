@@ -1,10 +1,10 @@
 import { getMetadataStorage } from '../MetadataStorage';
-import { IEntity } from '../types';
+import { InstanstiableIEntity } from '../types';
 
-export default function CustomRepository(entity: {
-  new (): IEntity;
-}): Function {
+export default function CustomRepository(
+  entity: InstanstiableIEntity
+): Function {
   return function(target: Function) {
-    getMetadataStorage().repositories.set(entity, { entity, target });
+    getMetadataStorage().setRepository({ entity, target });
   };
 }

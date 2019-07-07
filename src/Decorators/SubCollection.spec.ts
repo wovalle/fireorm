@@ -1,23 +1,15 @@
 import SubCollection from './SubCollection';
 import { expect } from 'chai';
-import sinon from 'sinon';
+import { MetadataStorage, Initialize } from '../MetadataStorage';
 
 describe('SubCollectionDecorator', () => {
-  let stub = null;
-  const metadataStorage = { subCollections: [] };
-  before(() => {
-    stub = sinon
-      .stub(global as any, 'metadataStorage')
-      .returns(metadataStorage);
+  const store = { metadataStorage: new MetadataStorage() };
+
+  beforeEach(() => {
+    store.metadataStorage = new MetadataStorage();
+    Initialize(null, store);
   });
 
-  afterEach(() => {
-    metadataStorage.subCollections = [];
-  });
-
-  after(() => {
-    stub.restore();
-  });
   it('should register collections', () => {
     class SubEntity {}
     class Entity {
@@ -25,10 +17,10 @@ describe('SubCollectionDecorator', () => {
       readonly subentity: null;
     }
 
-    expect(metadataStorage.subCollections.length).to.eql(1);
-    expect(metadataStorage.subCollections[0].name).to.eql('subentities');
-    expect(metadataStorage.subCollections[0].target).to.eql(Entity);
-    expect(metadataStorage.subCollections[0].entity).to.eql(SubEntity);
+    expect(store.metadataStorage.subCollections.length).to.eql(1);
+    expect(store.metadataStorage.subCollections[0].name).to.eql('subentities');
+    expect(store.metadataStorage.subCollections[0].parentEntity).to.eql(Entity);
+    expect(store.metadataStorage.subCollections[0].entity).to.eql(SubEntity);
   });
 
   it('should register collections with default name', () => {
@@ -38,9 +30,9 @@ describe('SubCollectionDecorator', () => {
       readonly subentity: null;
     }
 
-    expect(metadataStorage.subCollections.length).to.eql(1);
-    expect(metadataStorage.subCollections[0].name).to.eql('subentities');
-    expect(metadataStorage.subCollections[0].target).to.eql(Entity);
-    expect(metadataStorage.subCollections[0].entity).to.eql(SubEntity);
+    expect(store.metadataStorage.subCollections.length).to.eql(1);
+    expect(store.metadataStorage.subCollections[0].name).to.eql('subentities');
+    expect(store.metadataStorage.subCollections[0].parentEntity).to.eql(Entity);
+    expect(store.metadataStorage.subCollections[0].entity).to.eql(SubEntity);
   });
 });

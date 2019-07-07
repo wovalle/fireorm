@@ -1,6 +1,7 @@
 import {
   IQueryBuilder,
   IFireOrmQueryLine,
+  IOrderByParams,
   IFirestoreVal,
   FirestoreOperators,
   IQueryExecutor,
@@ -11,6 +12,7 @@ export default class QueryBuilder<T extends IEntity>
   implements IQueryBuilder<T> {
   protected queries: Array<IFireOrmQueryLine> = [];
   protected limitVal: number;
+  protected orderByObj: IOrderByParams;
 
   // TODO: validate not doing range fields in different
   // fields if the indexes are not created
@@ -71,11 +73,36 @@ export default class QueryBuilder<T extends IEntity>
   }
 
   limit(limitVal: number): QueryBuilder<T> {
+    if (this.limitVal) {
+      throw new Error('A limit function cannot be called more than once in the same query expression');
+    }
     this.limitVal = limitVal;
     return this;
   }
 
+  orderByAscending(prop: keyof T & string): QueryBuilder<T> {
+    if (this.orderByObj) {
+      throw new Error('An orderBy function cannot be called more than once in the same query expression')
+    }
+    this.orderByObj = {
+      fieldPath: prop,
+      directionStr: 'asc',
+    };
+    return this;
+  }
+
+  orderByDescending(prop: keyof T & string): QueryBuilder<T> {
+    if (this.orderByObj) {
+      throw new Error('An orderBy function cannot be called more than once in the same query expression')
+    }
+    this.orderByObj = {
+      fieldPath: prop,
+      directionStr: 'desc',
+    };
+    return this;
+  }
+
   find(): Promise<T[]> {
-    return this.executor.execute(this.queries, this.limitVal);
+    return this.executor.execute(this.queries, this.limitVal, this.orderByObj);
   }
 }

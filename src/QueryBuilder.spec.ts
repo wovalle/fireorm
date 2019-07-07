@@ -19,6 +19,7 @@ describe('QueryBuilder', () => {
   beforeEach(() => {
     executor = new FakeExecutor();
   });
+
   it('must build query', async () => {
     const queryBuilder = new QueryBuilder<Test>(executor);
     await queryBuilder.whereEqualTo('id', '1').find();
