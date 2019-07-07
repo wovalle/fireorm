@@ -3,16 +3,6 @@ import 'reflect-metadata';
 import { plainToClass } from 'class-transformer';
 
 import {
-  IRepository,
-  IFirestoreVal,
-  IQueryBuilder,
-  FirestoreCollectionType,
-  IFireOrmQueryLine,
-  IQueryExecutor,
-  IEntity,
-} from './types';
-
-import {
   DocumentSnapshot,
   CollectionReference,
   WhereFilterOp,
@@ -20,82 +10,107 @@ import {
 } from '@google-cloud/firestore';
 
 import QueryBuilder from './QueryBuilder';
-import { getMetadataStorage } from './MetadataStorage';
 import { GetRepository } from './helpers';
 
+import {
+  IRepository,
+  IFirestoreVal,
+  IQueryBuilder,
+  FirestoreCollectionType,
+  IFireOrmQueryLine,
+  IOrderByParams,
+  IQueryExecutor,
+  IEntity,
+} from './types';
+
+import {
+  getMetadataStorage,
+  CollectionMetadata,
+  SubCollectionMetadata,
+} from './MetadataStorage';
+
+/**
+ * Dummy class created with the sole purpose to be able to
+ * check if other classes are instances of BaseFirestoreRepository.
+ * Typescript is not capable to check instances of generics.
+ *
+ * @export
+ * @class BaseRepository
+ */
+export class BaseRepository {}
+
 export default class BaseFirestoreRepository<T extends IEntity>
+  extends BaseRepository
   implements IRepository<T>, IQueryBuilder<T>, IQueryExecutor<T> {
   public collectionType: FirestoreCollectionType;
-  private firestoreCollection: CollectionReference;
+  private readonly firestoreColRef: CollectionReference;
+  private readonly colMetadata: CollectionMetadata;
+  private readonly subColMetadata: SubCollectionMetadata[];
 
   constructor(colName: string);
   constructor(colName: string, docId: string, subColName: string);
 
   constructor(
-    protected colName: string,
-    protected docId?: string,
-    protected subColName?: string
+    protected readonly colName: string,
+    protected readonly docId?: string,
+    protected readonly subColName?: string
   ) {
-    const { firestoreRef } = getMetadataStorage();
+    super();
+    const {
+      firestoreRef,
+      getCollection,
+      getSubCollectionsFromParent,
+    } = getMetadataStorage();
 
     if (!firestoreRef) {
       throw new Error('Firestore must be initialized first');
     }
 
+    this.colMetadata = getCollection(this.colName);
+
+    if (!this.colMetadata) {
+      throw new Error(`There is no metadata stored for "${this.colName}"`);
+    }
+
+    this.subColMetadata = getSubCollectionsFromParent(this.colMetadata.entity);
+
     if (this.docId) {
       this.collectionType = FirestoreCollectionType.subcollection;
-      this.firestoreCollection = firestoreRef
+      this.firestoreColRef = firestoreRef
         .collection(this.colName)
         .doc(this.docId)
         .collection(this.subColName);
     } else {
       this.collectionType = FirestoreCollectionType.collection;
-      this.firestoreCollection = firestoreRef.collection(this.colName);
+      this.firestoreColRef = firestoreRef.collection(this.colName);
     }
   }
 
+  private initializeSubCollections = (entity: T) => {
+    this.subColMetadata.forEach(subCol => {
+      Object.assign(entity, {
+        [subCol.name]: GetRepository(
+          subCol.entity as any,
+          entity.id,
+          subCol.name
+        ),
+      });
+    });
+  };
+
   private extractTFromDocSnap = (doc: DocumentSnapshot): T => {
-    // TODO: documents with only subcollections will return null, validate
     if (!doc.exists) {
       return null;
     }
 
-    const collection = getMetadataStorage().collections.find(
-      c => c.name === this.colName
-    );
-
-    if (!collection) {
-      throw new Error(`There is no collection called ${this.colName}`);
-    }
-
-    /*
-      Here we're casting to any because plainToClass returns a type
-      that cannot be implicitly casted to T, might revisit later.
-    */
     // tslint:disable-next-line:no-unnecessary-type-assertion
     const entity = plainToClass(
-      collection.entity as any,
-      this.parseTimestamp(doc.data() as T)
-    ) as any;
+      this.colMetadata.entity as any,
+      this.transformFirestoreTypes(doc.data() as T)
+    ) as T;
 
-    /*
-      If we're retreiving a Collection, we have to check if we have
-      subcollections registered. If so, set the repositories.
-    */
     if (this.collectionType === FirestoreCollectionType.collection) {
-      const subcollections = getMetadataStorage().subCollections.filter(
-        sc => sc.parentEntity === collection.entity
-      );
-
-      subcollections.forEach(subCol => {
-        Object.assign(entity, {
-          [subCol.name]: GetRepository(
-            subCol.entity as any,
-            doc.id,
-            subCol.name
-          ),
-        });
-      });
+      this.initializeSubCollections(entity);
     }
 
     return entity;
@@ -105,13 +120,16 @@ export default class BaseFirestoreRepository<T extends IEntity>
     return q.docs.map(this.extractTFromDocSnap);
   };
 
-  private parseTimestamp = (obj: T): T => {
+  private transformFirestoreTypes = (obj: T): T => {
     Object.keys(obj).forEach(key => {
       if (!obj[key]) return;
       if (typeof obj[key] === 'object' && 'toDate' in obj[key]) {
         obj[key] = obj[key].toDate();
+      } else if (obj[key].constructor.name === 'GeoPoint') {
+        const { latitude, longitude } = obj[key];
+        obj[key] = { latitude, longitude };
       } else if (typeof obj[key] === 'object') {
-        this.parseTimestamp(obj[key]);
+        this.transformFirestoreTypes(obj[key]);
       }
     });
 
@@ -124,7 +142,7 @@ export default class BaseFirestoreRepository<T extends IEntity>
   };
 
   findById(id: string): Promise<T> {
-    return this.firestoreCollection
+    return this.firestoreColRef
       .doc(id)
       .get()
       .then(this.extractTFromDocSnap);
@@ -135,52 +153,69 @@ export default class BaseFirestoreRepository<T extends IEntity>
       const found = await this.findById(item.id);
       if (found) {
         return Promise.reject(
-          new Error('Trying to create an already existing document')
+          new Error(`A document with id ${item.id} already exists.`)
         );
       }
     }
 
-    const doc = item.id
-      ? this.firestoreCollection.doc(item.id)
-      : this.firestoreCollection.doc();
+    const doc = this.firestoreColRef.doc(item.id || undefined);
+
+    if (!item.id) {
+      item.id = doc.id;
+    }
 
     await doc.set(this.toObject(item));
 
-    item.id = doc.id;
+    if (this.collectionType === FirestoreCollectionType.collection) {
+      this.initializeSubCollections(item);
+    }
 
     return item;
   }
 
   async update(item: T): Promise<T> {
     // TODO: handle errors
-    await this.firestoreCollection.doc(item.id).update(this.toObject(item));
+    await this.firestoreColRef.doc(item.id).update(this.toObject(item));
     return item;
   }
 
   async delete(id: string): Promise<void> {
     // TODO: handle errors
-    await this.firestoreCollection.doc(id).delete();
+    await this.firestoreColRef.doc(id).delete();
   }
 
   limit(limitVal: number): QueryBuilder<T> {
-    return new QueryBuilder<T>(this).limit(limitVal);;
+    return new QueryBuilder<T>(this).limit(limitVal);
+  }
+
+  orderByAscending(prop: keyof T & string): QueryBuilder<T> {
+    return new QueryBuilder<T>(this).orderByAscending(prop);
+  }
+
+  orderByDescending(prop: keyof T & string): QueryBuilder<T> {
+    return new QueryBuilder<T>(this).orderByDescending(prop);
   }
 
   find(): Promise<T[]> {
     return new QueryBuilder<T>(this).find();
   }
 
-  execute(queries: Array<IFireOrmQueryLine>, limitVal?: number): Promise<T[]> {
-    let query = queries
-      .reduce((acc, cur) => {
-        const op = cur.operator as WhereFilterOp;
-        return acc.where(cur.prop, op, cur.val);
-      }, this.firestoreCollection);
-      if (limitVal) {
-        query = query.limit(limitVal)
-      }
-      return query.get()
-        .then(this.extractTFromColSnap);
+  execute(
+    queries: Array<IFireOrmQueryLine>,
+    limitVal?: number,
+    orderByObj?: IOrderByParams
+  ): Promise<T[]> {
+    let query = queries.reduce((acc, cur) => {
+      const op = cur.operator as WhereFilterOp;
+      return acc.where(cur.prop, op, cur.val);
+    }, this.firestoreColRef);
+    if (orderByObj) {
+      query = query.orderBy(orderByObj.fieldPath, orderByObj.directionStr);
+    }
+    if (limitVal) {
+      query = query.limit(limitVal);
+    }
+    return query.get().then(this.extractTFromColSnap);
   }
 
   whereEqualTo(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
