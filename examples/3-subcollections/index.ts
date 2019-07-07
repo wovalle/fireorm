@@ -50,6 +50,9 @@ const run = async () => {
   await rush.albums.create(fourthAlbum);
   await rush.albums.create(eighthAlbum);
 
+  const entityFilter = await rush.albums.filterBySubstring('name', '21');
+  console.table(entityFilter);
+
   // Retrieving albums before 1980
   const albumsBefore1980 = await rush.albums.whereLessThan('year', 1980).find();
   console.log(`Albums before 1980: ${albumsBefore1980.map(a => a.name)}`);

@@ -207,7 +207,7 @@ export default class BaseFirestoreRepository<T extends IEntity>
     return new QueryBuilder<T>(this).whereArrayContains(prop, val);
   }
 
-  filterByString(prop: string, val: string): Promise<T[]> {
+  filterBySubtring(prop: string, val: string): Promise<T[]> {
     return this.firestoreCollection
       .orderBy(prop)
       .startAt(val.toLowerCase())

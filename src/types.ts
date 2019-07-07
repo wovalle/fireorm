@@ -4,7 +4,7 @@ import QueryBuilder from './QueryBuilder';
 export interface IRepository<T extends { id: string }> {
   limit(limitVal: number): QueryBuilder<T>;
   findById(id: string): Promise<T>;
-  filterByString(prop: string, val: string): Promise<T[]>;
+  filterBySubstring(prop: string, val: string): Promise<T[]>;
   create(item: T): Promise<T>;
   update(item: T): Promise<T>;
   delete(id: string): Promise<void>;
