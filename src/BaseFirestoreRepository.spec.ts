@@ -6,37 +6,37 @@ import { Type } from './';
 import { MetadataStorage } from './MetadataStorage';
 const MockFirebase = require('mock-cloud-firestore');
 
-describe('BaseRepository', () => {
-  const store = { metadataStorage: new MetadataStorage() };
-  Initialize(null, store);
+const store = { metadataStorage: new MetadataStorage() };
+Initialize(null, store);
 
-  @Collection('bands')
-  class Band {
-    id: string;
-    name: string;
-    formationYear: number;
-    lastShow: Date;
+@Collection('bands')
+class Band {
+  id: string;
+  name: string;
+  formationYear: number;
+  lastShow: Date;
 
-    // Todo create fireorm bypass decorator
-    @Type(() => Coordinates)
-    lastShowCoordinates: Coordinates;
-    genres: Array<string>;
+  // Todo create fireorm bypass decorator
+  @Type(() => Coordinates)
+  lastShowCoordinates: Coordinates;
+  genres: Array<string>;
 
-    @SubCollection(Album)
-    albums?: ISubCollection<Album>;
+  @SubCollection(Album)
+  albums?: ISubCollection<Album>;
 
-    getLastShowYear() {
-      return this.lastShow.getFullYear();
-    }
-
-    getPopularGenre() {
-      return this.genres[0];
-    }
+  getLastShowYear() {
+    return this.lastShow.getFullYear();
   }
 
-  class BandRepository extends BaseFirestoreRepository<Band> {}
+  getPopularGenre() {
+    return this.genres[0];
+  }
+}
 
-  let bandRepository: BaseFirestoreRepository<Band> | null = null;
+class BandRepository extends BaseFirestoreRepository<Band> {}
+
+describe('BaseRepository', () => {
+  let bandRepository: BaseFirestoreRepository<Band> = null;
 
   beforeEach(() => {
     const fixture = Object.assign({}, getFixture());
@@ -79,7 +79,12 @@ describe('BaseRepository', () => {
     });
 
     it('must throw an exception if limit call more than once', async () => {
-      expect(() => bandRepository.limit(2).limit(2).find()).to.throw();
+      expect(() =>
+        bandRepository
+          .limit(2)
+          .limit(2)
+          .find()
+      ).to.throw();
     });
   });
 
