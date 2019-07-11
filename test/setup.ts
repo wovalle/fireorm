@@ -3,7 +3,7 @@ import * as admin from 'firebase-admin';
 import { Initialize } from '../src';
 const serviceAccount = require('./firestore.creds.json');
 
-const uniqueCollections: Array<String> = [];
+const uniqueCollections: Array<string> = [];
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: `https://${serviceAccount.project_id}.firebaseio.com`,
@@ -15,8 +15,17 @@ firestore.settings({
 });
 Initialize(firestore);
 
-after(() => {
-  console.log('must delete uniqueCollections', uniqueCollections);
+after(async () => {
+  console.info('Deleting collections', uniqueCollections);
+
+  const batch = firestore.batch();
+
+  for (const uc of uniqueCollections) {
+    const docs = await firestore.collection(uc).listDocuments();
+    docs.forEach(d => batch.delete(d));
+  }
+
+  await batch.commit();
 });
 
 export const getUniqueColName = (col: string) => {
