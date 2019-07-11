@@ -16,7 +16,6 @@ export class Band {
   lastShow: Date;
   lastShowCoordinates?: Coordinates;
   genres: Array<string>;
-  albums: Array<Album>;
 }
 
 export const getInitialData = () => {

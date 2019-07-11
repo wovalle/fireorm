@@ -8,7 +8,7 @@ import {
 import { expect } from 'chai';
 import { getUniqueColName } from '../setup';
 
-describe.only('Integration test: Custom Repository', () => {
+describe('Integration test: Custom Repository', () => {
   @Collection(getUniqueColName('band'))
   class Band extends BandEntity {}
 
@@ -30,7 +30,7 @@ describe.only('Integration test: Custom Repository', () => {
     await Promise.all(seed);
   });
 
-  it('should do stuff', async () => {
+  it('should use custom repository', async () => {
     const band = new Band();
     band.id = 'opeth';
     band.name = 'Opeth';
