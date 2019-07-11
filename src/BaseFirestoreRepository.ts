@@ -158,7 +158,9 @@ export default class BaseFirestoreRepository<T extends IEntity>
       }
     }
 
-    const doc = this.firestoreColRef.doc(item.id || undefined);
+    const doc = item.id
+      ? this.firestoreColRef.doc(item.id)
+      : this.firestoreColRef.doc();
 
     if (!item.id) {
       item.id = doc.id;
