@@ -21,6 +21,9 @@ describe('SubCollectionDecorator', () => {
     expect(store.metadataStorage.subCollections[0].name).to.eql('subentities');
     expect(store.metadataStorage.subCollections[0].parentEntity).to.eql(Entity);
     expect(store.metadataStorage.subCollections[0].entity).to.eql(SubEntity);
+    expect(store.metadataStorage.subCollections[0].propertyKey).to.eql(
+      'subentity'
+    );
   });
 
   it('should register collections with default name', () => {
@@ -34,5 +37,8 @@ describe('SubCollectionDecorator', () => {
     expect(store.metadataStorage.subCollections[0].name).to.eql('subentities');
     expect(store.metadataStorage.subCollections[0].parentEntity).to.eql(Entity);
     expect(store.metadataStorage.subCollections[0].entity).to.eql(SubEntity);
+    expect(store.metadataStorage.subCollections[0].propertyKey).to.eql(
+      'subentity'
+    );
   });
 });

@@ -10,6 +10,7 @@ export default function SubCollection(
       entity,
       name: entityName || plural(propertyKey),
       parentEntity: target.constructor,
+      propertyKey,
     });
   };
 }
