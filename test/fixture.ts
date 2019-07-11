@@ -9,7 +9,7 @@ export class Album {
   comment?: string;
 }
 
-export class BandEntity {
+export class Band {
   id: string;
   name: string;
   formationYear: number;
@@ -111,7 +111,7 @@ const getCollectionBoilerplate = (entity: string, hash: object) => ({
   },
 });
 
-const getBandFixture = (): BandEntity[] => {
+const getBandFixture = (): Band[] => {
   const initialData = getInitialData();
 
   const objectifyList = (arr: Array<any>, cb) =>
