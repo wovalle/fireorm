@@ -14,6 +14,7 @@ jobs:
         - yarn lint
         # - commitlint-travis
         - yarn test
+        - yarn test:integration
 
     - stage: deploy
       script:
