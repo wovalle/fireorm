@@ -422,6 +422,16 @@ describe('BaseRepository', () => {
       expect(updatedAlbum.comment).to.eql('Anesthethize is top 3 IMHO');
     });
 
+    it('should be able to update collections with subcollections', async () => {
+      const pt = await bandRepository.findById('porcupine-tree');
+      pt.name = 'Porcupine Tree IS THE BEST';
+      const updatedPt = await bandRepository.update(pt);
+      const foundUpdatedPt = await bandRepository.update(pt);
+
+      expect(updatedPt.name).to.eql(pt.name);
+      expect(foundUpdatedPt.name).to.eql(pt.name);
+    });
+
     it('should be able to delete subcollections', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
       await pt.albums.delete('fear-blank-planet');
