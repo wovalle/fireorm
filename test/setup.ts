@@ -1,12 +1,21 @@
 import uuid from 'uuid';
 import * as admin from 'firebase-admin';
 import { Initialize } from '../src';
-const serviceAccount = require('./firestore.creds.json');
+
+const serviceAccount = {
+  projectId: process.env.FIRESTORE_PROJECT_ID,
+  databaseUrl: process.env.FIREBASE_DATABASE_URL,
+  privateKey: Buffer.from(
+    process.env.FIRESTORE_PRIVATE_KEY_BASE_64,
+    'base64'
+  ).toString('ascii'),
+  clientEmail: process.env.FIRESTORE_CLIENT_EMAIL,
+};
 
 const uniqueCollections: Array<string> = [];
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: `https://${serviceAccount.project_id}.firebaseio.com`,
+  databaseURL: serviceAccount.databaseUrl,
 });
 
 const firestore = admin.firestore();
