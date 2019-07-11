@@ -17,6 +17,7 @@ export interface SubCollectionMetadata {
   parentEntity: Function;
   name: string;
   entity: Function;
+  propertyKey: string;
 }
 
 export interface RepositoryMetadata {
