@@ -104,11 +104,12 @@ yarn install # npm install
 
 ### Testing
 
-You can run the tests with the following command:
+Fireorm has two types of tests:
 
-```bash
-yarn test # or npm test
-```
+-   Unit tests: `yarn test # or npm test`
+-   Integration tests: `yarn test:integration # or npm test:integration`
+
+To be able to run the integration tests you'll need to [create a firebase service account](https://firebase.google.com/docs/admin/setup#initialize_the_sdk) and declare some [environment variables](https://github.com/wovalle/fireorm/blob/master/test/setup.ts#L5-L13).
 
 Test files must follow the naming convention `*.test.ts` and use [mocha](https://mochajs.org/) as the test runner.
 
