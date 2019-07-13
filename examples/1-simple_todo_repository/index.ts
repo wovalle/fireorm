@@ -33,23 +33,23 @@ const run = async () => {
   console.log(`Created todo with id: ${todoEntity.id}`);
   console.table(todoEntity);
 
-  // Read a todo
-  const todoId = todoEntity.id;
-  const mySuperTodo = await todoRepository.findById(todoId);
-  console.log(`Got todo with id: ${todoId}`);
-  console.table(mySuperTodo);
+  // // Read a todo
+  // const todoId = todoEntity.id;
+  // const mySuperTodo = await todoRepository.findById(todoId);
+  // console.log(`Got todo with id: ${todoId}`);
+  // console.table(mySuperTodo);
 
-  // Update a todo
-  mySuperTodo.done = true;
-  await todoRepository.update(mySuperTodo);
-  console.log(`Updated todo.`);
-  console.table(mySuperTodo);
+  // // Update a todo
+  // mySuperTodo.done = true;
+  // await todoRepository.update(mySuperTodo);
+  // console.log(`Updated todo.`);
+  // console.table(mySuperTodo);
 
-  // Delete a todo
-  await todoRepository.delete(mySuperTodo.id);
-  console.log(`Deleted todo.`);
-  const deletedTodo = await todoRepository.findById(mySuperTodo.id);
-  console.log('Deleted Todo:', deletedTodo);
+  // // Delete a todo
+  // await todoRepository.delete(mySuperTodo.id);
+  // console.log(`Deleted todo.`);
+  // const deletedTodo = await todoRepository.findById(mySuperTodo.id);
+  // console.log('Deleted Todo:', deletedTodo);
 };
 
 run().catch(e => console.error(e));
