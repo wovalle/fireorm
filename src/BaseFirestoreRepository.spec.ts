@@ -14,16 +14,21 @@ const meta = {
   relationships: {},
 };
 
+enum RelationshipType {
+  OneToOne = 'OneToOne',
+  OneToMany = 'OneToMany',
+  ManyToMany = 'ManyToMany',
+}
+
 export default function OneToMany(
   entity: InstanstiableIEntity,
   primaryKey: string,
   foreignKey: string
 ): Function {
-  return function(target: Function, propertyKey: string, c: any) {
-    console.log({ target, propertyKey, c });
-    const primaryEntity = target.name;
-    const foreignEntity = entity.name;
-    const relName = [primaryEntity, foreignEntity]
+  return function(target: Function, propertyKey: string) {
+    const primaryEntity = target.constructor;
+    const foreignEntity = entity;
+    const relName = [primaryEntity.name, foreignEntity.name]
       .sort((a, b) => a.localeCompare(b))
       .join('_');
 
@@ -32,14 +37,18 @@ export default function OneToMany(
       primaryKey,
       foreignEntity,
       foreignKey,
+      propertyKey,
+      type: RelationshipType.OneToMany,
     };
   };
 }
+
 @Collection('user')
 export class User {
   id: string;
   name: string;
 }
+
 @Collection('bands')
 class Band {
   id: string;
@@ -484,8 +493,19 @@ describe('BaseRepository', () => {
     });
   });
 
-  describe.skip('relationships', () => {
-    it('must handle one OneToOne relationships', async () => {
+  describe.only('relationships', () => {
+    // TODO: To be moved to Decorator tests
+    it('must register relationships', async () => {
+      const rel = meta.relationships['Band_User'];
+      expect(rel.primaryEntity).to.equal(Band);
+      expect(rel.primaryKey).to.equal('id');
+      expect(rel.foreignEntity).to.equal(User);
+      expect(rel.foreignKey).to.equal('bandId');
+      expect(rel.propertyKey).to.equal('members');
+      expect(rel.type).to.equal(RelationshipType.OneToMany);
+    });
+
+    it.skip('must handle one OneToOne relationships', async () => {
       const band = await bandRepository.findById('pink-floyd');
       expect(band.members.length).to.equal(2);
     });
