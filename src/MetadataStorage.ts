@@ -1,5 +1,6 @@
 import { Firestore } from '@google-cloud/firestore';
 import { BaseRepository } from './BaseFirestoreRepository';
+import { InstanstiableIEntity, RelationshipType } from './types';
 let store: IMetadataStore = null;
 
 export interface IMetadataStore {
@@ -25,10 +26,21 @@ export interface RepositoryMetadata {
   entity: Function;
 }
 
+export interface RelationshipMetadata {
+  name: string;
+  primaryEntity: InstanstiableIEntity;
+  primaryKey: string;
+  foreignEntity: InstanstiableIEntity;
+  foreignKey: string;
+  propertyKey: string;
+  type: RelationshipType;
+}
+
 export class MetadataStorage {
   readonly collections: Array<CollectionMetadata> = [];
   readonly subCollections: Array<SubCollectionMetadata> = [];
   readonly repositories: Map<unknown, RepositoryMetadata> = new Map();
+  readonly relationships: Array<RelationshipMetadata> = [];
 
   public getCollection = (param: string | Function) => {
     if (typeof param === 'string') {
@@ -81,6 +93,18 @@ export class MetadataStorage {
     }
 
     this.repositories.set(repo.entity, repo);
+  };
+
+  public getRelationships = (param: InstanstiableIEntity) => {
+    // WIP: prevent duplicates
+    const primary = this.relationships.filter(r => r.primaryEntity === param);
+    const foreign = this.relationships.filter(r => r.foreignEntity === param);
+    return [...primary, ...foreign];
+  };
+
+  public setRelationships = (rel: RelationshipMetadata) => {
+    // WIP: define validation
+    this.relationships.push(rel);
   };
 
   public firestoreRef: Firestore = null;

@@ -4,42 +4,33 @@ import { expect } from 'chai';
 import { Collection, SubCollection, ISubCollection, Initialize } from '.';
 import { Type } from './';
 import { MetadataStorage } from './MetadataStorage';
-import { InstanstiableIEntity } from './types';
+import { InstanstiableIEntity, RelationshipType } from './types';
 const MockFirebase = require('mock-cloud-firestore');
 
 const store = { metadataStorage: new MetadataStorage() };
 Initialize(null, store);
-
-const meta = {
-  relationships: {},
-};
-
-enum RelationshipType {
-  OneToOne = 'OneToOne',
-  OneToMany = 'OneToMany',
-  ManyToMany = 'ManyToMany',
-}
 
 export default function OneToMany(
   entity: InstanstiableIEntity,
   primaryKey: string,
   foreignKey: string
 ): Function {
-  return function(target: Function, propertyKey: string) {
-    const primaryEntity = target.constructor;
+  return function(target: InstanstiableIEntity, propertyKey: string) {
+    const primaryEntity = target.constructor as InstanstiableIEntity;
     const foreignEntity = entity;
-    const relName = [primaryEntity.name, foreignEntity.name]
+    const name = [primaryEntity.name, foreignEntity.name]
       .sort((a, b) => a.localeCompare(b))
       .join('_');
 
-    meta.relationships[relName] = {
+    store.metadataStorage.setRelationships({
       primaryEntity,
       primaryKey,
       foreignEntity,
       foreignKey,
       propertyKey,
       type: RelationshipType.OneToMany,
-    };
+      name,
+    });
   };
 }
 
@@ -496,7 +487,7 @@ describe('BaseRepository', () => {
   describe.only('relationships', () => {
     // TODO: To be moved to Decorator tests
     it('must register relationships', async () => {
-      const rel = meta.relationships['Band_User'];
+      const rel = store.metadataStorage.getRelationships(Band)[0];
       expect(rel.primaryEntity).to.equal(Band);
       expect(rel.primaryKey).to.equal('id');
       expect(rel.foreignEntity).to.equal(User);
