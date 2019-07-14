@@ -21,12 +21,14 @@ import {
   IOrderByParams,
   IQueryExecutor,
   IEntity,
+  InstanstiableIEntity,
 } from './types';
 
 import {
   getMetadataStorage,
   CollectionMetadata,
   SubCollectionMetadata,
+  RelationshipMetadata,
 } from './MetadataStorage';
 
 /**
@@ -46,6 +48,7 @@ export default class BaseFirestoreRepository<T extends IEntity>
   private readonly firestoreColRef: CollectionReference;
   private readonly colMetadata: CollectionMetadata;
   private readonly subColMetadata: SubCollectionMetadata[];
+  private readonly relMetadata: RelationshipMetadata[];
 
   constructor(colName: string);
   constructor(colName: string, docId: string, subColName: string);
@@ -60,6 +63,7 @@ export default class BaseFirestoreRepository<T extends IEntity>
       firestoreRef,
       getCollection,
       getSubCollectionsFromParent,
+      getPrimaryRelationships,
     } = getMetadataStorage();
 
     if (!firestoreRef) {
@@ -72,6 +76,8 @@ export default class BaseFirestoreRepository<T extends IEntity>
       throw new Error(`There is no metadata stored for "${this.colName}"`);
     }
 
+    this.relMetadata = getPrimaryRelationships(this.colMetadata
+      .entity as InstanstiableIEntity);
     this.subColMetadata = getSubCollectionsFromParent(this.colMetadata.entity);
 
     if (this.docId) {
@@ -103,7 +109,6 @@ export default class BaseFirestoreRepository<T extends IEntity>
       return null;
     }
 
-    // tslint:disable-next-line:no-unnecessary-type-assertion
     const entity = plainToClass(
       this.colMetadata.entity as any,
       this.transformFirestoreTypes(doc.data() as T)
@@ -113,6 +118,27 @@ export default class BaseFirestoreRepository<T extends IEntity>
       this.initializeSubCollections(entity);
     }
 
+    return entity;
+  };
+
+  private handleRelationships = async (entity: T): Promise<T> => {
+    // TODO: what to do with foreign rels
+    if (this.relMetadata.length && entity) {
+      const queries = this.relMetadata.map(rel => {
+        return GetRepository(rel.foreignEntity)
+          .whereEqualTo(rel.foreignKey as any, entity.id)
+          .find()
+          .then(res => ({ rel, res }));
+      });
+
+      await Promise.all(queries).then(resolvedQueries => {
+        resolvedQueries.forEach(r => {
+          Object.assign(entity, {
+            [r.rel.propertyKey]: r.res,
+          });
+        });
+      });
+    }
     return entity;
   };
 
@@ -147,7 +173,8 @@ export default class BaseFirestoreRepository<T extends IEntity>
     return this.firestoreColRef
       .doc(id)
       .get()
-      .then(this.extractTFromDocSnap);
+      .then(this.extractTFromDocSnap)
+      .then(this.handleRelationships);
   }
 
   async create(item: T): Promise<T> {

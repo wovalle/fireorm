@@ -34,10 +34,13 @@ export default function OneToMany(
   };
 }
 
-@Collection('user')
+@Collection('members')
 export class User {
   id: string;
+  bandId: string;
   name: string;
+  from: Date;
+  to: Date;
 }
 
 @Collection('bands')
@@ -484,7 +487,7 @@ describe('BaseRepository', () => {
     });
   });
 
-  describe.only('relationships', () => {
+  describe('relationships', () => {
     // TODO: To be moved to Decorator tests
     it('must register relationships', async () => {
       const rel = store.metadataStorage.getRelationships(Band)[0];
@@ -496,9 +499,9 @@ describe('BaseRepository', () => {
       expect(rel.type).to.equal(RelationshipType.OneToMany);
     });
 
-    it.skip('must handle one OneToOne relationships', async () => {
-      const band = await bandRepository.findById('pink-floyd');
-      expect(band.members.length).to.equal(2);
+    it('must handle one OneToMany relationships', async () => {
+      const band = await bandRepository.findById('porcupine-tree');
+      expect(band.members.length).to.equal(4);
     });
   });
 });

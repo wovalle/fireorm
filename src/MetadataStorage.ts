@@ -95,6 +95,10 @@ export class MetadataStorage {
     this.repositories.set(repo.entity, repo);
   };
 
+  public getPrimaryRelationships = (param: InstanstiableIEntity) => {
+    return this.relationships.filter(r => r.primaryEntity === param);
+  };
+
   public getRelationships = (param: InstanstiableIEntity) => {
     // WIP: prevent duplicates
     const primary = this.relationships.filter(r => r.primaryEntity === param);
