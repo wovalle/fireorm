@@ -20,10 +20,13 @@ export class Band {
 
 export class BandMembers {
   id: string;
+  bandId: string;
   name: string;
+  from: Date;
+  to: Date;
 }
 
-export const getInitialData = () => {
+export const getInitialBandData = () => {
   return [
     {
       id: 'porcupine-tree',
@@ -107,25 +110,78 @@ export const getInitialData = () => {
   ];
 };
 
-const getCollectionBoilerplate = (entity: string, hash: object) => ({
-  __collection__: {
-    [entity]: {
-      __doc__: hash,
+export const getInitialBandMemberData = () => {
+  return [
+    {
+      id: '1',
+      bandId: 'porcupine-tree',
+      name: 'Steven Wilson',
+      from: new Date('1987-01-01'),
+      to: null,
     },
-  },
-});
+    {
+      id: '2',
+      bandId: 'porcupine-tree',
+      name: 'Richard Barbieri',
+      from: new Date('1987-01-01'),
+      to: null,
+    },
+    {
+      id: '3',
+      bandId: 'porcupine-tree',
+      name: 'Chris Maitland',
+      from: new Date('1987-01-01'),
+      to: new Date('2002-02-01'),
+    },
+    {
+      id: '4',
+      name: 'Colin Edwins',
+      from: new Date('1987-01-01'),
+      to: null,
+    },
+    {
+      id: '4',
+      bandId: 'porcupine-tree',
+      name: 'Gavin Harrison',
+      from: new Date('2002-02-01'),
+      to: null,
+    },
+  ];
+};
+
+type ICollectionBoilerplate = [string, object];
+
+const getCollectionBoilerplate = (colBoilerplate: ICollectionBoilerplate[]) => {
+  return {
+    __collection__: {
+      ...colBoilerplate.reduce((acc, [colName, colData]) => {
+        acc[colName] = {
+          __doc__: colData,
+        };
+        return acc;
+      }, {}),
+    },
+  };
+};
+
+const objectifyList = (arr: Array<any>, cb = a => a) =>
+  arr.reduce((acc, cur) => ({ ...acc, [cur.id]: cb(cur) }), {});
 
 const getBandFixture = (): Band[] => {
-  const initialData = getInitialData();
+  const initialData = getInitialBandData();
 
-  const objectifyList = (arr: Array<any>, cb) =>
-    arr.reduce((acc, cur) => ({ ...acc, [cur.id]: cb(cur) }), {});
-
-  return objectifyList(initialData, ({ albums, ...rest }) => ({
+  return objectifyList(initialData, ({ albums = [], ...rest }) => ({
     ...rest,
-    ...getCollectionBoilerplate('albums', objectifyList(albums, a => a)),
+    ...getCollectionBoilerplate([['albums', objectifyList(albums)]]),
   }));
 };
 
+const getBandMembersFixture = (): BandMembers[] => {
+  return objectifyList(getInitialBandMemberData());
+};
+
 export const getFixture = () =>
-  getCollectionBoilerplate('bands', getBandFixture());
+  getCollectionBoilerplate([
+    ['bands', getBandFixture()],
+    ['members', getBandMembersFixture()],
+  ]);

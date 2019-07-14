@@ -1,4 +1,4 @@
-import { Band, Album, getInitialData } from '../fixture';
+import { Band, Album, getInitialBandData } from '../fixture';
 import {
   GetRepository,
   Collection,
@@ -18,7 +18,7 @@ describe('Integration test: SubCollections', () => {
   const fullBandRepository = GetRepository(FullBand);
 
   before(async () => {
-    const seed = getInitialData().map(({ albums, ...band }) => ({
+    const seed = getInitialBandData().map(({ albums, ...band }) => ({
       band,
       albums,
     }));

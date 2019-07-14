@@ -1,4 +1,4 @@
-import { getInitialData, Band as BandEntity } from '../fixture';
+import { getInitialBandData, Band as BandEntity } from '../fixture';
 import {
   CustomRepository,
   BaseFirestoreRepository,
@@ -26,7 +26,7 @@ describe('Integration test: Custom Repository', () => {
   const rockBandRepository = GetRepository(Band) as CustomRockBandRepository;
 
   before(async () => {
-    const seed = getInitialData().map(b => rockBandRepository.create(b));
+    const seed = getInitialBandData().map(b => rockBandRepository.create(b));
     await Promise.all(seed);
   });
 
