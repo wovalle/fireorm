@@ -311,7 +311,6 @@ describe('BaseRepository', () => {
     });
 
     it('must throw if item is not found', async () => {
-      //tslint:disable-next-line:rule1 no-void-expression
       expect(await bandRepository.delete('lol')).to.throw;
     });
   });
@@ -499,9 +498,24 @@ describe('BaseRepository', () => {
       expect(rel.type).to.equal(RelationshipType.OneToMany);
     });
 
-    it('must handle one OneToMany relationships', async () => {
+    it('must handle one OneToMany relationships with findById operations', async () => {
       const band = await bandRepository.findById('porcupine-tree');
-      expect(band.members.length).to.equal(4);
+      expect(band.members.length).to.eql(4);
+      expect(band.members.map(m => m.id)).to.eql('1234'.split(''));
+    });
+
+    it('must handle one OneToMany relationships with *where operations', async () => {
+      const band = await bandRepository
+        .whereEqualTo('id', 'porcupine-tree')
+        .find();
+      expect(band[0].members.length).to.eql(4);
+      expect(band[0].members.map(m => m.id)).to.eql('1234'.split(''));
+    });
+
+    it('must handle when when primary is null with findById operations');
+    it('must handle when foreign is null', async () => {
+      const band = await bandRepository.findById('pink-floyd');
+      expect(band.members).to.eql([]);
     });
   });
 });

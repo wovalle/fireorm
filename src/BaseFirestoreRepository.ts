@@ -233,7 +233,7 @@ export default class BaseFirestoreRepository<T extends IEntity>
     return new QueryBuilder<T>(this).find();
   }
 
-  execute(
+  async execute(
     queries: Array<IFireOrmQueryLine>,
     limitVal?: number,
     orderByObj?: IOrderByParams
@@ -248,7 +248,10 @@ export default class BaseFirestoreRepository<T extends IEntity>
     if (limitVal) {
       query = query.limit(limitVal);
     }
-    return query.get().then(this.extractTFromColSnap);
+    return query
+      .get()
+      .then(this.extractTFromColSnap)
+      .then(arr => Promise.all(arr.map(a => this.handleRelationships(a))));
   }
 
   whereEqualTo(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {

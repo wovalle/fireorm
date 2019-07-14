@@ -29,7 +29,6 @@ describe('Helpers', () => {
       }
     }
 
-    //TODO: I don't know why store is undefined here, check it out
     const rep = GetRepository(Entity) as EntityRepo;
     expect(rep).to.be.instanceOf(BaseFirestoreRepository);
     expect(rep.meaningOfLife()).to.eql(42);
