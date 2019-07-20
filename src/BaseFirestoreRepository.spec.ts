@@ -4,35 +4,11 @@ import { expect } from 'chai';
 import { Collection, SubCollection, ISubCollection, Initialize } from '.';
 import { Type } from './';
 import { MetadataStorage } from './MetadataStorage';
-import { InstanstiableIEntity, RelationshipType } from './types';
+import { OneToMany } from './Decorators/Relationships';
 const MockFirebase = require('mock-cloud-firestore');
 
 const store = { metadataStorage: new MetadataStorage() };
 Initialize(null, store);
-
-export default function OneToMany(
-  entity: InstanstiableIEntity,
-  primaryKey: string,
-  foreignKey: string
-): Function {
-  return function(target: InstanstiableIEntity, propertyKey: string) {
-    const primaryEntity = target.constructor as InstanstiableIEntity;
-    const foreignEntity = entity;
-    const name = [primaryEntity.name, foreignEntity.name]
-      .sort((a, b) => a.localeCompare(b))
-      .join('_');
-
-    store.metadataStorage.setRelationships({
-      primaryEntity,
-      primaryKey,
-      foreignEntity,
-      foreignKey,
-      propertyKey,
-      type: RelationshipType.OneToMany,
-      name,
-    });
-  };
-}
 
 @Collection('members')
 export class User {
@@ -487,17 +463,6 @@ describe('BaseRepository', () => {
   });
 
   describe('relationships', () => {
-    // TODO: To be moved to Decorator tests
-    it('must register relationships', async () => {
-      const rel = store.metadataStorage.getRelationships(Band)[0];
-      expect(rel.primaryEntity).to.equal(Band);
-      expect(rel.primaryKey).to.equal('id');
-      expect(rel.foreignEntity).to.equal(User);
-      expect(rel.foreignKey).to.equal('bandId');
-      expect(rel.propertyKey).to.equal('members');
-      expect(rel.type).to.equal(RelationshipType.OneToMany);
-    });
-
     it('must handle one OneToMany relationships with findById operations', async () => {
       const band = await bandRepository.findById('porcupine-tree');
       expect(band.members.length).to.eql(4);
