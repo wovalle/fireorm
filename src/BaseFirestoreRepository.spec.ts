@@ -19,9 +19,18 @@ export class User {
   to: Date;
 }
 
+@Collection('label_band')
+export class LabelBand {
+  id: string;
+  bandId: string;
+  name: string;
+  from: Date;
+  to: Date;
+}
 @Collection('bands')
 class Band {
   id: string;
+  // @Primary()
   name: string;
   formationYear: number;
   lastShow: Date;
@@ -34,8 +43,11 @@ class Band {
   @SubCollection(Album)
   albums?: ISubCollection<Album>;
 
-  @OneToMany(User, 'id', 'bandId')
-  members: Array<User>;
+  @OneToMany(User, 'id', 'bandId', false)
+  members: User[];
+
+  @OneToMany(LabelBand, 'id', 'bandId')
+  labels: Promise<LabelBand[]>;
 
   getLastShowYear() {
     return this.lastShow.getFullYear();
@@ -463,6 +475,14 @@ describe('BaseRepository', () => {
   });
 
   describe('relationships', () => {
+    it('must handle lazy relationships', async () => {
+      const band = await bandRepository.findById('porcupine-tree');
+      expect(band.labels).instanceOf(Promise);
+      const labels = await band.labels;
+      expect(labels).instanceOf(Array);
+      expect(labels).length(2);
+    });
+
     it('must handle one OneToMany relationships with findById operations', async () => {
       const band = await bandRepository.findById('porcupine-tree');
       expect(band.members.length).to.eql(4);

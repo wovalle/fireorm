@@ -1,6 +1,7 @@
 // tslint:disable-next-line:no-import-side-effect
 import 'reflect-metadata';
 import { plainToClass } from 'class-transformer';
+import LazyPromise from 'p-lazy';
 
 import {
   DocumentSnapshot,
@@ -124,21 +125,22 @@ export default class BaseFirestoreRepository<T extends IEntity>
   private handleRelationships = async (entity: T): Promise<T> => {
     // TODO: what to do with foreign rels
     if (this.relMetadata.length && entity) {
-      const queries = this.relMetadata.map(rel => {
-        return GetRepository(rel.foreignEntity)
-          .whereEqualTo(rel.foreignKey as any, entity.id)
-          .find()
-          .then(res => ({ rel, res }));
-      });
+      for (const rel of this.relMetadata) {
+        const queryBuilder = GetRepository(rel.foreignEntity).whereEqualTo(
+          rel.foreignKey as any,
+          entity.id
+        );
 
-      await Promise.all(queries).then(resolvedQueries => {
-        resolvedQueries.forEach(r => {
-          Object.assign(entity, {
-            [r.rel.propertyKey]: r.res,
-          });
+        const t = rel.lazy
+          ? LazyPromise.from(() => queryBuilder.find())
+          : await queryBuilder.find();
+
+        Object.assign(entity, {
+          [rel.propertyKey]: t,
         });
-      });
+      }
     }
+
     return entity;
   };
 
@@ -166,6 +168,11 @@ export default class BaseFirestoreRepository<T extends IEntity>
     this.subColMetadata.forEach(scm => {
       delete obj[scm.propertyKey];
     });
+
+    this.relMetadata.forEach(scm => {
+      delete obj[scm.propertyKey];
+    });
+
     return { ...obj };
   };
 

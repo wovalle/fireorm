@@ -1,14 +1,14 @@
 import { getMetadataStorage } from '../MetadataStorage';
 import { InstanstiableIEntity, RelationshipType } from '..';
 
-export function OneToMany(
-  entity: InstanstiableIEntity,
-  primaryKey: string,
-  foreignKey: string
+export function OneToMany<T, K extends InstanstiableIEntity>(
+  foreignEntity: K,
+  primaryKey: keyof T & string,
+  foreignKey: string,
+  lazy: boolean = true
 ): Function {
-  return function(target: InstanstiableIEntity, propertyKey: string) {
-    const primaryEntity = target.constructor as InstanstiableIEntity;
-    const foreignEntity = entity;
+  return function(primary: T, propertyKey: string) {
+    const primaryEntity = primary.constructor as InstanstiableIEntity;
     const name = [primaryEntity.name, foreignEntity.name]
       .sort((a, b) => a.localeCompare(b))
       .join('_');
@@ -21,6 +21,7 @@ export function OneToMany(
       propertyKey,
       type: RelationshipType.OneToMany,
       name,
+      lazy,
     });
   };
 }

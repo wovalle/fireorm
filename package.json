@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "class-transformer": "^0.2.0",
+    "p-lazy": "^3.0.0",
     "pluralize": "^8.0.0"
   },
   "devDependencies": {

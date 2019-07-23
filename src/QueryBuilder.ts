@@ -74,7 +74,9 @@ export default class QueryBuilder<T extends IEntity>
 
   limit(limitVal: number): QueryBuilder<T> {
     if (this.limitVal) {
-      throw new Error('A limit function cannot be called more than once in the same query expression');
+      throw new Error(
+        'A limit function cannot be called more than once in the same query expression'
+      );
     }
     this.limitVal = limitVal;
     return this;
@@ -82,7 +84,9 @@ export default class QueryBuilder<T extends IEntity>
 
   orderByAscending(prop: keyof T & string): QueryBuilder<T> {
     if (this.orderByObj) {
-      throw new Error('An orderBy function cannot be called more than once in the same query expression')
+      throw new Error(
+        'An orderBy function cannot be called more than once in the same query expression'
+      );
     }
     this.orderByObj = {
       fieldPath: prop,
@@ -93,7 +97,9 @@ export default class QueryBuilder<T extends IEntity>
 
   orderByDescending(prop: keyof T & string): QueryBuilder<T> {
     if (this.orderByObj) {
-      throw new Error('An orderBy function cannot be called more than once in the same query expression')
+      throw new Error(
+        'An orderBy function cannot be called more than once in the same query expression'
+      );
     }
     this.orderByObj = {
       fieldPath: prop,

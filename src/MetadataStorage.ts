@@ -34,6 +34,7 @@ export interface RelationshipMetadata {
   foreignKey: string;
   propertyKey: string;
   type: RelationshipType;
+  lazy: boolean;
 }
 
 export class MetadataStorage {
