@@ -3,11 +3,16 @@ import { MetadataStorage, Initialize } from '../MetadataStorage';
 import { Collection, RelationshipType } from '..';
 import { OneToMany } from './Relationships';
 
-// TODO: eager/lazy (lazy as default)
+// TODO: eager/lazy (lazy as default) [ok]
+// TODO: validate duplicated relationships [ok]
 // TODO: cascade update/save?
 // TODO: circular relationships?
 // TODO: ManyToMany
-// TODO: validate duplicated relationships
+// TODO: @Primary
+// TODO: Handle foreigns with deep fields
+// TODO: mock for BandLabel
+// TODO: what to do with foreign rels
+// TODO: for now only taking first element of foreignKeys
 describe('RelationshipsDecorators', () => {
   const store = { metadataStorage: new MetadataStorage() };
 
@@ -26,7 +31,7 @@ describe('RelationshipsDecorators', () => {
     class Foo {
       id: string;
 
-      @OneToMany(Bar, 'id', 'fooId')
+      @OneToMany(Bar, b => b.fooId)
       bars: Array<Bar>;
     }
 
@@ -34,7 +39,7 @@ describe('RelationshipsDecorators', () => {
     expect(rel.primaryEntity).to.equal(Foo);
     expect(rel.primaryKey).to.equal('id');
     expect(rel.foreignEntity).to.equal(Bar);
-    expect(rel.foreignKey).to.equal('fooId');
+    expect(rel.foreignKey).to.eql(['fooId']);
     expect(rel.propertyKey).to.equal('bars');
     expect(rel.type).to.equal(RelationshipType.OneToMany);
   });
@@ -49,7 +54,7 @@ describe('RelationshipsDecorators', () => {
     class Foo {
       id: string;
 
-      @OneToMany(Bar, 'id', 'fooId')
+      @OneToMany(Bar, b => b.fooId)
       bars: Array<Bar>;
     }
 
@@ -57,7 +62,7 @@ describe('RelationshipsDecorators', () => {
     expect(rel.primaryEntity).to.equal(Foo);
     expect(rel.primaryKey).to.equal('id');
     expect(rel.foreignEntity).to.equal(Bar);
-    expect(rel.foreignKey).to.equal('fooId');
+    expect(rel.foreignKey).to.eql(['fooId']);
     expect(rel.propertyKey).to.equal('bars');
     expect(rel.type).to.equal(RelationshipType.OneToMany);
   });

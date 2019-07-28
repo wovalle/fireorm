@@ -43,10 +43,10 @@ class Band {
   @SubCollection(Album)
   albums?: ISubCollection<Album>;
 
-  @OneToMany(User, 'id', 'bandId', false)
+  @OneToMany(User, u => u.bandId, { lazy: false })
   members: User[];
 
-  @OneToMany(LabelBand, 'id', 'bandId')
+  @OneToMany(LabelBand, l => l.bandId)
   labels: Promise<LabelBand[]>;
 
   getLastShowYear() {

@@ -31,7 +31,7 @@ export interface RelationshipMetadata {
   primaryEntity: InstanstiableIEntity;
   primaryKey: string;
   foreignEntity: InstanstiableIEntity;
-  foreignKey: string;
+  foreignKey: string[];
   propertyKey: string;
   type: RelationshipType;
   lazy: boolean;

@@ -1,27 +1,34 @@
 import { getMetadataStorage } from '../MetadataStorage';
 import { InstanstiableIEntity, RelationshipType } from '..';
+import { getPath } from 'ts-object-path';
+import { TInstanstiableIEntity, IEntity } from '../types';
 
-export function OneToMany<T, K extends InstanstiableIEntity>(
-  foreignEntity: K,
-  primaryKey: keyof T & string,
-  foreignKey: string,
-  lazy: boolean = true
+type IRelationshipOptions = {
+  lazy?: boolean;
+};
+
+export function OneToMany<T extends IEntity>(
+  foreignEntity: TInstanstiableIEntity<T>,
+  foreignKeyFactory: (t: T) => any,
+  opt: IRelationshipOptions = { lazy: true }
 ): Function {
-  return function(primary: T, propertyKey: string) {
+  return function(primary: InstanstiableIEntity, propertyKey: string) {
     const primaryEntity = primary.constructor as InstanstiableIEntity;
     const name = [primaryEntity.name, foreignEntity.name]
       .sort((a, b) => a.localeCompare(b))
       .join('_');
 
+    const foreignKey = getPath(foreignKeyFactory) as string[];
+
     getMetadataStorage().setRelationships({
       primaryEntity,
-      primaryKey,
+      primaryKey: 'id', // id o result de @Primary
       foreignEntity,
       foreignKey,
       propertyKey,
       type: RelationshipType.OneToMany,
       name,
-      lazy,
+      lazy: opt.lazy,
     });
   };
 }

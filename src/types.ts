@@ -68,6 +68,7 @@ export interface IEntity {
 }
 
 export type InstanstiableIEntity = { new (): IEntity };
+export type TInstanstiableIEntity<T extends IEntity> = { new (): T };
 
 export enum RelationshipType {
   OneToOne = 'OneToOne',

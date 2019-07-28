@@ -123,11 +123,10 @@ export default class BaseFirestoreRepository<T extends IEntity>
   };
 
   private handleRelationships = async (entity: T): Promise<T> => {
-    // TODO: what to do with foreign rels
     if (this.relMetadata.length && entity) {
       for (const rel of this.relMetadata) {
         const queryBuilder = GetRepository(rel.foreignEntity).whereEqualTo(
-          rel.foreignKey as any,
+          rel.foreignKey[0] as any,
           entity.id
         );
 
@@ -164,16 +163,18 @@ export default class BaseFirestoreRepository<T extends IEntity>
     return obj;
   };
 
-  private toSerializableObject = (obj: T): Object => {
+  private toSerializableObject = (entity: T): Object => {
+    const clone = { ...entity };
+
     this.subColMetadata.forEach(scm => {
-      delete obj[scm.propertyKey];
+      delete clone[scm.propertyKey];
     });
 
     this.relMetadata.forEach(scm => {
-      delete obj[scm.propertyKey];
+      delete clone[scm.propertyKey];
     });
 
-    return { ...obj };
+    return clone;
   };
 
   findById(id: string): Promise<T> {
