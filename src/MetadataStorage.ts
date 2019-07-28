@@ -27,7 +27,6 @@ export interface RepositoryMetadata {
 }
 
 export interface RelationshipMetadata {
-  name: string;
   primaryEntity: InstanstiableIEntity;
   primaryKey: string;
   foreignEntity: InstanstiableIEntity;

@@ -14,10 +14,6 @@ export function OneToMany<T extends IEntity>(
 ): Function {
   return function(primary: InstanstiableIEntity, propertyKey: string) {
     const primaryEntity = primary.constructor as InstanstiableIEntity;
-    const name = [primaryEntity.name, foreignEntity.name]
-      .sort((a, b) => a.localeCompare(b))
-      .join('_');
-
     const foreignKey = getPath(foreignKeyFactory) as string[];
 
     getMetadataStorage().setRelationships({
@@ -27,7 +23,6 @@ export function OneToMany<T extends IEntity>(
       foreignKey,
       propertyKey,
       type: RelationshipType.OneToMany,
-      name,
       lazy: opt.lazy,
     });
   };
