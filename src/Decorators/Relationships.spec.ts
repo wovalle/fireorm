@@ -13,6 +13,7 @@ import { OneToMany } from './Relationships';
 // TODO: mock for BandLabel
 // TODO: what to do with foreign rels
 // TODO: for now only taking first element of foreignKeys
+// TODO: actually using @Primary, baserep, handleRels
 describe('RelationshipsDecorators', () => {
   const store = { metadataStorage: new MetadataStorage() };
 
@@ -37,7 +38,6 @@ describe('RelationshipsDecorators', () => {
 
     const rel = store.metadataStorage.getRelationships(Foo)[0];
     expect(rel.primaryEntity).to.equal(Foo);
-    expect(rel.primaryKey).to.equal('id');
     expect(rel.foreignEntity).to.equal(Bar);
     expect(rel.foreignKey).to.eql(['fooId']);
     expect(rel.propertyKey).to.equal('bars');
@@ -60,11 +60,31 @@ describe('RelationshipsDecorators', () => {
 
     const rel = store.metadataStorage.getRelationships(Bar)[0];
     expect(rel.primaryEntity).to.equal(Foo);
-    expect(rel.primaryKey).to.equal('id');
     expect(rel.foreignEntity).to.equal(Bar);
     expect(rel.foreignKey).to.eql(['fooId']);
     expect(rel.propertyKey).to.equal('bars');
     expect(rel.type).to.equal(RelationshipType.OneToMany);
+  });
+
+  it('should register a field metadata', () => {
+    class Bar {
+      id: string;
+      fooId: string;
+    }
+
+    @Collection()
+    class Foo {
+      id: string;
+
+      @OneToMany(Bar, b => b.fooId)
+      bars: Array<Bar>;
+    }
+
+    const fieldsMetadata = store.metadataStorage.getFields(Foo);
+    expect(fieldsMetadata.length).to.eql(1);
+    expect(fieldsMetadata[0].entity).to.eql(Foo);
+    expect(fieldsMetadata[0].propertyKey).to.eql('bars');
+    expect(fieldsMetadata[0].type).to.eql('relationship');
   });
 
   it("shouldn't return duplicated relationships");

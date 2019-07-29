@@ -10,7 +10,7 @@ describe('SubCollectionDecorator', () => {
     Initialize(null, store);
   });
 
-  it('should register collections', () => {
+  it('should register subCollections', () => {
     class SubEntity {}
     class Entity {
       @SubCollection(SubEntity, 'subentities')
@@ -26,7 +26,7 @@ describe('SubCollectionDecorator', () => {
     );
   });
 
-  it('should register collections with default name', () => {
+  it('should register subCollections with default name', () => {
     class SubEntity {}
     class Entity {
       @SubCollection(SubEntity)
@@ -40,5 +40,19 @@ describe('SubCollectionDecorator', () => {
     expect(store.metadataStorage.subCollections[0].propertyKey).to.eql(
       'subentity'
     );
+  });
+
+  it('should register a field metadata', () => {
+    class SubEntity {}
+    class Entity {
+      @SubCollection(SubEntity)
+      readonly subentity: null;
+    }
+
+    const fieldsMetadata = store.metadataStorage.getFields(Entity);
+    expect(fieldsMetadata.length).to.eql(1);
+    expect(fieldsMetadata[0].entity).to.eql(Entity);
+    expect(fieldsMetadata[0].propertyKey).to.eql('subentity');
+    expect(fieldsMetadata[0].type).to.eql('subcollection');
   });
 });

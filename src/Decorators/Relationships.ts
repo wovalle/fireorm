@@ -9,7 +9,7 @@ type IRelationshipOptions = {
 
 export function OneToMany<T extends IEntity>(
   foreignEntity: TInstanstiableIEntity<T>,
-  foreignKeyFactory: (t: T) => any,
+  foreignKeyFactory: (t: T) => unknown,
   opt: IRelationshipOptions = { lazy: true }
 ): Function {
   return function(primary: InstanstiableIEntity, propertyKey: string) {
@@ -18,7 +18,6 @@ export function OneToMany<T extends IEntity>(
 
     getMetadataStorage().setRelationships({
       primaryEntity,
-      primaryKey: 'id', // id o result de @Primary
       foreignEntity,
       foreignKey,
       propertyKey,

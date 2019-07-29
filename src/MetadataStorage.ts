@@ -7,8 +7,6 @@ export interface IMetadataStore {
   metadataStorage: MetadataStorage;
 }
 
-const globalStore = global as any;
-
 export interface CollectionMetadata {
   entity: Function;
   name: string;
@@ -26,9 +24,14 @@ export interface RepositoryMetadata {
   entity: Function;
 }
 
+export interface FieldMetadata {
+  entity: Function;
+  propertyKey: string;
+  type: 'primary' | 'subcollection' | 'relationship';
+}
+
 export interface RelationshipMetadata {
   primaryEntity: InstanstiableIEntity;
-  primaryKey: string;
   foreignEntity: InstanstiableIEntity;
   foreignKey: string[];
   propertyKey: string;
@@ -41,6 +44,7 @@ export class MetadataStorage {
   readonly subCollections: Array<SubCollectionMetadata> = [];
   readonly repositories: Map<unknown, RepositoryMetadata> = new Map();
   readonly relationships: Array<RelationshipMetadata> = [];
+  readonly fields: Array<FieldMetadata> = [];
 
   public getCollection = (param: string | Function) => {
     if (typeof param === 'string') {
@@ -71,6 +75,11 @@ export class MetadataStorage {
 
   public setSubCollection = (subCol: SubCollectionMetadata) => {
     this.subCollections.push(subCol);
+    this.setField({
+      entity: subCol.parentEntity,
+      propertyKey: subCol.propertyKey,
+      type: 'subcollection',
+    });
   };
 
   public getRepository = (param: Function) => {
@@ -95,6 +104,32 @@ export class MetadataStorage {
     this.repositories.set(repo.entity, repo);
   };
 
+  public getFields = (entity: Function) => {
+    return this.fields.filter(f => f.entity === entity);
+  };
+
+  public getPrimary = (entity: Function) => {
+    return this.getFields(entity).find(f => f.type === 'primary');
+  };
+
+  public setField = (field: FieldMetadata) => {
+    const fieldMetadata = this.getFields(field.entity);
+
+    if (field.type === 'primary' && fieldMetadata.length) {
+      if (fieldMetadata.some(f => f.type === 'primary')) {
+        throw new Error(
+          `Entity ${field.entity.name} already has a primary field`
+        );
+      } else {
+        throw new Error(
+          '`Primary` decorator should not be used in conjuction with other property decorators '
+        );
+      }
+    }
+
+    this.fields.push(field);
+  };
+
   public getPrimaryRelationships = (param: InstanstiableIEntity) => {
     return this.relationships.filter(r => r.primaryEntity === param);
   };
@@ -109,6 +144,11 @@ export class MetadataStorage {
   public setRelationships = (rel: RelationshipMetadata) => {
     // WIP: define validation
     this.relationships.push(rel);
+    this.setField({
+      entity: rel.primaryEntity,
+      propertyKey: rel.propertyKey,
+      type: 'relationship',
+    });
   };
 
   public firestoreRef: Firestore = null;
@@ -126,7 +166,7 @@ export const getMetadataStorage = (): MetadataStorage => {
 
 export const Initialize = (
   firestore: Firestore,
-  metadataStore: IMetadataStore = globalStore
+  metadataStore: IMetadataStore = global as any
 ): void => {
   store = metadataStore;
 
