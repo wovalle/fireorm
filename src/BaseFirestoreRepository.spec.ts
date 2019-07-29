@@ -19,8 +19,8 @@ export class User {
   to: Date;
 }
 
-@Collection('label_band')
-export class LabelBand {
+@Collection('labels')
+export class BandLabel {
   id: string;
   bandId: string;
   name: string;
@@ -46,8 +46,8 @@ class Band {
   @OneToMany(User, u => u.bandId, { lazy: false })
   members: User[];
 
-  @OneToMany(LabelBand, l => l.bandId)
-  labels: Promise<LabelBand[]>;
+  @OneToMany(BandLabel, l => l.bandId)
+  labels: Promise<BandLabel[]>;
 
   getLastShowYear() {
     return this.lastShow.getFullYear();
@@ -480,7 +480,7 @@ describe('BaseRepository', () => {
       expect(band.labels).instanceOf(Promise);
       const labels = await band.labels;
       expect(labels).instanceOf(Array);
-      expect(labels).length(2);
+      expect(labels).length(4);
     });
 
     it('must handle one OneToMany relationships with findById operations', async () => {

@@ -26,6 +26,14 @@ export class BandMembers {
   to: Date;
 }
 
+export class Label {
+  id: string;
+  bandId: string;
+  name: string;
+  from: Date;
+  to: Date;
+}
+
 export const getInitialBandData = () => {
   return [
     {
@@ -135,6 +143,7 @@ export const getInitialBandMemberData = () => {
     },
     {
       id: '4',
+      bandId: 'porcupine-tree',
       name: 'Colin Edwins',
       from: new Date('1987-01-01'),
       to: null,
@@ -144,6 +153,53 @@ export const getInitialBandMemberData = () => {
       bandId: 'porcupine-tree',
       name: 'Gavin Harrison',
       from: new Date('2002-02-01'),
+      to: null,
+    },
+  ];
+};
+
+export const getInitialBandLabelData = () => {
+  return [
+    {
+      id: '1',
+      bandId: 'porcupine-tree',
+      name: 'Delerium',
+      from: new Date('1991-01-01'),
+      to: new Date('1997-10-01'),
+    },
+    {
+      id: '2',
+      bandId: 'porcupine-tree',
+      name: 'Snapper',
+      from: new Date('1999-03-01'),
+      to: new Date('2001-04-01'),
+    },
+    {
+      id: '3',
+      bandId: 'porcupine-tree',
+      name: 'Lava Records',
+      from: new Date('2001-04-02'),
+      to: new Date('2006-07-31'),
+    },
+    {
+      id: '4',
+      bandId: 'porcupine-tree',
+      name: 'Roadrunner Records UK',
+      from: new Date('2006-08-01'),
+      to: null,
+    },
+    {
+      id: '5',
+      bandId: 'red-hot-chilli-peppers',
+      name: 'EMI America',
+      from: new Date('1983-11-01'),
+      to: null,
+    },
+    {
+      id: '6',
+      bandId: 'red-hot-chilli-peppers',
+      name: 'Warner Bros. Records',
+      from: new Date('1990-05-01'),
       to: null,
     },
   ];
@@ -180,8 +236,13 @@ const getBandMembersFixture = (): BandMembers[] => {
   return objectifyList(getInitialBandMemberData());
 };
 
+const getBandLabelsFixture = (): Label[] => {
+  return objectifyList(getInitialBandLabelData());
+};
+
 export const getFixture = () =>
   getCollectionBoilerplate([
     ['bands', getBandFixture()],
     ['members', getBandMembersFixture()],
+    ['labels', getBandLabelsFixture()],
   ]);
