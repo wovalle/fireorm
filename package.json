@@ -27,7 +27,7 @@
     "lint:md": "remark README.md -o README.md",
     "release": "semantic-release",
     "test": "mocha --require ts-node/register --extension ts --recursive src",
-    "test:integration": "mocha --require ts-node/register --extension ts --recursive -t 10000 --file test/setup.ts test",
+    "test:integration": "mocha --require ts-node/register --require=dotenv/config --extension ts --recursive -t 10000 --file test/setup.ts test",
     "test:watch": "mocha --require ts-node/register --extension ts --recursive -w src"
   },
   "dependencies": {
@@ -41,10 +41,12 @@
     "@google-cloud/firestore": "^2.2.1",
     "@qiwi/semantic-release-gh-pages-plugin": "^1.9.1",
     "@types/chai": "^4.1.7",
+    "@types/dotenv": "^6.1.1",
     "@types/mocha": "^5.2.7",
     "@types/pluralize": "^0.0.29",
     "@types/uuid": "^3.4.5",
     "chai": "^4.2.0",
+    "dotenv": "^8.0.0",
     "firebase-admin": "^8.1.0",
     "husky": "^2.3.0",
     "mocha": "^6.1.4",
