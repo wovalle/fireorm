@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import { Collection, SubCollection, ISubCollection, Initialize } from '.';
 import { Type } from './';
 import { MetadataStorage } from './MetadataStorage';
-import { OneToMany, ManyToOne } from './Decorators/Relationships';
+import { hasMany } from './Decorators/Relationships';
 import Primary from './Decorators/Primary';
 const MockFirebase = require('mock-cloud-firestore');
 
@@ -49,10 +49,10 @@ class Band {
   @SubCollection(Album)
   albums?: ISubCollection<Album>;
 
-  @OneToMany(User, u => u.bandId, { lazy: false })
+  @hasMany(User, { lazy: false })
   members: User[];
 
-  @OneToMany(BandLabel, l => l.bandId)
+  @hasMany(BandLabel)
   labels: Promise<BandLabel[]>;
 
   getLastShowYear() {
@@ -489,13 +489,13 @@ describe('BaseRepository', () => {
       expect(labels).length(4);
     });
 
-    it('must handle one OneToMany relationships with findById operations', async () => {
+    it('must handle one hasMany relationships with findById operations', async () => {
       const band = await bandRepository.findById('porcupine-tree');
       expect(band.members.length).to.eql(4);
       expect(band.members.map(m => m.id)).to.eql('1234'.split(''));
     });
 
-    it('must handle one OneToMany relationships with *where operations', async () => {
+    it('must handle one hasMany relationships with *where operations', async () => {
       const band = await bandRepository
         .whereEqualTo('id', 'porcupine-tree')
         .find();

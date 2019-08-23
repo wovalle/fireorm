@@ -3,23 +3,45 @@ import { InstanstiableIEntity, RelationshipType } from '..';
 import { getPath } from 'ts-object-path';
 import { TInstanstiableIEntity, IEntity } from '../types';
 
-type IRelationshipOptions = {
-  lazy?: boolean;
+const toCamelCase = (str: string) => {
+  // Lower cases the string
+  return (
+    str
+      .toLowerCase()
+      // Replaces any - or _ characters with a space
+      .replace(/[-_]+/g, ' ')
+      // Removes any non alphanumeric characters
+      .replace(/[^\w\s]/g, '')
+      // Uppercases the first character in each group immediately following a space
+      // (delimited by spaces)
+      .replace(/ (.)/g, function($1) {
+        return $1.toUpperCase();
+      })
+      // Removes spaces
+      .replace(/ /g, '')
+  );
 };
 
-export function OneToMany<T extends IEntity>(
+type IRelationshipOptions = {
+  lazy?: boolean;
+  relField?: string;
+};
+
+export function hasMany<T extends IEntity>(
   foreignEntity: TInstanstiableIEntity<T>,
-  foreignKeyFactory: (t: T) => unknown,
   opt: IRelationshipOptions = { lazy: true }
 ): Function {
   return function(primary: InstanstiableIEntity, propertyKey: string) {
     const primaryEntity = primary.constructor as InstanstiableIEntity;
-    const foreignKey = getPath(foreignKeyFactory) as string[];
+
+    const relationField = opt.relField
+      ? opt.relField
+      : toCamelCase(primaryEntity.name + '_id');
 
     getMetadataStorage().setRelationships({
       primaryEntity,
       foreignEntity,
-      foreignKey,
+      foreignKey: relationField,
       propertyKey,
       type: RelationshipType.OneToMany,
       lazy: opt.lazy,
@@ -27,65 +49,24 @@ export function OneToMany<T extends IEntity>(
   };
 }
 
-export function ManyToOne<T, T2>(
-  primaryEntity: any,
-  a: (t: T) => Promise<T2[]>,
-  primaryKeyFactory: (t2: T2) => unknown,
+export function belongsTo<T extends IEntity>(
+  primaryEntity: TInstanstiableIEntity<T>,
   opt: IRelationshipOptions = { lazy: true }
 ): Function {
-  return function(foreign: { new (...args: any[]): T }, propertyKey: string) {
+  return function(foreign: InstanstiableIEntity, propertyKey: string) {
     const foreignEntity = foreign.constructor as InstanstiableIEntity;
-    const foreignKey = getPath(primaryKeyFactory) as string[];
+
+    const relationField = opt.relField
+      ? opt.relField
+      : toCamelCase(primaryEntity.name + '_id');
 
     getMetadataStorage().setRelationships({
       primaryEntity,
       foreignEntity,
-      foreignKey,
+      foreignKey: relationField,
       propertyKey,
       type: RelationshipType.ManyToOne,
       lazy: opt.lazy,
     });
   };
-}
-
-class Baz {
-  id: string;
-}
-
-class Foo {
-  id: string;
-  barId: string;
-
-  // @RelationKey(Baz)
-  bazId: string;
-
-  @ManyToOne<Foo>(Baz, foo => baz.id)
-  bars: Baz[];
-}
-
-class Bar {
-  id: string;
-
-  @OneToMany(Foo, f => f.barId)
-  foo: Promise<Foo>;
-}
-
-function DecorateClass<T>(
-  instantiate: (...args: any[]) => T,
-  second: (t: T) => unknown
-) {
-  return (classTarget: { new (...args: any[]): T }) => {
-    /*...*/
-  };
-}
-
-const a: () => Animal = null;
-@DecorateClass(a, t => t.Name)
-class Animal {
-  public Name: string;
-  public Sound: string;
-}
-
-function getAnimal() {
-  return new Animal();
 }

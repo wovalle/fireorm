@@ -126,7 +126,7 @@ export default class BaseFirestoreRepository<T extends IEntity>
     if (this.relMetadata.length && entity) {
       for (const rel of this.relMetadata) {
         const queryBuilder = GetRepository(rel.foreignEntity).whereEqualTo(
-          rel.foreignKey[0] as any,
+          rel.foreignKey as any,
           entity.id
         );
 

@@ -1,19 +1,19 @@
 import { expect } from 'chai';
 import { MetadataStorage, Initialize } from '../MetadataStorage';
-import { Collection, RelationshipType } from '..';
-import { OneToMany, ManyToOne } from './Relationships';
+import { RelationshipType } from '..';
+import { hasMany, belongsTo } from './Relationships';
 
 // TODO: eager/lazy (lazy as default) [ok]
-// TODO: validate duplicated relationships [ok]
+// TODO: validate duplicated relationships
 // TODO: cascade update/save?
 // TODO: circular relationships?
 // TODO: ManyToMany
-// TODO: @Primary
-// TODO: Handle foreigns with deep fields
-// TODO: mock for BandLabel
+// TODO: @Primary [ok] [revisit]
+// TODO: Handle foreigns with deep fieldss
+// TODO: mock for BandLabel [ok]
 // TODO: what to do with foreign rels
-// TODO: for now only taking first element of foreignKeys
-// TODO: actually using @Primary, baserep, handleRels
+// TODO: for now only taking first element of foreignKeys [n/a]
+// TODO: actually using @Primary, baserep, handleRels [n/a]
 describe('RelationshipsDecorators', () => {
   const store = { metadataStorage: new MetadataStorage() };
 
@@ -22,68 +22,65 @@ describe('RelationshipsDecorators', () => {
     Initialize(null, store);
   });
 
-  describe('OneToMany', () => {
-    it('must register OneToMany relationships and find them from primary', async () => {
-      class Bar {
+  describe('hasMany', () => {
+    it('must register hasMany relationships with default fields', async () => {
+      class Member {
         id: string;
         fooId: string;
       }
 
-      @Collection()
-      class Foo {
+      class Band {
         id: string;
 
-        @OneToMany(Bar, b => b.fooId)
-        bars: Array<Bar>;
+        @hasMany(Member)
+        members: Array<Member>;
       }
 
-      const rel = store.metadataStorage.getRelationships(Foo)[0];
-      expect(rel.primaryEntity).to.equal(Foo);
-      expect(rel.foreignEntity).to.equal(Bar);
-      expect(rel.foreignKey).to.eql(['fooId']);
-      expect(rel.propertyKey).to.equal('bars');
+      const rel = store.metadataStorage.getRelationships(Band)[0];
+      expect(rel.primaryEntity).to.equal(Band);
+      expect(rel.foreignEntity).to.equal(Member);
+      expect(rel.foreignKey).to.eql('bandId');
+      expect(rel.propertyKey).to.equal('members');
       expect(rel.type).to.equal(RelationshipType.OneToMany);
     });
 
-    it('must register OneToMany relationships and find them from foreign', async () => {
-      class Bar {
+    it('must register hasMany relationships with custom fields', async () => {
+      class Member {
         id: string;
-        fooId: string;
+        relId: string;
       }
 
-      @Collection()
-      class Foo {
+      class Band {
         id: string;
 
-        @OneToMany(Bar, b => b.fooId)
-        bars: Array<Bar>;
+        @hasMany(Member, { relField: 'relId' })
+        bars: Array<Member>;
       }
 
-      const rel = store.metadataStorage.getRelationships(Bar)[0];
-      expect(rel.primaryEntity).to.equal(Foo);
-      expect(rel.foreignEntity).to.equal(Bar);
-      expect(rel.foreignKey).to.eql(['fooId']);
+      const rel = store.metadataStorage.getRelationships(Member)[0];
+      expect(rel.primaryEntity).to.equal(Band);
+      expect(rel.foreignEntity).to.equal(Member);
+      expect(rel.foreignKey).to.eql('relId');
       expect(rel.propertyKey).to.equal('bars');
       expect(rel.type).to.equal(RelationshipType.OneToMany);
     });
 
     it('should register a field metadata', () => {
-      class Bar {
+      class Member {
         id: string;
         fooId: string;
       }
 
-      @Collection()
-      class Foo {
+      class Band {
         id: string;
 
-        @OneToMany(Bar, b => b.fooId)
-        bars: Array<Bar>;
+        @hasMany(Member)
+        bars: Array<Member>;
       }
 
-      const fieldsMetadata = store.metadataStorage.getFields(Foo);
+      const fieldsMetadata = store.metadataStorage.getFields(Band);
       expect(fieldsMetadata.length).to.eql(1);
-      expect(fieldsMetadata[0].entity).to.eql(Foo);
+      expect(fieldsMetadata[0].entity).to.eql(Band);
       expect(fieldsMetadata[0].propertyKey).to.eql('bars');
       expect(fieldsMetadata[0].type).to.eql('relationship');
     });
@@ -91,68 +88,67 @@ describe('RelationshipsDecorators', () => {
     it("shouldn't return duplicated relationships");
   });
 
-  describe.only('ManyToOne', () => {
-    it('must register ManyToOne relationships and find them from primary', async () => {
-      class Foo {
+  describe('belongsTo', () => {
+    it('must register belongsTo relationships with default fields', async () => {
+      class Band {
         id: string;
       }
 
-      class Bar {
+      class Member {
         id: string;
-        fooId: string;
+        bandId: string;
 
-        @ManyToOne(Foo, t => k => k.id)
-        foo: Promise<Foo>;
+        @belongsTo(Band)
+        band: Promise<Band>;
       }
 
-      const rel = store.metadataStorage.getRelationships(Foo)[0];
-      expect(rel.primaryEntity).to.equal(Foo);
-      expect(rel.foreignEntity).to.equal(Bar);
-      expect(rel.foreignKey).to.eql(['fooId']);
-      expect(rel.propertyKey).to.equal('foo');
+      const rel = store.metadataStorage.getRelationships(Member)[0];
+      expect(rel.primaryEntity).to.equal(Band);
+      expect(rel.foreignEntity).to.equal(Member);
+      expect(rel.foreignKey).to.eql('bandId');
+      expect(rel.propertyKey).to.equal('band');
       expect(rel.type).to.equal(RelationshipType.ManyToOne);
     });
 
-    it('must register OneToMany relationships and find them from foreign', async () => {
-      class Bar {
+    it('must register hasMany relationships with custom fields', async () => {
+      class Band {
         id: string;
-        fooId: string;
       }
 
-      @Collection()
-      class Foo {
+      class Member {
         id: string;
+        bandId: string;
 
-        @OneToMany(Bar, b => b.fooId)
-        bars: Array<Bar>;
+        @belongsTo(Band, { relField: 'relId' })
+        band: Promise<Band>;
       }
 
-      const rel = store.metadataStorage.getRelationships(Bar)[0];
-      expect(rel.primaryEntity).to.equal(Foo);
-      expect(rel.foreignEntity).to.equal(Bar);
-      expect(rel.foreignKey).to.eql(['fooId']);
-      expect(rel.propertyKey).to.equal('bars');
-      expect(rel.type).to.equal(RelationshipType.OneToMany);
+      const rel = store.metadataStorage.getRelationships(Member)[0];
+      expect(rel.primaryEntity).to.equal(Band);
+      expect(rel.foreignEntity).to.equal(Member);
+      expect(rel.foreignKey).to.eql('relId');
+      expect(rel.propertyKey).to.equal('band');
+      expect(rel.type).to.equal(RelationshipType.ManyToOne);
     });
 
     it('should register a field metadata', () => {
-      class Bar {
+      class Band {
         id: string;
-        fooId: string;
       }
 
-      @Collection()
-      class Foo {
+      class Member {
         id: string;
+        bandId: string;
 
-        @OneToMany(Bar, b => b.fooId)
-        bars: Array<Bar>;
+        @belongsTo(Band)
+        band: Promise<Band>;
       }
 
-      const fieldsMetadata = store.metadataStorage.getFields(Foo);
+      // TODO: Have to check fieldMetadata again
+      const fieldsMetadata = store.metadataStorage.getFields(Band);
       expect(fieldsMetadata.length).to.eql(1);
-      expect(fieldsMetadata[0].entity).to.eql(Foo);
-      expect(fieldsMetadata[0].propertyKey).to.eql('bars');
+      expect(fieldsMetadata[0].entity).to.eql(Band);
+      expect(fieldsMetadata[0].propertyKey).to.eql('band');
       expect(fieldsMetadata[0].type).to.eql('relationship');
     });
 

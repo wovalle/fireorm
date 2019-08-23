@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { MetadataStorage, Initialize } from '../MetadataStorage';
 import Primary from './Primary';
-import { OneToMany } from './Relationships';
+import { hasMany } from './Relationships';
 import SubCollection from './SubCollection';
 
 describe('PrimaryDecorator', () => {
@@ -41,7 +41,7 @@ describe('PrimaryDecorator', () => {
     }).to.throw();
   });
 
-  it('should prevent using primary field for OneToMany Relationships', () => {
+  it('should prevent using primary field for hasMany Relationships', () => {
     expect(() => {
       class Foo {
         id: string;
@@ -51,7 +51,7 @@ describe('PrimaryDecorator', () => {
         id: string;
 
         @Primary
-        @OneToMany(Foo, f => f.id)
+        @hasMany(Foo)
         anotherId: string;
       }
     }).to.throw();
