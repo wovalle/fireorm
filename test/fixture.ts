@@ -28,6 +28,7 @@ export class BandMembers {
 
 export class Label {
   id: string;
+  bandLabelId: string;
   bandId: string;
   name: string;
   from: Date;
@@ -162,6 +163,7 @@ export const getInitialBandLabelData = () => {
   return [
     {
       id: '1',
+      bandLabelId: 'porcupine-tree-1',
       bandId: 'porcupine-tree',
       name: 'Delerium',
       from: new Date('1991-01-01'),
@@ -169,6 +171,7 @@ export const getInitialBandLabelData = () => {
     },
     {
       id: '2',
+      bandLabelId: 'porcupine-tree-2',
       bandId: 'porcupine-tree',
       name: 'Snapper',
       from: new Date('1999-03-01'),
@@ -176,6 +179,7 @@ export const getInitialBandLabelData = () => {
     },
     {
       id: '3',
+      bandLabelId: 'porcupine-tree-3',
       bandId: 'porcupine-tree',
       name: 'Lava Records',
       from: new Date('2001-04-02'),
@@ -183,6 +187,7 @@ export const getInitialBandLabelData = () => {
     },
     {
       id: '4',
+      bandLabelId: 'porcupine-tree-4',
       bandId: 'porcupine-tree',
       name: 'Roadrunner Records UK',
       from: new Date('2006-08-01'),
@@ -190,6 +195,7 @@ export const getInitialBandLabelData = () => {
     },
     {
       id: '5',
+      bandLabelId: 'red-hot-chilli-peppers-1',
       bandId: 'red-hot-chilli-peppers',
       name: 'EMI America',
       from: new Date('1983-11-01'),
@@ -197,6 +203,7 @@ export const getInitialBandLabelData = () => {
     },
     {
       id: '6',
+      bandLabelId: 'red-hot-chilli-peppers-2',
       bandId: 'red-hot-chilli-peppers',
       name: 'Warner Bros. Records',
       from: new Date('1990-05-01'),

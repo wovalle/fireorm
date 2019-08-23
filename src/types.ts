@@ -67,11 +67,14 @@ export interface IEntity {
   id: string;
 }
 
-export type InstanstiableIEntity = { new (): IEntity };
-export type TInstanstiableIEntity<T extends IEntity> = { new (): T };
+export type InstanstiableIEntity = { new (...args: any[]): IEntity };
+export type TInstanstiableIEntity<T extends IEntity> = {
+  new (...args: any[]): T;
+};
 
 export enum RelationshipType {
   OneToOne = 'OneToOne',
   OneToMany = 'OneToMany',
+  ManyToOne = 'ManyToOne',
   ManyToMany = 'ManyToMany',
 }
