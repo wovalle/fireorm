@@ -2,6 +2,7 @@ export class Coordinates {
   latitude: number;
   longitude: number;
 }
+
 export class Album {
   id: string;
   name: string;
@@ -9,7 +10,7 @@ export class Album {
   comment?: string;
 }
 
-export class Band {
+export abstract class Band {
   id: string;
   name: string;
   formationYear: number;
@@ -18,7 +19,7 @@ export class Band {
   genres: Array<string>;
 }
 
-export class BandMembers {
+export abstract class BandMember {
   id: string;
   bandId: string;
   name: string;
@@ -26,7 +27,7 @@ export class BandMembers {
   to: Date;
 }
 
-export class Label {
+export abstract class Label {
   id: string;
   bandLabelId: string;
   bandId: string;
@@ -150,7 +151,7 @@ export const getInitialBandMemberData = () => {
       to: null,
     },
     {
-      id: '4',
+      id: '5',
       bandId: 'porcupine-tree',
       name: 'Gavin Harrison',
       from: new Date('2002-02-01'),
@@ -239,7 +240,7 @@ const getBandFixture = (): Band[] => {
   }));
 };
 
-const getBandMembersFixture = (): BandMembers[] => {
+const getBandMembersFixture = (): BandMember[] => {
   return objectifyList(getInitialBandMemberData());
 };
 

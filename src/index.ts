@@ -5,6 +5,8 @@ import BaseFirestoreRepository from './BaseFirestoreRepository';
 
 export * from './types';
 export * from './helpers';
+export * from './Decorators/Relationships';
+
 export { Initialize } from './MetadataStorage';
 
 export { Collection, SubCollection, CustomRepository, BaseFirestoreRepository };

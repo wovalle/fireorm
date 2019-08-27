@@ -491,16 +491,16 @@ describe('BaseRepository', () => {
 
     it('must handle one hasMany relationships with findById operations', async () => {
       const band = await bandRepository.findById('porcupine-tree');
-      expect(band.members.length).to.eql(4);
-      expect(band.members.map(m => m.id)).to.eql('1234'.split(''));
+      expect(band.members.length).to.eql(5);
+      expect(band.members.map(m => m.id)).to.eql('12345'.split(''));
     });
 
     it('must handle one hasMany relationships with *where operations', async () => {
       const band = await bandRepository
         .whereEqualTo('id', 'porcupine-tree')
         .find();
-      expect(band[0].members.length).to.eql(4);
-      expect(band[0].members.map(m => m.id)).to.eql('1234'.split(''));
+      expect(band[0].members.length).to.eql(5);
+      expect(band[0].members.map(m => m.id)).to.eql('12345'.split(''));
     });
 
     it('must handle when when primary is null with findById operations');
