@@ -1,4 +1,4 @@
-import { Band, Album, getInitialBandData } from '../fixture';
+import { BaseAlbum, BaseBand, getInitialBandData } from '../fixture';
 import {
   GetRepository,
   Collection,
@@ -10,12 +10,12 @@ import { expect } from 'chai';
 
 describe('Integration test: SubCollections', () => {
   @Collection(getUniqueColName('band-with-subcollections'))
-  class FullBand extends Band {
-    @SubCollection(Album)
-    albums: ISubCollection<Album>;
+  class Band extends BaseBand {
+    @SubCollection(BaseAlbum)
+    albums: ISubCollection<BaseAlbum>;
   }
 
-  const fullBandRepository = GetRepository(FullBand);
+  const fullBandRepository = GetRepository(Band);
 
   before(async () => {
     const seed = getInitialBandData().map(({ albums, ...band }) => ({
@@ -24,7 +24,7 @@ describe('Integration test: SubCollections', () => {
     }));
 
     for (const s of seed) {
-      const band = new FullBand();
+      const band = new Band();
       band.id = s.band.id;
       band.name = s.band.name;
       band.genres = s.band.genres;
@@ -35,7 +35,7 @@ describe('Integration test: SubCollections', () => {
       await fullBandRepository.create(band);
 
       const albums = s.albums.map(a => {
-        const album = new Album();
+        const album = new BaseAlbum();
         album.id = a.id;
         album.releaseDate = a.releaseDate;
         album.name = a.name;
@@ -48,7 +48,7 @@ describe('Integration test: SubCollections', () => {
   });
 
   it('should do crud with subcollections', async () => {
-    const rush = new FullBand();
+    const rush = new Band();
     rush.id = 'rush';
     rush.name = 'Rush';
     rush.formationYear = 1968;
@@ -57,17 +57,17 @@ describe('Integration test: SubCollections', () => {
     await fullBandRepository.create(rush);
 
     // Inserting some albums (subcollections)
-    const secondAlbum = new Album();
+    const secondAlbum = new BaseAlbum();
     secondAlbum.id = 'fly-by-night';
     secondAlbum.name = 'Fly by Night';
     secondAlbum.releaseDate = new Date('1975-02-15');
 
-    const fourthAlbum = new Album();
+    const fourthAlbum = new BaseAlbum();
     fourthAlbum.id = '2112';
     fourthAlbum.name = '2112';
     fourthAlbum.releaseDate = new Date('1976-04-01');
 
-    const eighthAlbum = new Album();
+    const eighthAlbum = new BaseAlbum();
     eighthAlbum.id = 'moving-pictures';
     eighthAlbum.name = 'Moving Pictures';
     eighthAlbum.releaseDate = new Date('1982-02-12');

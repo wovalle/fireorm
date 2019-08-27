@@ -3,14 +3,14 @@ export class Coordinates {
   longitude: number;
 }
 
-export class Album {
+export class BaseAlbum {
   id: string;
   name: string;
   releaseDate: Date;
   comment?: string;
 }
 
-export abstract class Band {
+export abstract class BaseBand {
   id: string;
   name: string;
   formationYear: number;
@@ -19,7 +19,7 @@ export abstract class Band {
   genres: Array<string>;
 }
 
-export abstract class BandMember {
+export abstract class BaseMember {
   id: string;
   bandId: string;
   name: string;
@@ -27,7 +27,7 @@ export abstract class BandMember {
   to: Date;
 }
 
-export abstract class Label {
+export abstract class BaseLabel {
   id: string;
   bandLabelId: string;
   bandId: string;
@@ -231,7 +231,7 @@ const getCollectionBoilerplate = (colBoilerplate: ICollectionBoilerplate[]) => {
 const objectifyList = (arr: Array<any>, cb = a => a) =>
   arr.reduce((acc, cur) => ({ ...acc, [cur.id]: cb(cur) }), {});
 
-const getBandFixture = (): Band[] => {
+const getBandFixture = (): BaseAlbum[] => {
   const initialData = getInitialBandData();
 
   return objectifyList(initialData, ({ albums = [], ...rest }) => ({
@@ -240,11 +240,11 @@ const getBandFixture = (): Band[] => {
   }));
 };
 
-const getBandMembersFixture = (): BandMember[] => {
+const getBandMembersFixture = (): BaseMember[] => {
   return objectifyList(getInitialBandMemberData());
 };
 
-const getBandLabelsFixture = (): Label[] => {
+const getBandLabelsFixture = (): BaseLabel[] => {
   return objectifyList(getInitialBandLabelData());
 };
 

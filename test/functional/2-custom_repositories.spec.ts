@@ -1,4 +1,4 @@
-import { getInitialBandData, Band as BandEntity } from '../fixture';
+import { getInitialBandData, BaseBand } from '../fixture';
 import {
   CustomRepository,
   BaseFirestoreRepository,
@@ -10,7 +10,7 @@ import { getUniqueColName } from '../setup';
 
 describe('Integration test: Custom Repository', () => {
   @Collection(getUniqueColName('band'))
-  class Band extends BandEntity {}
+  class Band extends BaseBand {}
 
   @CustomRepository(Band)
   class CustomRockBandRepository extends BaseFirestoreRepository<Band> {

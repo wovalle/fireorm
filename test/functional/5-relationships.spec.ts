@@ -1,38 +1,65 @@
 import {
-  Band,
+  BaseAlbum,
+  BaseLabel,
+  BaseMember,
   getInitialBandData,
-  BandMember,
   getInitialBandMemberData,
+  getInitialBandLabelData,
 } from '../fixture';
-import { GetRepository, Collection, hasMany } from '../../src';
+import { GetRepository, Collection, hasMany, belongsTo } from '../../src';
 import { getUniqueColName } from '../setup';
 import { expect } from 'chai';
 
-describe.only('Integration test: Relationships', () => {
+describe('Integration test: Relationships', () => {
   // Collection Setup
-  @Collection(getUniqueColName('relationships-members'))
-  class Member extends BandMember {}
+  @Collection(getUniqueColName('relationships-member'))
+  class Member extends BaseMember {}
 
   @Collection(getUniqueColName('relationships-band'))
-  class BandWithMembers extends Band {
-    @hasMany(Member, { relField: 'bandId' })
+  class Band extends BaseAlbum {
+    @hasMany(Member)
     members?: Promise<Member[]>;
   }
 
-  const bandRepository = GetRepository(BandWithMembers);
+  @Collection(getUniqueColName('relationships-label'))
+  class Label extends BaseLabel {
+    @belongsTo(Band)
+    bandId: Band;
+  }
+
+  const bandRepository = GetRepository(Band);
   const memberRepository = GetRepository(Member);
+  const labelRepository = GetRepository(Label);
 
   before(async () => {
     const bandSeed = getInitialBandData().map(({ albums, ...band }) => band);
     const membersSeed = getInitialBandMemberData();
+    const labelsSeed = getInitialBandLabelData();
 
     await Promise.all(bandSeed.map(b => bandRepository.create(b)));
     await Promise.all(membersSeed.map(m => memberRepository.create(m)));
+    await Promise.all(labelsSeed.map(l => labelRepository.create(l)));
   });
 
   it('should read members from band', async () => {
     const porcupine = await bandRepository.findById('porcupine-tree');
     expect(porcupine.members).instanceOf(Promise);
+    const members = await porcupine.members;
+    expect(members.length).to.eql(5);
+
+    const names = members.map(m => m.name);
+    expect(names).to.eql([
+      'Steven Wilson',
+      'Richard Barbieri',
+      'Chris Maitland',
+      'Colin Edwins',
+      'Gavin Harrison',
+    ]);
+  });
+
+  it('should read band labels', async () => {
+    const porcupine = await bandRepository.findById('porcupine-tree');
+    expect(porcupine.labels).instanceOf(Promise);
     const members = await porcupine.members;
     expect(members.length).to.eql(5);
 

@@ -1,5 +1,5 @@
 import BaseFirestoreRepository from './BaseFirestoreRepository';
-import { getFixture, Album, Coordinates } from '../test/fixture';
+import { getFixture, BaseAlbum, Coordinates } from '../test/fixture';
 import { expect } from 'chai';
 import { Collection, SubCollection, ISubCollection, Initialize } from '.';
 import { Type } from './';
@@ -46,8 +46,8 @@ class Band {
   lastShowCoordinates: Coordinates;
   genres: Array<string>;
 
-  @SubCollection(Album)
-  albums?: ISubCollection<Album>;
+  @SubCollection(BaseAlbum)
+  albums?: ISubCollection<BaseAlbum>;
 
   @hasMany(User, { lazy: false })
   members: User[];
@@ -305,6 +305,7 @@ describe('BaseRepository', () => {
     });
 
     it('must throw if item is not found', async () => {
+      //tslint:disable-next-line:no-void-expression
       expect(await bandRepository.delete('lol')).to.throw;
     });
   });
@@ -418,17 +419,17 @@ describe('BaseRepository', () => {
 
       await bandRepository.create(band);
 
-      const firstAlbum = new Album();
+      const firstAlbum = new BaseAlbum();
       firstAlbum.id = '30-seconds-to-mars';
       firstAlbum.name = '30 Seconds to Mars';
       firstAlbum.releaseDate = new Date('2002-07-22');
 
-      const secondAlbum = new Album();
+      const secondAlbum = new BaseAlbum();
       secondAlbum.id = 'a-beautiful-lie';
       secondAlbum.name = 'A Beautiful Lie';
       secondAlbum.releaseDate = new Date('2005-07-30');
 
-      const thirdAlbum = new Album();
+      const thirdAlbum = new BaseAlbum();
       thirdAlbum.id = 'this-is-war';
       thirdAlbum.name = 'This Is War';
       thirdAlbum.releaseDate = new Date('2009-12-08');

@@ -6,7 +6,7 @@ import { hasMany, belongsTo } from './Relationships';
 // TODO: eager/lazy (lazy as default) [ok]
 // TODO: validate duplicated relationships
 // TODO: cascade update/save?
-// TODO: circular relationships?
+// TODO: circular/recursive relationships?
 // TODO: ManyToMany
 // TODO: @Primary [ok] [revisit]
 // TODO: Handle foreigns with deep fieldss
@@ -14,6 +14,8 @@ import { hasMany, belongsTo } from './Relationships';
 // TODO: what to do with foreign rels
 // TODO: for now only taking first element of foreignKeys [n/a]
 // TODO: actually using @Primary, baserep, handleRels [n/a]
+// TODO: runtime error if relFields doesn't exist
+// TODO: self referencing entities
 describe('RelationshipsDecorators', () => {
   const store = { metadataStorage: new MetadataStorage() };
 

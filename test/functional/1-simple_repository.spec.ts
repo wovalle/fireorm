@@ -1,11 +1,11 @@
 import { GetRepository, Collection } from '../../src';
-import { Band as BandEntity } from '../fixture';
+import { BaseBand } from '../fixture';
 import { expect } from 'chai';
 import { getUniqueColName } from '../setup';
 
 describe('Integration test: Simple Repository', () => {
   @Collection(getUniqueColName('band'))
-  class Band extends BandEntity {}
+  class Band extends BaseBand {}
 
   const bandRepository = GetRepository(Band);
 

@@ -110,6 +110,7 @@ export default class BaseFirestoreRepository<T extends IEntity>
       return null;
     }
 
+    //tslint:disable-next-line:no-unnecessary-type-assertion
     const entity = plainToClass(
       this.colMetadata.entity as any,
       this.transformFirestoreTypes(doc.data() as T)
