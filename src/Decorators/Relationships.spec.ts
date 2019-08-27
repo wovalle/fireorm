@@ -41,6 +41,7 @@ describe('RelationshipsDecorators', () => {
       expect(rel.foreignEntity).to.equal(Member);
       expect(rel.foreignKey).to.eql('bandId');
       expect(rel.propertyKey).to.equal('members');
+      expect(rel.lazy).to.equal(true);
       expect(rel.type).to.equal(RelationshipType.OneToMany);
     });
 
@@ -62,6 +63,29 @@ describe('RelationshipsDecorators', () => {
       expect(rel.foreignEntity).to.equal(Member);
       expect(rel.foreignKey).to.eql('relId');
       expect(rel.propertyKey).to.equal('bars');
+      expect(rel.lazy).to.equal(true);
+      expect(rel.type).to.equal(RelationshipType.OneToMany);
+    });
+
+    it('must register hasMany relationships with custom fields and lazy false', async () => {
+      class Member {
+        id: string;
+        relId: string;
+      }
+
+      class Band {
+        id: string;
+
+        @hasMany(Member, { relField: 'relId', lazy: false })
+        bars: Array<Member>;
+      }
+
+      const rel = store.metadataStorage.getRelationships(Member)[0];
+      expect(rel.primaryEntity).to.equal(Band);
+      expect(rel.foreignEntity).to.equal(Member);
+      expect(rel.foreignKey).to.eql('relId');
+      expect(rel.propertyKey).to.equal('bars');
+      expect(rel.lazy).to.equal(false);
       expect(rel.type).to.equal(RelationshipType.OneToMany);
     });
 
@@ -84,8 +108,6 @@ describe('RelationshipsDecorators', () => {
       expect(fieldsMetadata[0].propertyKey).to.eql('bars');
       expect(fieldsMetadata[0].type).to.eql('relationship');
     });
-
-    it("shouldn't return duplicated relationships");
   });
 
   describe('belongsTo', () => {
@@ -107,10 +129,11 @@ describe('RelationshipsDecorators', () => {
       expect(rel.foreignEntity).to.equal(Member);
       expect(rel.foreignKey).to.eql('bandId');
       expect(rel.propertyKey).to.equal('band');
+      expect(rel.lazy).to.equal(true);
       expect(rel.type).to.equal(RelationshipType.ManyToOne);
     });
 
-    it('must register hasMany relationships with custom fields', async () => {
+    it('must register belongsTo relationships with custom fields', async () => {
       class Band {
         id: string;
       }
@@ -128,6 +151,29 @@ describe('RelationshipsDecorators', () => {
       expect(rel.foreignEntity).to.equal(Member);
       expect(rel.foreignKey).to.eql('relId');
       expect(rel.propertyKey).to.equal('band');
+      expect(rel.lazy).to.equal(true);
+      expect(rel.type).to.equal(RelationshipType.ManyToOne);
+    });
+
+    it('must register belongsTo relationships with custom fields and lazy false', async () => {
+      class Band {
+        id: string;
+      }
+
+      class Member {
+        id: string;
+        bandId: string;
+
+        @belongsTo(Band, { relField: 'relId', lazy: false })
+        band: Promise<Band>;
+      }
+
+      const rel = store.metadataStorage.getRelationships(Member)[0];
+      expect(rel.primaryEntity).to.equal(Band);
+      expect(rel.foreignEntity).to.equal(Member);
+      expect(rel.foreignKey).to.eql('relId');
+      expect(rel.propertyKey).to.equal('band');
+      expect(rel.lazy).to.equal(false);
       expect(rel.type).to.equal(RelationshipType.ManyToOne);
     });
 
@@ -151,7 +197,5 @@ describe('RelationshipsDecorators', () => {
       expect(fieldsMetadata[0].propertyKey).to.eql('band');
       expect(fieldsMetadata[0].type).to.eql('relationship');
     });
-
-    it("shouldn't return duplicated relationships");
   });
 });

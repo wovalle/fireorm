@@ -1,6 +1,5 @@
 import { getMetadataStorage } from '../MetadataStorage';
 import { InstanstiableIEntity, RelationshipType } from '..';
-import { getPath } from 'ts-object-path';
 import { TInstanstiableIEntity, IEntity } from '../types';
 
 const toCamelCase = (str: string) => {
@@ -29,13 +28,15 @@ type IRelationshipOptions = {
 
 export function hasMany<T extends IEntity>(
   foreignEntity: TInstanstiableIEntity<T>,
-  opt: IRelationshipOptions = { lazy: true }
+  opt?: IRelationshipOptions
 ): Function {
   return function(primary: InstanstiableIEntity, propertyKey: string) {
     const primaryEntity = primary.constructor as InstanstiableIEntity;
 
-    const relationField = opt.relField
-      ? opt.relField
+    const options = { lazy: true, ...opt };
+
+    const relationField = options.relField
+      ? options.relField
       : toCamelCase(primaryEntity.name + '_id');
 
     getMetadataStorage().setRelationships({
@@ -44,20 +45,22 @@ export function hasMany<T extends IEntity>(
       foreignKey: relationField,
       propertyKey,
       type: RelationshipType.OneToMany,
-      lazy: opt.lazy,
+      lazy: options.lazy,
     });
   };
 }
 
 export function belongsTo<T extends IEntity>(
   primaryEntity: TInstanstiableIEntity<T>,
-  opt: IRelationshipOptions = { lazy: true }
+  opt?: IRelationshipOptions
 ): Function {
   return function(foreign: InstanstiableIEntity, propertyKey: string) {
     const foreignEntity = foreign.constructor as InstanstiableIEntity;
 
-    const relationField = opt.relField
-      ? opt.relField
+    const options = { lazy: true, ...opt };
+
+    const relationField = options.relField
+      ? options.relField
       : toCamelCase(primaryEntity.name + '_id');
 
     getMetadataStorage().setRelationships({
@@ -66,7 +69,7 @@ export function belongsTo<T extends IEntity>(
       foreignKey: relationField,
       propertyKey,
       type: RelationshipType.ManyToOne,
-      lazy: opt.lazy,
+      lazy: options.lazy,
     });
   };
 }
