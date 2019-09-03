@@ -32,7 +32,8 @@
   },
   "dependencies": {
     "class-transformer": "^0.2.0",
-    "pluralize": "^8.0.0"
+    "pluralize": "^8.0.0",
+    "ts-object-path": "^0.1.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.6.1",

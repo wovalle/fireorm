@@ -39,16 +39,28 @@ export interface IOrderByParams {
 }
 
 export type IQueryBuilderResult = IFireOrmQueryLine[];
-
+export type IWherePropParam<T> = keyof T | ((t: T) => unknown);
 export interface IQueryBuilder<T extends IEntity> {
-  whereEqualTo(prop: keyof T, val: IFirestoreVal): IQueryBuilder<T>;
-  whereGreaterThan(prop: keyof T, val: IFirestoreVal): IQueryBuilder<T>;
-  whereGreaterOrEqualThan(prop: keyof T, val: IFirestoreVal): IQueryBuilder<T>;
-  whereLessThan(prop: keyof T, val: IFirestoreVal): IQueryBuilder<T>;
-  whereLessOrEqualThan(prop: keyof T, val: IFirestoreVal): IQueryBuilder<T>;
-  whereArrayContains(prop: keyof T, val: IFirestoreVal): IQueryBuilder<T>;
-  orderByAscending(prop: keyof T & string): IQueryBuilder<T>;
-  orderByDescending(prop: keyof T & string): IQueryBuilder<T>;
+  whereEqualTo(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T>;
+  whereGreaterThan(
+    prop: IWherePropParam<T>,
+    val: IFirestoreVal
+  ): IQueryBuilder<T>;
+  whereGreaterOrEqualThan(
+    prop: IWherePropParam<T>,
+    val: IFirestoreVal
+  ): IQueryBuilder<T>;
+  whereLessThan(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T>;
+  whereLessOrEqualThan(
+    prop: IWherePropParam<T>,
+    val: IFirestoreVal
+  ): IQueryBuilder<T>;
+  whereArrayContains(
+    prop: IWherePropParam<T>,
+    val: IFirestoreVal
+  ): IQueryBuilder<T>;
+  orderByAscending(prop: IWherePropParam<T> & string): IQueryBuilder<T>;
+  orderByDescending(prop: IWherePropParam<T> & string): IQueryBuilder<T>;
   find(): Promise<T[]>;
 }
 

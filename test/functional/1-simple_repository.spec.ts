@@ -4,8 +4,10 @@ import { expect } from 'chai';
 import { getUniqueColName } from '../setup';
 
 describe('Integration test: Simple Repository', () => {
-  @Collection(getUniqueColName('band'))
-  class Band extends BandEntity {}
+  @Collection(getUniqueColName('band-simple-repository'))
+  class Band extends BandEntity {
+    extra?: { website: string };
+  }
 
   const bandRepository = GetRepository(Band);
 
@@ -16,6 +18,9 @@ describe('Integration test: Simple Repository', () => {
     dt.name = 'DreamTheater';
     dt.formationYear = 1985;
     dt.genres = ['progressive-metal', 'progressive-rock'];
+    dt.extra = {
+      website: 'www.dreamtheater.net',
+    };
 
     const savedBand = await bandRepository.create(dt);
     expect(savedBand.name).to.equal(dt.name);
@@ -44,6 +49,13 @@ describe('Integration test: Simple Repository', () => {
     const updatedDtInDb = await bandRepository.findById(dt.id);
     expect(updatedDt.name).to.equal(dt.name);
     expect(updatedDtInDb.name).to.equal(dt.name);
+
+    // Filter a band by subfield
+    const byWebsite = await bandRepository
+      .whereEqualTo(a => a.extra.website, 'www.dreamtheater.net')
+      .find();
+
+    expect(byWebsite[0].id).to.equal('dream-theater');
 
     // Delete a band
     await bandRepository.delete(dt.id);

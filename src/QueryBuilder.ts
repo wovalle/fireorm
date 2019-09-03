@@ -1,3 +1,5 @@
+import { getPath } from 'ts-object-path';
+
 import {
   IQueryBuilder,
   IFireOrmQueryLine,
@@ -6,6 +8,7 @@ import {
   FirestoreOperators,
   IQueryExecutor,
   IEntity,
+  IWherePropParam,
 } from './types';
 
 export default class QueryBuilder<T extends IEntity>
@@ -18,54 +21,71 @@ export default class QueryBuilder<T extends IEntity>
   // fields if the indexes are not created
   constructor(protected executor: IQueryExecutor<T>) {}
 
-  whereEqualTo(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
+  private extractWhereParam = (param: IWherePropParam<T>) => {
+    if (typeof param === 'string') return param;
+    return getPath(param as Function).join('.');
+  };
+
+  whereEqualTo(param: IWherePropParam<T>, val: IFirestoreVal): QueryBuilder<T> {
     this.queries.push({
-      prop: prop.toString(),
+      prop: this.extractWhereParam(param),
       val,
       operator: FirestoreOperators.equal,
     });
     return this;
   }
 
-  whereGreaterThan(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
+  whereGreaterThan(
+    prop: IWherePropParam<T>,
+    val: IFirestoreVal
+  ): QueryBuilder<T> {
     this.queries.push({
-      prop: prop.toString(),
+      prop: this.extractWhereParam(prop),
       val,
       operator: FirestoreOperators.greaterThan,
     });
     return this;
   }
 
-  whereGreaterOrEqualThan(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
+  whereGreaterOrEqualThan(
+    prop: IWherePropParam<T>,
+    val: IFirestoreVal
+  ): QueryBuilder<T> {
     this.queries.push({
-      prop: prop.toString(),
+      prop: this.extractWhereParam(prop),
       val,
       operator: FirestoreOperators.greaterThanEqual,
     });
     return this;
   }
 
-  whereLessThan(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
+  whereLessThan(prop: IWherePropParam<T>, val: IFirestoreVal): QueryBuilder<T> {
     this.queries.push({
-      prop: prop.toString(),
+      prop: this.extractWhereParam(prop),
       val,
       operator: FirestoreOperators.lessThan,
     });
     return this;
   }
 
-  whereLessOrEqualThan(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
+  whereLessOrEqualThan(
+    prop: IWherePropParam<T>,
+    val: IFirestoreVal
+  ): QueryBuilder<T> {
     this.queries.push({
-      prop: prop.toString(),
+      prop: this.extractWhereParam(prop),
       val,
       operator: FirestoreOperators.lessThanEqual,
     });
     return this;
   }
 
-  whereArrayContains(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
+  whereArrayContains(
+    prop: IWherePropParam<T>,
+    val: IFirestoreVal
+  ): QueryBuilder<T> {
     this.queries.push({
-      prop: prop.toString(),
+      prop: this.extractWhereParam(prop),
       val,
       operator: FirestoreOperators.arrayContains,
     });
@@ -74,15 +94,19 @@ export default class QueryBuilder<T extends IEntity>
 
   limit(limitVal: number): QueryBuilder<T> {
     if (this.limitVal) {
-      throw new Error('A limit function cannot be called more than once in the same query expression');
+      throw new Error(
+        'A limit function cannot be called more than once in the same query expression'
+      );
     }
     this.limitVal = limitVal;
     return this;
   }
 
-  orderByAscending(prop: keyof T & string): QueryBuilder<T> {
+  orderByAscending(prop: IWherePropParam<T> & string): QueryBuilder<T> {
     if (this.orderByObj) {
-      throw new Error('An orderBy function cannot be called more than once in the same query expression')
+      throw new Error(
+        'An orderBy function cannot be called more than once in the same query expression'
+      );
     }
     this.orderByObj = {
       fieldPath: prop,
@@ -91,9 +115,11 @@ export default class QueryBuilder<T extends IEntity>
     return this;
   }
 
-  orderByDescending(prop: keyof T & string): QueryBuilder<T> {
+  orderByDescending(prop: IWherePropParam<T> & string): QueryBuilder<T> {
     if (this.orderByObj) {
-      throw new Error('An orderBy function cannot be called more than once in the same query expression')
+      throw new Error(
+        'An orderBy function cannot be called more than once in the same query expression'
+      );
     }
     this.orderByObj = {
       fieldPath: prop,
