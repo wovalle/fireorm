@@ -40,5 +40,6 @@ after(async () => {
 export const getUniqueColName = (col: string) => {
   const unique = `${col}#${uuid.v4()}`;
   uniqueCollections.push(unique);
+  console.log(`Now using collection: ${unique}`);
   return unique;
 };

@@ -280,6 +280,14 @@ describe('BaseRepository', () => {
   });
 
   describe('.where*', () => {
+    it('whereEqualTo must accept function as first parameter', async () => {
+      const list = await bandRepository
+        .whereEqualTo(b => b.name, 'Porcupine Tree')
+        .find();
+      expect(list.length).to.equal(1);
+      expect(list[0].name).to.equal('Porcupine Tree');
+    });
+
     it('must return T[]', async () => {
       const progressiveRockBands = await bandRepository
         .whereArrayContains('genres', 'progressive-rock')

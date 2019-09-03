@@ -21,6 +21,7 @@ import {
   IOrderByParams,
   IQueryExecutor,
   IEntity,
+  IWherePropParam,
 } from './types';
 
 import {
@@ -224,7 +225,7 @@ export default class BaseFirestoreRepository<T extends IEntity>
     return query.get().then(this.extractTFromColSnap);
   }
 
-  whereEqualTo(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
+  whereEqualTo(prop: IWherePropParam<T>, val: IFirestoreVal): QueryBuilder<T> {
     return new QueryBuilder<T>(this).whereEqualTo(prop, val);
   }
 
