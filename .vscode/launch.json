@@ -27,6 +27,8 @@
         "--colors",
         "--require",
         "ts-node/register",
+        "--require",
+        "dotenv/config",
         "${relativeFile}"
       ],
       "cwd": "${workspaceRoot}",
@@ -40,6 +42,8 @@
       "args": [
         "--require",
         "ts-node/register",
+        "--require",
+        "dotenv/config",
         "--ui",
         "bdd",
         "--timeout",
