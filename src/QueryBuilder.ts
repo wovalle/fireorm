@@ -102,7 +102,7 @@ export default class QueryBuilder<T extends IEntity>
     return this;
   }
 
-  orderByAscending(prop: IWherePropParam<T> & string): QueryBuilder<T> {
+  orderByAscending(prop: keyof T & string): QueryBuilder<T> {
     if (this.orderByObj) {
       throw new Error(
         'An orderBy function cannot be called more than once in the same query expression'
@@ -115,7 +115,7 @@ export default class QueryBuilder<T extends IEntity>
     return this;
   }
 
-  orderByDescending(prop: IWherePropParam<T> & string): QueryBuilder<T> {
+  orderByDescending(prop: keyof T & string): QueryBuilder<T> {
     if (this.orderByObj) {
       throw new Error(
         'An orderBy function cannot be called more than once in the same query expression'

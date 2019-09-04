@@ -1,13 +1,14 @@
 import QueryBuilder from './QueryBuilder';
 import { OrderByDirection } from '@google-cloud/firestore';
 
-// TODO: separate Read/Write interfaces to achieve readonly?
+export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
 export interface IRepository<T extends { id: string }> {
   limit(limitVal: number): QueryBuilder<T>;
   orderByAscending(prop: keyof T & string): QueryBuilder<T>;
   orderByDescending(prop: keyof T & string): QueryBuilder<T>;
   findById(id: string): Promise<T>;
-  create(item: T): Promise<T>;
+  create(item: PartialBy<T, 'id'>): Promise<T>;
   update(item: T): Promise<T>;
   delete(id: string): Promise<void>;
 }
@@ -39,7 +40,10 @@ export interface IOrderByParams {
 }
 
 export type IQueryBuilderResult = IFireOrmQueryLine[];
-export type IWherePropParam<T> = keyof T | ((t: T) => unknown);
+
+export type IWherePropParam<T> = T extends string
+  ? keyof T
+  : ((t: T) => unknown);
 export interface IQueryBuilder<T extends IEntity> {
   whereEqualTo(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T>;
   whereGreaterThan(
@@ -59,8 +63,8 @@ export interface IQueryBuilder<T extends IEntity> {
     prop: IWherePropParam<T>,
     val: IFirestoreVal
   ): IQueryBuilder<T>;
-  orderByAscending(prop: IWherePropParam<T> & string): IQueryBuilder<T>;
-  orderByDescending(prop: IWherePropParam<T> & string): IQueryBuilder<T>;
+  orderByAscending(prop: keyof T & string): IQueryBuilder<T>;
+  orderByDescending(prop: keyof T & string): IQueryBuilder<T>;
   find(): Promise<T[]>;
 }
 
