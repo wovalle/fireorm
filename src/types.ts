@@ -41,9 +41,7 @@ export interface IOrderByParams {
 
 export type IQueryBuilderResult = IFireOrmQueryLine[];
 
-export type IWherePropParam<T> = T extends string
-  ? keyof T
-  : ((t: T) => unknown);
+export type IWherePropParam<T> = keyof T | ((t: T) => unknown);
 export interface IQueryBuilder<T extends IEntity> {
   whereEqualTo(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T>;
   whereGreaterThan(

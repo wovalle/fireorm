@@ -30,6 +30,8 @@ import {
   SubCollectionMetadata,
 } from './MetadataStorage';
 
+import { TransactionRepository } from './BaseFirestoreTransactionRepository';
+
 /**
  * Dummy class created with the sole purpose to be able to
  * check if other classes are instances of BaseFirestoreRepository.
@@ -203,6 +205,18 @@ export default class BaseFirestoreRepository<T extends IEntity>
     return new QueryBuilder<T>(this).orderByDescending(prop);
   }
 
+  runTransaction(executor: (tran: TransactionRepository<T>) => Promise<void>) {
+    return this.firestoreColRef.firestore.runTransaction(t => {
+      return executor(
+        new TransactionRepository<T>(
+          this.firestoreColRef,
+          t,
+          this.colMetadata.entity
+        )
+      );
+    });
+  }
+
   find(): Promise<T[]> {
     return new QueryBuilder<T>(this).find();
   }
@@ -229,23 +243,35 @@ export default class BaseFirestoreRepository<T extends IEntity>
     return new QueryBuilder<T>(this).whereEqualTo(prop, val);
   }
 
-  whereGreaterThan(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
+  whereGreaterThan(
+    prop: IWherePropParam<T>,
+    val: IFirestoreVal
+  ): QueryBuilder<T> {
     return new QueryBuilder<T>(this).whereGreaterThan(prop, val);
   }
 
-  whereGreaterOrEqualThan(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
+  whereGreaterOrEqualThan(
+    prop: IWherePropParam<T>,
+    val: IFirestoreVal
+  ): QueryBuilder<T> {
     return new QueryBuilder<T>(this).whereGreaterOrEqualThan(prop, val);
   }
 
-  whereLessThan(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
+  whereLessThan(prop: IWherePropParam<T>, val: IFirestoreVal): QueryBuilder<T> {
     return new QueryBuilder<T>(this).whereLessThan(prop, val);
   }
 
-  whereLessOrEqualThan(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
+  whereLessOrEqualThan(
+    prop: IWherePropParam<T>,
+    val: IFirestoreVal
+  ): QueryBuilder<T> {
     return new QueryBuilder<T>(this).whereLessOrEqualThan(prop, val);
   }
 
-  whereArrayContains(prop: keyof T, val: IFirestoreVal): QueryBuilder<T> {
+  whereArrayContains(
+    prop: IWherePropParam<T>,
+    val: IFirestoreVal
+  ): QueryBuilder<T> {
     return new QueryBuilder<T>(this).whereArrayContains(prop, val);
   }
 }

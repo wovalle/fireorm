@@ -374,6 +374,20 @@ describe('BaseRepository', () => {
     });
   });
 
+  describe.skip('transactions', () => {
+    // TODO: firestore mock does not have support for runTransaction :( gotta find how to test it
+    it('should be able to open transactions', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const band = await tran.findById('porcupine-tree');
+        band.name = 'Árbol de Puercoespín';
+        await tran.update(band);
+      });
+
+      const updated = await bandRepository.findById('porcupine-tree');
+      expect(updated.name).to.eql('Árbol de Puercoespín');
+    });
+  });
+
   describe('must handle subcollections', () => {
     it('should initialize subcollections', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
