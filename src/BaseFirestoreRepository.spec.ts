@@ -5,6 +5,7 @@ import { Collection, SubCollection, ISubCollection, Initialize } from '.';
 import { Type } from './';
 import { MetadataStorage } from './MetadataStorage';
 const MockFirebase = require('mock-cloud-firestore');
+import monkeyPatchFirestoreTran from '../test/monkey-patch-firestore-transaction';
 
 const store = { metadataStorage: new MetadataStorage() };
 Initialize(null, store);
@@ -45,6 +46,7 @@ describe('BaseRepository', () => {
     });
 
     const firestore = firebase.firestore();
+    monkeyPatchFirestoreTran(firestore);
     Initialize(firestore, store);
     bandRepository = new BandRepository('bands');
   });
@@ -374,7 +376,7 @@ describe('BaseRepository', () => {
     });
   });
 
-  describe.skip('transactions', () => {
+  describe.only('transactions', () => {
     // TODO: firestore mock does not have support for runTransaction :( gotta find how to test it
     it('should be able to open transactions', async () => {
       await bandRepository.runTransaction(async tran => {
