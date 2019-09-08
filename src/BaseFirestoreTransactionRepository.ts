@@ -2,24 +2,17 @@ import { CollectionReference, Transaction } from '@google-cloud/firestore';
 
 import {
   IEntity,
-  IQueryExecutor,
-  IWherePropParam,
-  IFirestoreVal,
   IFireOrmQueryLine,
-  ITransactionQueryBuilder,
-  ITransactionRepository,
   WithOptionalId,
+  IQueryBuilder,
+  IRepository,
 } from './types';
 
 import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
-import QueryBuilder from './QueryBuilder';
 
 export class TransactionRepository<T extends IEntity>
   extends AbstractFirestoreRepository<T>
-  implements
-    ITransactionRepository<T>,
-    ITransactionQueryBuilder<T>,
-    IQueryExecutor<T> {
+  implements IRepository<T> {
   constructor(
     private collection: CollectionReference,
     private transaction: Transaction,
@@ -30,42 +23,6 @@ export class TransactionRepository<T extends IEntity>
 
   execute(queries: IFireOrmQueryLine[]): Promise<T[]> {
     throw new Error('Method not implemented.');
-  }
-
-  whereEqualTo(prop: IWherePropParam<T>, val: IFirestoreVal): QueryBuilder<T> {
-    return new QueryBuilder<T>(this).whereEqualTo(prop, val);
-  }
-
-  whereGreaterThan(
-    prop: IWherePropParam<T>,
-    val: IFirestoreVal
-  ): QueryBuilder<T> {
-    return new QueryBuilder<T>(this).whereGreaterThan(prop, val);
-  }
-
-  whereGreaterOrEqualThan(
-    prop: IWherePropParam<T>,
-    val: IFirestoreVal
-  ): QueryBuilder<T> {
-    return new QueryBuilder<T>(this).whereGreaterOrEqualThan(prop, val);
-  }
-
-  whereLessThan(prop: IWherePropParam<T>, val: IFirestoreVal): QueryBuilder<T> {
-    return new QueryBuilder<T>(this).whereLessThan(prop, val);
-  }
-
-  whereLessOrEqualThan(
-    prop: IWherePropParam<T>,
-    val: IFirestoreVal
-  ): QueryBuilder<T> {
-    return new QueryBuilder<T>(this).whereLessOrEqualThan(prop, val);
-  }
-
-  whereArrayContains(
-    prop: IWherePropParam<T>,
-    val: IFirestoreVal
-  ): QueryBuilder<T> {
-    return new QueryBuilder<T>(this).whereArrayContains(prop, val);
   }
 
   find(): Promise<T[]> {
@@ -89,5 +46,21 @@ export class TransactionRepository<T extends IEntity>
 
   delete(id: string): Promise<void> {
     throw new Error('Method not implemented.');
+  }
+
+  limit(): IQueryBuilder<T> {
+    throw new Error('`limit` is not available for transaction repositories');
+  }
+
+  orderByAscending(): IQueryBuilder<T> {
+    throw new Error(
+      '`orderByAscending` is not available for transaction repositories'
+    );
+  }
+
+  orderByDescending(): IQueryBuilder<T> {
+    throw new Error(
+      '`orderByDescending` is not available for transaction repositories'
+    );
   }
 }

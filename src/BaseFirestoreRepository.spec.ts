@@ -88,6 +88,9 @@ describe('BaseFirestoreRepository', () => {
           .find()
       ).to.throw();
     });
+
+    it('must return if limit is 0');
+    it('must throw if the limit is less than 0');
   });
 
   describe('orderByAscending', () => {

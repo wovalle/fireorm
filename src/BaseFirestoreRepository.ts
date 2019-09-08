@@ -2,28 +2,22 @@
 import 'reflect-metadata';
 
 import { CollectionReference, WhereFilterOp } from '@google-cloud/firestore';
-import QueryBuilder from './QueryBuilder';
 
 import {
   IRepository,
-  IFirestoreVal,
-  IQueryBuilder,
   FirestoreCollectionType,
   IFireOrmQueryLine,
   IOrderByParams,
-  IQueryExecutor,
   IEntity,
-  IWherePropParam,
 } from './types';
 
 import { getMetadataStorage } from './MetadataStorage';
-
 import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
 import { TransactionRepository } from './BaseFirestoreTransactionRepository';
 
 export default class BaseFirestoreRepository<T extends IEntity>
   extends AbstractFirestoreRepository<T>
-  implements IRepository<T>, IQueryBuilder<T>, IQueryExecutor<T> {
+  implements IRepository<T> {
   private readonly firestoreColRef: CollectionReference;
 
   constructor(colName: string);
@@ -94,18 +88,6 @@ export default class BaseFirestoreRepository<T extends IEntity>
     await this.firestoreColRef.doc(id).delete();
   }
 
-  limit(limitVal: number): QueryBuilder<T> {
-    return new QueryBuilder<T>(this).limit(limitVal);
-  }
-
-  orderByAscending(prop: keyof T & string): QueryBuilder<T> {
-    return new QueryBuilder<T>(this).orderByAscending(prop);
-  }
-
-  orderByDescending(prop: keyof T & string): QueryBuilder<T> {
-    return new QueryBuilder<T>(this).orderByDescending(prop);
-  }
-
   runTransaction(executor: (tran: TransactionRepository<T>) => Promise<void>) {
     return this.firestoreColRef.firestore.runTransaction(t => {
       return executor(
@@ -118,10 +100,6 @@ export default class BaseFirestoreRepository<T extends IEntity>
     });
   }
 
-  find(): Promise<T[]> {
-    return new QueryBuilder<T>(this).find();
-  }
-
   execute(
     queries: Array<IFireOrmQueryLine>,
     limitVal?: number,
@@ -131,48 +109,14 @@ export default class BaseFirestoreRepository<T extends IEntity>
       const op = cur.operator as WhereFilterOp;
       return acc.where(cur.prop, op, cur.val);
     }, this.firestoreColRef);
+
     if (orderByObj) {
       query = query.orderBy(orderByObj.fieldPath, orderByObj.directionStr);
     }
+
     if (limitVal) {
       query = query.limit(limitVal);
     }
     return query.get().then(this.extractTFromColSnap);
-  }
-
-  whereEqualTo(prop: IWherePropParam<T>, val: IFirestoreVal): QueryBuilder<T> {
-    return new QueryBuilder<T>(this).whereEqualTo(prop, val);
-  }
-
-  whereGreaterThan(
-    prop: IWherePropParam<T>,
-    val: IFirestoreVal
-  ): QueryBuilder<T> {
-    return new QueryBuilder<T>(this).whereGreaterThan(prop, val);
-  }
-
-  whereGreaterOrEqualThan(
-    prop: IWherePropParam<T>,
-    val: IFirestoreVal
-  ): QueryBuilder<T> {
-    return new QueryBuilder<T>(this).whereGreaterOrEqualThan(prop, val);
-  }
-
-  whereLessThan(prop: IWherePropParam<T>, val: IFirestoreVal): QueryBuilder<T> {
-    return new QueryBuilder<T>(this).whereLessThan(prop, val);
-  }
-
-  whereLessOrEqualThan(
-    prop: IWherePropParam<T>,
-    val: IFirestoreVal
-  ): QueryBuilder<T> {
-    return new QueryBuilder<T>(this).whereLessOrEqualThan(prop, val);
-  }
-
-  whereArrayContains(
-    prop: IWherePropParam<T>,
-    val: IFirestoreVal
-  ): QueryBuilder<T> {
-    return new QueryBuilder<T>(this).whereArrayContains(prop, val);
   }
 }

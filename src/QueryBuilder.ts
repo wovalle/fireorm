@@ -17,8 +17,6 @@ export default class QueryBuilder<T extends IEntity>
   protected limitVal: number;
   protected orderByObj: IOrderByParams;
 
-  // TODO: validate not doing range fields in different
-  // fields if the indexes are not created
   constructor(protected executor: IQueryExecutor<T>) {}
 
   private extractWhereParam = (param: IWherePropParam<T>) => {
@@ -102,29 +100,33 @@ export default class QueryBuilder<T extends IEntity>
     return this;
   }
 
-  orderByAscending(prop: keyof T & string): QueryBuilder<T> {
+  orderByAscending(prop: IWherePropParam<T>): QueryBuilder<T> {
     if (this.orderByObj) {
       throw new Error(
         'An orderBy function cannot be called more than once in the same query expression'
       );
     }
+
     this.orderByObj = {
-      fieldPath: prop,
+      fieldPath: this.extractWhereParam(prop),
       directionStr: 'asc',
     };
+
     return this;
   }
 
-  orderByDescending(prop: keyof T & string): QueryBuilder<T> {
+  orderByDescending(prop: IWherePropParam<T>): QueryBuilder<T> {
     if (this.orderByObj) {
       throw new Error(
         'An orderBy function cannot be called more than once in the same query expression'
       );
     }
+
     this.orderByObj = {
-      fieldPath: prop,
+      fieldPath: this.extractWhereParam(prop),
       directionStr: 'desc',
     };
+
     return this;
   }
 

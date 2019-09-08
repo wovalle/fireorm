@@ -12,21 +12,6 @@ export interface IRepository<T extends { id: string }> {
   delete(id: string): Promise<void>;
 }
 
-export type TransactionOmitteKeys =
-  | 'limit'
-  | 'orderByAscending'
-  | 'orderByDescending';
-
-export type ITransactionRepository<T extends IEntity> = Omit<
-  IRepository<T>,
-  TransactionOmitteKeys
->;
-
-export type ITransactionQueryBuilder<T extends IEntity> = Omit<
-  IQueryBuilder<T>,
-  TransactionOmitteKeys
->;
-
 export type WithOptionalId<T extends { id: unknown }> = Pick<
   T,
   Exclude<keyof T, 'id'>
@@ -81,8 +66,9 @@ export interface IQueryBuilder<T extends IEntity> {
     prop: IWherePropParam<T>,
     val: IFirestoreVal
   ): IQueryBuilder<T>;
-  orderByAscending(prop: keyof T & string): IQueryBuilder<T>;
-  orderByDescending(prop: keyof T & string): IQueryBuilder<T>;
+  orderByAscending(prop: IWherePropParam<T>): IQueryBuilder<T>;
+  orderByDescending(prop: IWherePropParam<T>): IQueryBuilder<T>;
+  limit(limitVal: number): IQueryBuilder<T>;
   find(): Promise<T[]>;
 }
 
