@@ -15,6 +15,11 @@ import { getMetadataStorage } from './MetadataStorage';
 import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
 import { TransactionRepository } from './BaseFirestoreTransactionRepository';
 
+class BatchRepository<T> {
+  create(item: T) {}
+  update(item: T) {}
+  update(item: T) {}
+}
 export default class BaseFirestoreRepository<T extends IEntity>
   extends AbstractFirestoreRepository<T>
   implements IRepository<T> {
@@ -99,6 +104,8 @@ export default class BaseFirestoreRepository<T extends IEntity>
       );
     });
   }
+
+  createBatch() {}
 
   execute(
     queries: Array<IFireOrmQueryLine>,

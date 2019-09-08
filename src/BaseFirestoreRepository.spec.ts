@@ -393,6 +393,44 @@ describe('BaseFirestoreRepository', () => {
     it('should return TransactionRepository');
   });
 
+  describe('batch', () => {
+    it('should be able to create batched transactions', async () => {
+      // TODO: maybe is enough checking the type of batch
+      const batch = bandRepository.createBatch();
+
+      const entity1 = new Band();
+      entity1.id = 'entity1';
+      entity1.name = 'Entity1';
+      entity1.formationYear = 2099;
+
+      const entity2 = new Band();
+      entity2.id = 'entity2';
+      entity2.name = 'Entity2';
+      entity1.formationYear = 2099;
+
+      const entity3 = new Band();
+      entity3.id = 'entity3';
+      entity3.name = 'Entity3';
+      entity1.formationYear = 2099;
+
+      batch.create(entity1);
+      batch.create(entity2);
+      batch.create(entity3);
+
+      await batch.commit();
+
+      const batchedBands = await bandRepository
+        .whereEqualTo('formationYear', 2099)
+        .find();
+
+      expect(batchedBands.map(b => b.name)).to.equal([
+        'Entity1',
+        'Entity2',
+        'Entity3',
+      ]);
+    });
+    it('should return TransactionRepository');
+  });
   describe('must handle subcollections', () => {
     it('should initialize subcollections', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
