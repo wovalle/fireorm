@@ -36,7 +36,7 @@ class Band {
 
 class BandRepository extends BaseFirestoreRepository<Band> {}
 
-describe('BaseRepository', () => {
+describe('BaseFirestoreRepository', () => {
   let bandRepository: BaseFirestoreRepository<Band> = null;
 
   beforeEach(() => {
@@ -376,7 +376,7 @@ describe('BaseRepository', () => {
     });
   });
 
-  describe.only('transactions', () => {
+  describe('transactions', () => {
     // TODO: firestore mock does not have support for runTransaction :( gotta find how to test it
     it('should be able to open transactions', async () => {
       await bandRepository.runTransaction(async tran => {

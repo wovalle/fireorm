@@ -1,16 +1,8 @@
 // tslint:disable-next-line:no-import-side-effect
 import 'reflect-metadata';
-import { plainToClass } from 'class-transformer';
 
-import {
-  DocumentSnapshot,
-  CollectionReference,
-  WhereFilterOp,
-  QuerySnapshot,
-} from '@google-cloud/firestore';
-
+import { CollectionReference, WhereFilterOp } from '@google-cloud/firestore';
 import QueryBuilder from './QueryBuilder';
-import { GetRepository } from './helpers';
 
 import {
   IRepository,
@@ -24,127 +16,36 @@ import {
   IWherePropParam,
 } from './types';
 
-import {
-  getMetadataStorage,
-  CollectionMetadata,
-  SubCollectionMetadata,
-} from './MetadataStorage';
+import { getMetadataStorage } from './MetadataStorage';
 
+import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
 import { TransactionRepository } from './BaseFirestoreTransactionRepository';
 
-/**
- * Dummy class created with the sole purpose to be able to
- * check if other classes are instances of BaseFirestoreRepository.
- * Typescript is not capable to check instances of generics.
- *
- * @export
- * @class BaseRepository
- */
-export class BaseRepository {}
-
 export default class BaseFirestoreRepository<T extends IEntity>
-  extends BaseRepository
+  extends AbstractFirestoreRepository<T>
   implements IRepository<T>, IQueryBuilder<T>, IQueryExecutor<T> {
-  public collectionType: FirestoreCollectionType;
   private readonly firestoreColRef: CollectionReference;
-  private readonly colMetadata: CollectionMetadata;
-  private readonly subColMetadata: SubCollectionMetadata[];
 
   constructor(colName: string);
   constructor(colName: string, docId: string, subColName: string);
 
-  constructor(
-    protected readonly colName: string,
-    protected readonly docId?: string,
-    protected readonly subColName?: string
-  ) {
-    super();
-    const {
-      firestoreRef,
-      getCollection,
-      getSubCollectionsFromParent,
-    } = getMetadataStorage();
+  constructor(colName: string, docId?: string, subColName?: string) {
+    super(colName, docId, subColName);
+    const { firestoreRef } = getMetadataStorage();
 
     if (!firestoreRef) {
       throw new Error('Firestore must be initialized first');
     }
 
-    this.colMetadata = getCollection(this.colName);
-
-    if (!this.colMetadata) {
-      throw new Error(`There is no metadata stored for "${this.colName}"`);
-    }
-
-    this.subColMetadata = getSubCollectionsFromParent(this.colMetadata.entity);
-
     if (this.docId) {
-      this.collectionType = FirestoreCollectionType.subcollection;
       this.firestoreColRef = firestoreRef
         .collection(this.colName)
         .doc(this.docId)
         .collection(this.subColName);
     } else {
-      this.collectionType = FirestoreCollectionType.collection;
       this.firestoreColRef = firestoreRef.collection(this.colName);
     }
   }
-
-  private initializeSubCollections = (entity: T) => {
-    this.subColMetadata.forEach(subCol => {
-      Object.assign(entity, {
-        [subCol.propertyKey]: GetRepository(
-          subCol.entity as any,
-          entity.id,
-          subCol.name
-        ),
-      });
-    });
-  };
-
-  private extractTFromDocSnap = (doc: DocumentSnapshot): T => {
-    if (!doc.exists) {
-      return null;
-    }
-
-    // tslint:disable-next-line:no-unnecessary-type-assertion
-    const entity = plainToClass(
-      this.colMetadata.entity as any,
-      this.transformFirestoreTypes(doc.data() as T)
-    ) as T;
-
-    if (this.collectionType === FirestoreCollectionType.collection) {
-      this.initializeSubCollections(entity);
-    }
-
-    return entity;
-  };
-
-  private extractTFromColSnap = (q: QuerySnapshot): T[] => {
-    return q.docs.map(this.extractTFromDocSnap);
-  };
-
-  private transformFirestoreTypes = (obj: T): T => {
-    Object.keys(obj).forEach(key => {
-      if (!obj[key]) return;
-      if (typeof obj[key] === 'object' && 'toDate' in obj[key]) {
-        obj[key] = obj[key].toDate();
-      } else if (obj[key].constructor.name === 'GeoPoint') {
-        const { latitude, longitude } = obj[key];
-        obj[key] = { latitude, longitude };
-      } else if (typeof obj[key] === 'object') {
-        this.transformFirestoreTypes(obj[key]);
-      }
-    });
-
-    return obj;
-  };
-
-  private toSerializableObject = (obj: T): Object => {
-    this.subColMetadata.forEach(scm => {
-      delete obj[scm.propertyKey];
-    });
-    return { ...obj };
-  };
 
   findById(id: string): Promise<T> {
     return this.firestoreColRef

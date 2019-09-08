@@ -1,17 +1,37 @@
-import QueryBuilder from './QueryBuilder';
 import { OrderByDirection } from '@google-cloud/firestore';
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
 export interface IRepository<T extends { id: string }> {
-  limit(limitVal: number): QueryBuilder<T>;
-  orderByAscending(prop: keyof T & string): QueryBuilder<T>;
-  orderByDescending(prop: keyof T & string): QueryBuilder<T>;
+  limit(limitVal: number): IQueryBuilder<T>;
+  orderByAscending(prop: keyof T & string): IQueryBuilder<T>;
+  orderByDescending(prop: keyof T & string): IQueryBuilder<T>;
   findById(id: string): Promise<T>;
   create(item: PartialBy<T, 'id'>): Promise<T>;
   update(item: T): Promise<T>;
   delete(id: string): Promise<void>;
 }
+
+export type TransactionOmitteKeys =
+  | 'limit'
+  | 'orderByAscending'
+  | 'orderByDescending';
+
+export type ITransactionRepository<T extends IEntity> = Omit<
+  IRepository<T>,
+  TransactionOmitteKeys
+>;
+
+export type ITransactionQueryBuilder<T extends IEntity> = Omit<
+  IQueryBuilder<T>,
+  TransactionOmitteKeys
+>;
+
+export type WithOptionalId<T extends { id: unknown }> = Pick<
+  T,
+  Exclude<keyof T, 'id'>
+> &
+  Partial<Pick<T, 'id'>>;
 
 export type IFirestoreVal = string | number | Date | Boolean;
 
@@ -25,8 +45,8 @@ export enum FirestoreOperators {
 }
 
 export enum FirestoreCollectionType {
-  collection,
-  subcollection,
+  collection = 'collection',
+  subcollection = 'subcollection',
 }
 export interface IFireOrmQueryLine {
   prop: string;
