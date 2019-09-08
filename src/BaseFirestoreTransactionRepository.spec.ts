@@ -197,7 +197,7 @@ describe('BaseFirestoreTransactionRepository', () => {
 
     it('must throw if item is not found', async () => {
       await bandRepository.runTransaction(async tran => {
-        expect(await tran.delete('lol')).to.throw;
+        expect(() => tran.delete('lol')).to.throw;
       });
     });
   });
