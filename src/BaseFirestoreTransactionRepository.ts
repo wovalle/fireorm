@@ -1,4 +1,8 @@
-import { CollectionReference, Transaction } from '@google-cloud/firestore';
+import {
+  CollectionReference,
+  Transaction,
+  WhereFilterOp,
+} from '@google-cloud/firestore';
 
 import {
   IEntity,
@@ -6,6 +10,7 @@ import {
   WithOptionalId,
   IQueryBuilder,
   IRepository,
+  FirestoreCollectionType,
 } from './types';
 
 import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
@@ -16,17 +21,18 @@ export class TransactionRepository<T extends IEntity>
   constructor(
     private collection: CollectionReference,
     private transaction: Transaction,
-    private entityConstructor: Function
+    entityConstructor: Function
   ) {
     super(entityConstructor);
   }
 
   execute(queries: IFireOrmQueryLine[]): Promise<T[]> {
-    throw new Error('Method not implemented.');
-  }
+    const query = queries.reduce((acc, cur) => {
+      const op = cur.operator as WhereFilterOp;
+      return acc.where(cur.prop, op, cur.val);
+    }, this.collection);
 
-  find(): Promise<T[]> {
-    throw new Error('Method not implemented.');
+    return this.transaction.get(query).then(this.extractTFromColSnap);
   }
 
   findById(id: string): Promise<T> {
@@ -34,8 +40,29 @@ export class TransactionRepository<T extends IEntity>
     return this.transaction.get(query).then(this.extractTFromDocSnap);
   }
 
-  create(item: WithOptionalId<T>): Promise<T> {
-    throw new Error('Method not implemented.');
+  async create(item: WithOptionalId<T>): Promise<T> {
+    if (item.id) {
+      const found = await this.findById(item.id);
+      if (found) {
+        return Promise.reject(
+          new Error(`A document with id ${item.id} already exists.`)
+        );
+      }
+    }
+
+    const doc = item.id ? this.collection.doc(item.id) : this.collection.doc();
+
+    if (!item.id) {
+      item.id = doc.id;
+    }
+
+    await doc.set(this.toSerializableObject(item as T));
+
+    if (this.collectionType === FirestoreCollectionType.collection) {
+      this.initializeSubCollections(item as T);
+    }
+
+    return item as T;
   }
 
   async update(item: T): Promise<T> {
@@ -44,23 +71,19 @@ export class TransactionRepository<T extends IEntity>
     return item;
   }
 
-  delete(id: string): Promise<void> {
-    throw new Error('Method not implemented.');
+  async delete(id: string): Promise<void> {
+    await this.transaction.delete(this.collection.doc(id));
   }
 
   limit(): IQueryBuilder<T> {
-    throw new Error('`limit` is not available for transaction repositories');
+    throw new Error('`limit` is not available for transactions');
   }
 
   orderByAscending(): IQueryBuilder<T> {
-    throw new Error(
-      '`orderByAscending` is not available for transaction repositories'
-    );
+    throw new Error('`orderByAscending` is not available for transactions');
   }
 
   orderByDescending(): IQueryBuilder<T> {
-    throw new Error(
-      '`orderByDescending` is not available for transaction repositories'
-    );
+    throw new Error('`orderByDescending` is not available for transactions');
   }
 }
