@@ -2,9 +2,8 @@ import { GetRepository, Collection } from '../../src';
 import { Band as BandEntity } from '../fixture';
 import { expect } from 'chai';
 import { getUniqueColName } from '../setup';
-import { read } from 'fs';
 
-describe('Integration test: Simple Repository', () => {
+describe('Integration test: Transactions', () => {
   @Collection(getUniqueColName('transactions'))
   class Band extends BandEntity {
     extra?: { website: string };
@@ -59,9 +58,7 @@ describe('Integration test: Simple Repository', () => {
 
       dream.name = 'Dream Theater';
       const updatedDt = await tran.update(dream);
-      const updatedDtInDb = await tran.findById(dream.id);
       expect(updatedDt.name).to.equal(dream.name);
-      expect(updatedDtInDb.name).to.equal(dream.name);
     });
 
     // Verify what was done inside the last transaction
@@ -69,7 +66,7 @@ describe('Integration test: Simple Repository', () => {
     expect(bandOutsideTransaction.name).to.equal('Dream Theater');
 
     // Filter a band by subfield inside transaction
-    bandRepository.runTransaction(async tran => {
+    await bandRepository.runTransaction(async tran => {
       const byWebsite = await tran
         .whereEqualTo(a => a.extra.website, 'www.dreamtheater.net')
         .find();
@@ -77,10 +74,11 @@ describe('Integration test: Simple Repository', () => {
     });
 
     // Delete a band
-    bandRepository.runTransaction(async tran => {
+    await bandRepository.runTransaction(async tran => {
       await tran.delete(dt.id);
-      const deletedBand = await tran.findById(dt.id);
-      expect(deletedBand).to.equal(null);
     });
+
+    const deletedBand = await bandRepository.findById(dt.id);
+    expect(deletedBand).to.equal(null);
   });
 });
