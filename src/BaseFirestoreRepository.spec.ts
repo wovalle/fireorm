@@ -390,12 +390,16 @@ describe('BaseFirestoreRepository', () => {
       const updated = await bandRepository.findById('porcupine-tree');
       expect(updated.name).to.eql('Árbol de Puercoespín');
     });
-    it('should return TransactionRepository');
+
+    it('should return TransactionRepository', () => {
+      bandRepository.runTransaction(async tran => {
+        expect(tran.constructor.name).to.equal('TransactionRepository');
+      });
+    });
   });
 
   describe('batch', () => {
     it('should be able to create batched transactions', async () => {
-      // TODO: maybe is enough checking the type of batch
       const batch = bandRepository.createBatch();
 
       const entity1 = new Band();
@@ -406,12 +410,12 @@ describe('BaseFirestoreRepository', () => {
       const entity2 = new Band();
       entity2.id = 'entity2';
       entity2.name = 'Entity2';
-      entity1.formationYear = 2099;
+      entity2.formationYear = 2099;
 
       const entity3 = new Band();
       entity3.id = 'entity3';
       entity3.name = 'Entity3';
-      entity1.formationYear = 2099;
+      entity3.formationYear = 2099;
 
       batch.create(entity1);
       batch.create(entity2);
@@ -423,14 +427,20 @@ describe('BaseFirestoreRepository', () => {
         .whereEqualTo('formationYear', 2099)
         .find();
 
-      expect(batchedBands.map(b => b.name)).to.equal([
+      expect(batchedBands.map(b => b.name)).to.eql([
         'Entity1',
         'Entity2',
         'Entity3',
       ]);
     });
-    it('should return TransactionRepository');
+
+    it('should return FirestoreBatchRepository', () => {
+      expect(bandRepository.createBatch().constructor.name).to.eql(
+        'FirestoreBatchRepository'
+      );
+    });
   });
+
   describe('must handle subcollections', () => {
     it('should initialize subcollections', async () => {
       const pt = await bandRepository.findById('porcupine-tree');

@@ -1,11 +1,7 @@
 // tslint:disable-next-line:no-import-side-effect
 import 'reflect-metadata';
 
-import {
-  CollectionReference,
-  WhereFilterOp,
-  WriteBatch,
-} from '@google-cloud/firestore';
+import { CollectionReference, WhereFilterOp } from '@google-cloud/firestore';
 
 import {
   IRepository,
@@ -13,44 +9,13 @@ import {
   IFireOrmQueryLine,
   IOrderByParams,
   IEntity,
-  WithOptionalId,
 } from './types';
 
 import { getMetadataStorage } from './MetadataStorage';
 import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
 import { TransactionRepository } from './BaseFirestoreTransactionRepository';
+import { FirestoreBatchRepository } from './BatchFirestoreRepository';
 
-class FirestoreBatchRepository<T extends IEntity> {
-  private batch: WriteBatch;
-
-  constructor(
-    private collection: CollectionReference,
-    private serializer: Function
-  ) {
-    this.batch = collection.firestore.batch();
-  }
-
-  create(item: WithOptionalId<T>) {
-    const doc = item.id ? this.collection.doc(item.id) : this.collection.doc();
-
-    if (!item.id) {
-      item.id = doc.id;
-    }
-
-    this.batch.create(doc, this.serializer(item));
-  }
-
-  update(item: T) {
-    this.batch.update(this.collection.doc(item.id), this.serializer(item));
-  }
-
-  delete(item: T) {
-    this.batch.delete(this.collection.doc(item.id), this.serializer(item));
-  }
-  commit() {
-    return this.batch.commit();
-  }
-}
 export default class BaseFirestoreRepository<T extends IEntity>
   extends AbstractFirestoreRepository<T>
   implements IRepository<T> {
