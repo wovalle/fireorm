@@ -11,7 +11,7 @@ describe('Integration test: Transactions', () => {
 
   const bandRepository = GetRepository(Band);
 
-  it('should do crud operations inside transactions', async () => {
+  it('should do CRUD operations inside transactions', async () => {
     // Create a band
     const dt = new Band();
     dt.id = 'dream-theater';
@@ -80,5 +80,77 @@ describe('Integration test: Transactions', () => {
 
     const deletedBand = await bandRepository.findById(dt.id);
     expect(deletedBand).to.equal(null);
+  });
+
+  it('should do CUD operations inside batchs', async () => {
+    // Array of bands to batch-insert
+    const bands = [
+      {
+        name: 'Opeth',
+        formationYear: 1989,
+        genres: [
+          'progressive-death-metal',
+          'progressive-metal',
+          'progressive-rock',
+          'custom-genre',
+        ],
+      },
+      {
+        name: '30 Seconds To Mars',
+        formationYear: 1998,
+        genres: ['alternative-rock', 'custom-genre'],
+      },
+    ];
+
+    const createBatch = bandRepository.createBatch();
+    bands.forEach(b => createBatch.create(b));
+
+    await createBatch.commit();
+
+    // Assert that bands were actually created
+    const createdBands = await bandRepository
+      .whereArrayContains(b => b.genres, 'custom-genre')
+      .find();
+
+    const orderedBands = createdBands.sort((a, b) =>
+      b.name.localeCompare(a.name)
+    );
+
+    expect(orderedBands.length).to.eql(2);
+    expect(orderedBands[0].name).to.eql(bands[0].name);
+    expect(orderedBands[1].name).to.eql(bands[1].name);
+
+    // Update website for all bands with an update batch
+    const updateBatch = bandRepository.createBatch();
+
+    createdBands.forEach(b => {
+      b.extra = { website: 'https://fake.web' };
+      updateBatch.update(b);
+    });
+
+    await updateBatch.commit();
+
+    // Assert that bands were actually updated
+    const updatedBands = await bandRepository
+      .whereArrayContains(b => b.genres, 'custom-genre')
+      .find();
+
+    expect(updatedBands.length).to.eql(2);
+    expect(updatedBands[0].extra.website).to.eql('https://fake.web');
+    expect(updatedBands[1].extra.website).to.eql('https://fake.web');
+
+    // Delete bands with an delete batch
+    const deleteBatch = bandRepository.createBatch();
+
+    createdBands.forEach(b => deleteBatch.delete(b));
+
+    await deleteBatch.commit();
+
+    // Assert that bands were actually deleted
+    const deletedBands = await bandRepository
+      .whereArrayContains(b => b.genres, 'custom-genre')
+      .find();
+
+    expect(deletedBands.length).to.eql(0);
   });
 });
