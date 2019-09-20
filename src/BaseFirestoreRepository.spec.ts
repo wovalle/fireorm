@@ -391,8 +391,8 @@ describe('BaseFirestoreRepository', () => {
       expect(updated.name).to.eql('Árbol de Puercoespín');
     });
 
-    it('should return TransactionRepository', () => {
-      bandRepository.runTransaction(async tran => {
+    it('should return TransactionRepository', async () => {
+      await bandRepository.runTransaction(async tran => {
         expect(tran.constructor.name).to.equal('TransactionRepository');
       });
     });
