@@ -54,8 +54,17 @@ describe('Integration test: Simple Repository', () => {
     const byWebsite = await bandRepository
       .whereEqualTo(a => a.extra.website, 'www.dreamtheater.net')
       .find();
-
     expect(byWebsite[0].id).to.equal('dream-theater');
+
+    // Should be able to run transactions
+    await bandRepository.runTransaction(async tran => {
+      const band = await tran.findById('dream-theater');
+      band.name = 'Teatro del sueño';
+      await tran.update(band);
+    });
+
+    const updated = await bandRepository.findById('dream-theater');
+    expect(updated.name).to.eql('Teatro del sueño');
 
     // Delete a band
     await bandRepository.delete(dt.id);

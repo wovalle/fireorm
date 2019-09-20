@@ -1,5 +1,5 @@
 import { Firestore } from '@google-cloud/firestore';
-import { BaseRepository } from './BaseFirestoreRepository';
+import { BaseRepository } from './BaseRepository';
 let store: IMetadataStore = null;
 
 export interface IMetadataStore {

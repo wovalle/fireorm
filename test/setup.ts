@@ -19,9 +19,6 @@ admin.initializeApp({
 });
 
 const firestore = admin.firestore();
-firestore.settings({
-  timestampsInSnapshots: true,
-});
 Initialize(firestore);
 
 after(async () => {

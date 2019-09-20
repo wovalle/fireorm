@@ -5,6 +5,7 @@ import { Collection, SubCollection, ISubCollection, Initialize } from '.';
 import { Type } from './';
 import { MetadataStorage } from './MetadataStorage';
 const MockFirebase = require('mock-cloud-firestore');
+import monkeyPatchFirestoreTran from '../test/monkey-patch-firestore-transaction';
 
 const store = { metadataStorage: new MetadataStorage() };
 Initialize(null, store);
@@ -35,7 +36,7 @@ class Band {
 
 class BandRepository extends BaseFirestoreRepository<Band> {}
 
-describe('BaseRepository', () => {
+describe('BaseFirestoreRepository', () => {
   let bandRepository: BaseFirestoreRepository<Band> = null;
 
   beforeEach(() => {
@@ -45,6 +46,7 @@ describe('BaseRepository', () => {
     });
 
     const firestore = firebase.firestore();
+    monkeyPatchFirestoreTran(firestore);
     Initialize(firestore, store);
     bandRepository = new BandRepository('bands');
   });
@@ -86,6 +88,9 @@ describe('BaseRepository', () => {
           .find()
       ).to.throw();
     });
+
+    it('must return if limit is 0');
+    it('must throw if the limit is less than 0');
   });
 
   describe('orderByAscending', () => {
@@ -371,6 +376,68 @@ describe('BaseRepository', () => {
       expect(pt.lastShowCoordinates).to.be.instanceOf(Coordinates);
       expect(pt.lastShowCoordinates.latitude).to.equal(51.5009088);
       expect(pt.lastShowCoordinates.longitude).to.equal(-0.1795547);
+    });
+  });
+
+  describe('transactions', () => {
+    it('should be able to open transactions', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const band = await tran.findById('porcupine-tree');
+        band.name = 'Árbol de Puercoespín';
+        await tran.update(band);
+      });
+
+      const updated = await bandRepository.findById('porcupine-tree');
+      expect(updated.name).to.eql('Árbol de Puercoespín');
+    });
+
+    it('should return TransactionRepository', async () => {
+      await bandRepository.runTransaction(async tran => {
+        expect(tran.constructor.name).to.equal('TransactionRepository');
+      });
+    });
+  });
+
+  describe('batch', () => {
+    it('should be able to create batched transactions', async () => {
+      const batch = bandRepository.createBatch();
+
+      const entity1 = new Band();
+      entity1.id = 'entity1';
+      entity1.name = 'Entity1';
+      entity1.formationYear = 2099;
+
+      const entity2 = new Band();
+      entity2.id = 'entity2';
+      entity2.name = 'Entity2';
+      entity2.formationYear = 2099;
+
+      const entity3 = new Band();
+      entity3.id = 'entity3';
+      entity3.name = 'Entity3';
+      entity3.formationYear = 2099;
+
+      batch.create(entity1);
+      batch.create(entity2);
+      batch.create(entity3);
+
+      await batch.commit();
+
+      const batchedBands = await bandRepository
+        .whereEqualTo('formationYear', 2099)
+        .find();
+
+      expect(batchedBands.map(b => b.name)).to.eql([
+        'Entity1',
+        'Entity2',
+        'Entity3',
+      ]);
+    });
+
+    it('should return FirestoreBatchRepository', () => {
+      expect(bandRepository.createBatch().constructor.name).to.eql(
+        'FirestoreBatchRepository'
+      );
     });
   });
 
