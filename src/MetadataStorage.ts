@@ -88,23 +88,25 @@ export class MetadataStorage {
 
 export const getMetadataStorage = (): MetadataStorage => {
   if (!store) {
-    throw new Error(
-      'Application has not been initialized. Call Initialize() method'
-    );
+      initializeMetadataStorage();
   }
 
   return store.metadataStorage;
 };
 
-export const Initialize = (
-  firestore: Firestore,
-  metadataStore: IMetadataStore = globalStore
-): void => {
+export function initializeMetadataStorage(metadataStore: IMetadataStore = globalStore) {
   store = metadataStore;
 
   if (!store.metadataStorage) {
     store.metadataStorage = new MetadataStorage();
   }
+}
+
+export const Initialize = (
+  firestore: Firestore,
+  metadataStore: IMetadataStore = globalStore
+): void => {
+  initializeMetadataStorage(metadataStore)
 
   store.metadataStorage.firestoreRef = firestore;
 };
