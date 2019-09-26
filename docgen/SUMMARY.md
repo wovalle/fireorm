@@ -8,5 +8,3 @@
 - [Custom Repositories](CUSTOM_REPOSITORIES.md)
 - [Transactions](TRANSACTIONS.md)
 - [API](API.md)
-  - [Types](TYPES.md)
-- [Thanks](THANKS.md)
