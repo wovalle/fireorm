@@ -26,12 +26,12 @@ class DocsifyTheme extends MarkdownTheme {
 
   getSummaryMarkdown(renderer) {
     const md = [];
-    md.push(`- [Globals](globals.md)`);
+    md.push('- Types Documentation');
     this.getNavigation(renderer.project).children.forEach(rootNavigation => {
       if (rootNavigation.children) {
-        md.push(`- ${rootNavigation.title}`);
+        md.push(`  - ${rootNavigation.title}`);
         rootNavigation.children.forEach(item => {
-          md.push(`  - [${item.title}](${item.url})`);
+          md.push(`    - [${item.title}](${item.url})`);
         });
       }
     });

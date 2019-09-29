@@ -62,5 +62,4 @@ typings/
 
 firestore.creds.json
 lib
-_sidebar.md
-docs/generated
+docs

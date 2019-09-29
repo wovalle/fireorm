@@ -1,5 +1,5 @@
 {
-  "out": "docs/generated",
+  "out": "docs",
   "name": "fireorm🔥",
   "readme": "none",
   "mode": "file",
@@ -10,7 +10,7 @@
   "categorizeByGroups": false,
   "hideBreadcrumbs": true,
   "plugins": ["typedoc-plugin-markdown"],
-  "theme": "docs/typedoc-docsify",
+  "theme": "docgen/typedoc-docsify",
   "hideProjectTitle": true,
   "exclude": ["*.spec.*"]
 }

@@ -21,9 +21,9 @@
   ],
   "scripts": {
     "build": "tsc",
-    "build:typedoc": "typedoc  --options docs/typedoc.json",
-    "build:gitbook": "gitbook build",
-    "build:documentation": "yarn build:typedoc && cp CNAME docs/CNAME",
+    "build:typedoc": "typedoc --options docgen/typedoc.json",
+    "build:docsify": "yarn ts-node docgen/build.ts",
+    "build:documentation": "yarn rimraf docs && yarn build:typedoc && yarn build:docsify && cp CNAME docs/CNAME",
     "build:watch": "tsc -w --incremental",
     "lint": "tslint --project tsconfig.json",
     "lint:md": "remark README.md -o README.md",
@@ -56,14 +56,13 @@
     "mock-cloud-firestore": "^0.9.0",
     "reflect-metadata": "^0.1.13",
     "remark-cli": "^6.0.1",
-    "remark-parse": "^7.0.1",
+    "rimraf": "^3.0.0",
     "semantic-release": "^15.13.12",
     "ts-node": "^8.3.0",
     "tslint": "^5.12.0",
     "typedoc": "^0.15.0",
     "typedoc-plugin-markdown": "^2.2.7",
     "typescript": "^3.2.2",
-    "unified": "^8.4.0",
     "uuid": "^3.3.2"
   },
   "peerDependencies": {
