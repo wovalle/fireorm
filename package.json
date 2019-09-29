@@ -21,7 +21,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "build:typedoc": "typedoc --out docs/api --name fireorm --readme README.md --mode file --gaID UA-133856278-1 --excludeNotExported --exclude examples --exclude test",
+    "build:typedoc": "typedoc  --options docs/typedoc.json",
     "build:gitbook": "gitbook build",
     "build:documentation": "yarn build:typedoc && cp CNAME docs/CNAME",
     "build:watch": "tsc -w --incremental",
@@ -61,6 +61,7 @@
     "ts-node": "^8.3.0",
     "tslint": "^5.12.0",
     "typedoc": "^0.15.0",
+    "typedoc-plugin-markdown": "^2.2.7",
     "typescript": "^3.2.2",
     "unified": "^8.4.0",
     "uuid": "^3.3.2"

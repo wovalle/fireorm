@@ -14,7 +14,6 @@
       :root {
         --theme-color: #ff5722;
         --theme-color-dark: #e64a19;
-
         --text-color-base: #212121;
         --text-color-secondary: #757575;
         --text-color-tertiary: #81818e;
@@ -23,21 +22,48 @@
   </head>
   <body>
     <div id="app"></div>
+
     <script>
       window.$docsify = {
         name: 'fireorm 🔥',
         nameLink: '/',
         repo: 'https://github.com/wovalle/fireorm',
         loadSidebar: true,
+        ga: 'UA-133856278-1',
         homepage:
           'https://raw.githubusercontent.com/wovalle/fireorm/master/README.md',
         maxLevel: 3,
         subMaxLevel: 2,
         auto2top: true,
+        copyCode: {
+          buttonText: 'Copy',
+        },
+        plugins: [
+          function(hook, vm) {
+            hook.beforeEach(function(html) {
+              if (/types/.test(vm.route.file)) return html;
+
+              if (/githubusercontent\.com/.test(vm.route.file)) {
+                url = vm.route.file
+                  .replace('raw.githubusercontent.com', 'github.com')
+                  .replace(/\/master/, '/blob/master');
+              } else {
+                url =
+                  'https://github.com/wovalle/fireorm/blob/master/docs/' +
+                  vm.route.file;
+              }
+              var editHtml = '[:memo: Edit Document](' + url + ')\n';
+              return editHtml + html;
+            });
+          },
+        ],
       };
     </script>
+
     <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
     <script src="//unpkg.com/prismjs/components/prism-typescript.min.js"></script>
+    <script src="//unpkg.com/docsify/lib/plugins/ga.min.js"></script>
     <script src="//unpkg.com/docsify-copy-code@2"></script>
+    <script src="//unpkg.com/docsify-pagination/dist/docsify-pagination.min.js"></script>
   </body>
 </html>
