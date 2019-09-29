@@ -62,4 +62,4 @@ typings/
 
 firestore.creds.json
 lib
-docs
+_sidebar.md
