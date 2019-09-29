@@ -12,7 +12,7 @@ In Firestore, data is stored in _Documents_ which are organized into _Collection
 
 To take full advantage of what fireorm's have to offer, is recommended that you are familiarized with [Firestore Data Model](https://firebase.google.com/docs/firestore/data-model).
 
-### Fireorm Models
+## Fireorm Models
 
 Models in fireorm are just a way to specify the shape that our data (or _Documents_) will have. Models are represented with [JavaScript Classes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes)!
 
@@ -55,7 +55,7 @@ Wait, Firestore Collections must have a name, what will be the name of that coll
 @Collection('RockBands')
 ```
 
-### Fireorm Repositories
+## Fireorm Repositories
 
 One of my goals when developing this library was create a way to use the Repository Pattern with Firestore as easy as possible. We have our models, we have our collections, but how are we supposed to make CRUD operations? That’s what Repositories are for.
 

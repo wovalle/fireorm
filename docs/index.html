@@ -11,17 +11,13 @@
     />
     <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css" />
     <style>
-      /* :root {
+      :root {
         --theme-color: #ff5722;
         --theme-color-dark: #e64a19;
 
         --text-color-base: #212121;
         --text-color-secondary: #757575;
         --text-color-tertiary: #81818e;
-      } */
-
-      .sidebar li > p {
-        font-weight: 700;
       }
     </style>
   </head>
@@ -35,6 +31,9 @@
         loadSidebar: true,
         homepage:
           'https://raw.githubusercontent.com/wovalle/fireorm/master/README.md',
+        maxLevel: 3,
+        subMaxLevel: 2,
+        auto2top: true,
       };
     </script>
     <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>

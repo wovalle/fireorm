@@ -4,16 +4,16 @@ import fs from 'fs';
 import path from 'path';
 
 const markdownFiles = [
-  '../README',
-  'Core_Concepts',
-  'Read_Data',
-  'Manage_Data',
-  'Subcollections',
-  'Transactions',
-  'Custom_Repositories',
+  ['../README', 'Getting Started'],
+  ['Core_Concepts', 'Core Concepts'],
+  ['Read_Data', 'Retrieving Data'],
+  ['Manage_Data', 'Managing Data'],
+  ['Subcollections', 'SubCollections'],
+  ['Transactions', 'Transactions'],
+  ['Custom_Repositories', 'Custom Repositories'],
 ];
 
-const extractHeadingsFromMarkdown = (fileName, text) => {
+const extractHeadingsFromMarkdown = (fileName, fileTitle, text) => {
   const tokens = unified()
     .use(markdown)
     .parse(text) as any;
@@ -28,6 +28,7 @@ const extractHeadingsFromMarkdown = (fileName, text) => {
       .filter(c => [2, 3].includes(c.depth))
       .map(c => c.children[0].value),
     fileName,
+    fileTitle,
   };
 };
 
@@ -39,9 +40,9 @@ const createSideBarFromHeadings = async headings => {
       .trim();
 
   return headings.reduce((acc, cur) => {
-    const title = `- [${cur.title}](${cur.fileName}.md#${toLink(cur.title)})\n`;
+    const title = `- ${cur.fileTitle}\n`;
     const children = cur.children.map(c => {
-      return `  - [${c}](${cur.fileName}.md#${toLink(c)})`;
+      return `  - [${c}](${cur.fileName.replace('../', '')}.md#${toLink(c)})`;
     });
 
     // tslint:disable-next-line:no-parameter-reassignment
@@ -57,14 +58,19 @@ const saveSidebar = (basePath, sidebar) => {
 
 (async () => {
   const files = markdownFiles.map(f => ({
-    path: path.join(__dirname, `${f}.md`),
-    name: f.replace('../', ''),
+    path: path.join(__dirname, `${f[0]}.md`),
+    name: f[0],
+    title: f[1],
   }));
 
   const headings = await Promise.all(
     files.map(async file => {
       const buffer = await fs.promises.readFile(file.path);
-      return extractHeadingsFromMarkdown(file.name, buffer.toString());
+      return extractHeadingsFromMarkdown(
+        file.name,
+        file.title,
+        buffer.toString()
+      );
     })
   );
 
