@@ -33,7 +33,7 @@ Wait, I only mentioned name, formationYear and genres in my original specificati
 
 Great, we have a model, but how can we ‘take’ our model and ‘store’ it the database? In Firestore we store data in _[Documents](https://firebase.google.com/docs/firestore/data-model#documents)_ and they are organized into _[Collections](https://firebase.google.com/docs/firestore/data-model#collections)_. To represent a Collection in our code, we'll use a fairly new JavaScript feature which Typescript let us use super easy: [Decorators](https://www.typescriptlang.org/docs/handbook/decorators.html).
 
-To declare Collections we can just _decorate_ our model class with fireorm [Collection](API.md#CollectionDecorator) decorator and each instance of the model would act as a Firestore Document.
+To declare Collections we can just _decorate_ our model class with fireorm [Collection](globals.md#Collection) decorator and each instance of the model would act as a Firestore Document.
 
 ```typescript
 import { Collection } from 'fireorm';
@@ -47,7 +47,7 @@ class Band {
 }
 ```
 
-See how we're importing the [Collection Decorator](API.md#CollectionDecorator) from fireorm and we're decorating our Band class with it. Internally, fireorm will treat each instance of Band as a Firestore Document.
+See how we're importing the [Collection Decorator](globals.md#Collection) from fireorm and we're decorating our Band class with it. Internally, fireorm will treat each instance of Band as a Firestore Document.
 
 Wait, Firestore Collections must have a name, what will be the name of that collection? By default, fireorm will name the collections with the plural form of the Model name, in this case `Bands`. If you want you use your own name, you can pass an string as the first parameter of the Decorator.
 
@@ -61,7 +61,7 @@ One of my goals when developing this library was create a way to use the Reposit
 
 > In general, repositories are classes or components that encapsulate the logic required to access data sources. They centralize common data access functionality, providing better maintainability and decoupling the infrastructure or technology used to access databases from the domain model layer ([source](https://docs.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/infrastructure-persistence-layer-design)).
 
-Fireorm’s Repositories provide the necessary methods to create, retrieve, update and delete documents from our Firestore collections. To create a repository from a collection we can just call fireorm’s [GetRepository](API.md#GetRepository) method.
+Fireorm’s Repositories provide the necessary methods to create, retrieve, update and delete documents from our Firestore collections. To create a repository from a collection we can just call fireorm’s [GetRepository](Globals.md#GetRepository) method.
 
 ```typescript
 import { Collection, GetRepository } from 'fireorm';

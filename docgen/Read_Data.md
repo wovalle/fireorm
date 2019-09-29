@@ -6,9 +6,9 @@ We'll continue working with the Band's collection we defined in [Core Concept's]
 
 ## Simple Queries
 
-Fireorm [Repositories](CORE_CONCEPTS.md#FireormRepositories) have the method [findById](API.md#FindById) which you can use to retrieve documents by its... id, duh.
+Fireorm [Repositories](CORE_CONCEPTS.md#FireormRepositories) have the method [findById](Classes/Classes/BaseFirestoreRepository.md#FindById) which you can use to retrieve documents by its... id, duh.
 
-Let's imagine we have a Document in our Bands Collection in firestore with an id `red-hot-chilli-peppers`. To retrieve it we only have to use the handy [findById](API.md#FindById) method in our repository!
+Let's imagine we have a Document in our Bands Collection in firestore with an id `red-hot-chilli-peppers`. To retrieve it we only have to use the handy [findById](Classes/BaseFirestoreRepository.md#FindById) method in our repository!
 
 ```typescript
 import { Collection, GetRepository } from 'fireorm';
@@ -30,7 +30,7 @@ Now the variable band is an instance of our Band model that contains the informa
 
 ## Complex Queries
 
-Only being able to find documents by id is a bit limiting, that's why fireorm repositories provide a lot of helper functions to ease the filtering of data in queries. These are [whereEqualTo](API.md#WhereEqualTo), [whereGreaterThan](API.md#WhereGreaterThan), [whereGreaterOrEqualTha](API.md#WhereGreaterOrEqualThan), [whereLessThan](API.md#WhereLessThan), [whereLessOrEqualThan](API.md#WhereLessOrEqualThan), and [whereArrayContains](API.md#WhereArrayContains) methods. We can pipe as many methods as we need to perform complex queries, as long as we don’t forget to call the [find](API.md#Find) method at the end.
+Only being able to find documents by id is a bit limiting, that's why fireorm repositories provide a lot of helper functions to ease the filtering of data in queries. These are [whereEqualTo](Classes/BaseFirestoreRepository.md#WhereEqualTo), [whereGreaterThan](Classes/BaseFirestoreRepository.md#WhereGreaterThan), [whereGreaterOrEqualTha](Classes/BaseFirestoreRepository.md#WhereGreaterOrEqualThan), [whereLessThan](Classes/BaseFirestoreRepository.md#WhereLessThan), [whereLessOrEqualThan](Classes/BaseFirestoreRepository.md#WhereLessOrEqualThan), and [whereArrayContains](Classes/BaseFirestoreRepository.md#WhereArrayContains) methods. We can pipe as many methods as we need to perform complex queries, as long as we don’t forget to call the [find](Classes/BaseFirestoreRepository.md#Find) method at the end.
 
 ```typescript
 // Bands formed from 1990 onwards
@@ -68,7 +68,7 @@ await bandRepository
 
 ## Order By and Limit
 
-Fireorm repositories also provide functions to order documents and limit the quantity of documents that we will retrieve. These are [orderByAscending](API.md#OrderByAscending), [orderByDescending](API.md#OrderByDescending) and [limit](API.md#Limit). Please be aware that you can only use one orderBy and one limit per query.
+Fireorm repositories also provide functions to order documents and limit the quantity of documents that we will retrieve. These are [orderByAscending](Classes/BaseFirestoreRepository.md#OrderByAscending), [orderByDescending](Classes/BaseFirestoreRepository.md#OrderByDescending) and [limit](Classes/BaseFirestoreRepository.md#Limit). Please be aware that you can only use one orderBy and one limit per query.
 
 ```typescript
 // Bands formed from 1990 onwards or

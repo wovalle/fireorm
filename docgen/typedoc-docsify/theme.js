@@ -27,6 +27,7 @@ class DocsifyTheme extends MarkdownTheme {
   getSummaryMarkdown(renderer) {
     const md = [];
     md.push('- Types Documentation');
+    md.push('- [Summary](globals.md)');
     this.getNavigation(renderer.project).children.forEach(rootNavigation => {
       if (rootNavigation.children) {
         md.push(`  - ${rootNavigation.title}`);

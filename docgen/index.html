@@ -33,7 +33,7 @@
         homepage:
           'https://raw.githubusercontent.com/wovalle/fireorm/master/README.md',
         maxLevel: 3,
-        subMaxLevel: 1,
+        subMaxLevel: 2,
         auto2top: true,
         copyCode: {
           buttonText: 'Copy',
@@ -41,7 +41,16 @@
         plugins: [
           function(hook, vm) {
             hook.beforeEach(function(html) {
-              if (/types/.test(vm.route.file)) return html;
+              const generatedRoutes = [
+                'globals',
+                'classes',
+                'enums',
+                'interfaces',
+              ];
+
+              if (generatedRoutes.some(r => vm.route.file.includes(r))) {
+                return html;
+              }
 
               if (/githubusercontent\.com/.test(vm.route.file)) {
                 url = vm.route.file
