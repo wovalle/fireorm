@@ -1,9 +1,12 @@
 import SubCollection from './SubCollection';
 import { expect } from 'chai';
-import { MetadataStorage, Initialize } from '../MetadataStorage';
+import { MetadataStorage, Initialize, StoreScopes } from '../MetadataStorage';
 
 describe('SubCollectionDecorator', () => {
-  const store = { metadataStorage: new MetadataStorage() };
+  const store = {
+    metadataStorage: new MetadataStorage(),
+    scope: StoreScopes.local,
+  };
 
   beforeEach(() => {
     store.metadataStorage = new MetadataStorage();

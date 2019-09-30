@@ -42,8 +42,8 @@ export default class BaseFirestoreRepository<T extends IEntity>
     }
   }
 
-  findById(id: string): Promise<T> {
-    return this.firestoreColRef
+  async findById(id: string): Promise<T> {
+    return await this.firestoreColRef
       .doc(id)
       .get()
       .then(this.extractTFromDocSnap);
@@ -89,9 +89,11 @@ export default class BaseFirestoreRepository<T extends IEntity>
     await this.firestoreColRef.doc(id).delete();
   }
 
-  runTransaction(executor: (tran: TransactionRepository<T>) => Promise<void>) {
-    return this.firestoreColRef.firestore.runTransaction(t => {
-      return executor(
+  async runTransaction(
+    executor: (tran: TransactionRepository<T>) => Promise<void>
+  ) {
+    return await this.firestoreColRef.firestore.runTransaction(async t => {
+      return await executor(
         new TransactionRepository<T>(
           this.firestoreColRef,
           t,
@@ -108,7 +110,7 @@ export default class BaseFirestoreRepository<T extends IEntity>
     );
   }
 
-  execute(
+  async execute(
     queries: Array<IFireOrmQueryLine>,
     limitVal?: number,
     orderByObj?: IOrderByParams
@@ -125,6 +127,9 @@ export default class BaseFirestoreRepository<T extends IEntity>
     if (limitVal) {
       query = query.limit(limitVal);
     }
-    return query.get().then(this.extractTFromColSnap);
+
+    const queryRes = await query.get();
+
+    return this.extractTFromColSnap(queryRes);
   }
 }

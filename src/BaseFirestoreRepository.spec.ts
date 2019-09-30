@@ -3,11 +3,11 @@ import { getFixture, Album, Coordinates } from '../test/fixture';
 import { expect } from 'chai';
 import { Collection, SubCollection, ISubCollection, Initialize } from '.';
 import { Type } from './';
-import { MetadataStorage } from './MetadataStorage';
+import { MetadataStorage, StoreScopes } from './MetadataStorage';
 const MockFirebase = require('mock-cloud-firestore');
 import monkeyPatchFirestoreTran from '../test/monkey-patch-firestore-transaction';
 
-const store = { metadataStorage: new MetadataStorage() };
+const store = { metadataStorage: new MetadataStorage(), scope: StoreScopes.local };
 Initialize(null, store);
 
 @Collection('bands')

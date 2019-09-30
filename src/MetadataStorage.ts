@@ -1,12 +1,23 @@
 import { Firestore } from '@google-cloud/firestore';
 import { BaseRepository } from './BaseRepository';
+import { type } from 'os';
 let store: IMetadataStore = null;
+
+export const StoreScopes = {
+  global: 'global' as const,
+  local: 'local' as const,
+};
+export type MetadataStoreScope = keyof typeof StoreScopes;
 
 export interface IMetadataStore {
   metadataStorage: MetadataStorage;
+  scope: MetadataStoreScope;
 }
 
-const globalStore = global as any;
+function getGlobalStore(): IMetadataStore {
+  (global as any).scope = 'global';
+  return global as any;
+}
 
 export interface CollectionMetadata {
   entity: Function;
@@ -88,14 +99,20 @@ export class MetadataStorage {
 
 export const getMetadataStorage = (): MetadataStorage => {
   if (!store) {
-      initializeMetadataStorage();
+    initializeMetadataStorage();
   }
 
   return store.metadataStorage;
 };
 
-export function initializeMetadataStorage(metadataStore: IMetadataStore = globalStore) {
-  store = metadataStore;
+export function initializeMetadataStorage(localMetadataStore?: IMetadataStore) {
+  if (storeIntializedOnGlobal() && localMetadataStore) {
+    throw new Error(
+      'The store scope has already been initialized on the gloabl scope'
+    );
+  }
+
+  store = localMetadataStore || getGlobalStore();
 
   if (!store.metadataStorage) {
     store.metadataStorage = new MetadataStorage();
@@ -104,9 +121,13 @@ export function initializeMetadataStorage(metadataStore: IMetadataStore = global
 
 export const Initialize = (
   firestore: Firestore,
-  metadataStore: IMetadataStore = globalStore
+  localMetadataStore?: IMetadataStore
 ): void => {
-  initializeMetadataStorage(metadataStore)
+  initializeMetadataStorage(localMetadataStore);
 
   store.metadataStorage.firestoreRef = firestore;
 };
+
+function storeIntializedOnGlobal() {
+  return store && store.scope === StoreScopes.global;
+}
