@@ -30,12 +30,12 @@ const ignoreFiles = ['_sidebar.md'];
   )).toString();
 
   const generalSidebar = (await fs.promises.readFile(
-    `${docsDir}/_sidebar.md`
+    `${docsDir}/sidebar.md`
   )).toString();
 
   const fullSidebar = generalSidebar + '\n' + typesSidebar;
 
-  await fs.promises.writeFile(`${outDir}/_sidebar.md`, fullSidebar);
+  await fs.promises.writeFile(`${outDir}/sidebar.md`, fullSidebar);
 
   console.log('Documentation copied successfully!');
 })();
