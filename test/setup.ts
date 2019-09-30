@@ -1,3 +1,4 @@
+require('dotenv').config();
 import uuid from 'uuid';
 import * as admin from 'firebase-admin';
 import { Initialize } from '../src';
