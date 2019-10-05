@@ -16,7 +16,7 @@ import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
 import { TransactionRepository } from './BaseFirestoreTransactionRepository';
 import { FirestoreBatchRepository } from './BatchFirestoreRepository';
 
-export default class BaseFirestoreRepository<T extends IEntity>
+export class BaseFirestoreRepository<T extends IEntity>
   extends AbstractFirestoreRepository<T>
   implements IRepository<T> {
   private readonly firestoreColRef: CollectionReference;
