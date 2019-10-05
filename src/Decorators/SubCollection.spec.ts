@@ -1,16 +1,17 @@
-import SubCollection from './SubCollection';
+import { SubCollection } from './SubCollection';
 import { expect } from 'chai';
-import { MetadataStorage, Initialize, StoreScopes } from '../MetadataStorage';
+import {
+  Initialize,
+  clearMetadataStore,
+  getGlobalStore,
+} from '../MetadataStorage';
 
 describe('SubCollectionDecorator', () => {
-  const store = {
-    metadataStorage: new MetadataStorage(),
-    scope: StoreScopes.local,
-  };
+  const store = getGlobalStore();
 
   beforeEach(() => {
-    store.metadataStorage = new MetadataStorage();
-    Initialize(null, store);
+    clearMetadataStore();
+    Initialize(null);
   });
 
   it('should register collections', () => {

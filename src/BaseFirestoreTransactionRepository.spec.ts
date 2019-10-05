@@ -1,36 +1,10 @@
-import BaseFirestoreRepository from './BaseFirestoreRepository';
-import { getFixture, Album, Coordinates } from '../test/fixture';
 import { expect } from 'chai';
-import { Collection, SubCollection, ISubCollection, Initialize } from '.';
-import { MetadataStorage, StoreScopes, IMetadataStore } from './MetadataStorage';
 const MockFirebase = require('mock-cloud-firestore');
+import { BaseFirestoreRepository } from './BaseFirestoreRepository';
+import { getFixture, Album } from '../test/fixture';
+import { Initialize } from './MetadataStorage';
 import monkeyPatchFirestoreTran from '../test/monkey-patch-firestore-transaction';
-
-const store = {
-  metadataStorage: new MetadataStorage(),
-  scope: StoreScopes.local,
-};
-Initialize(null, store);
-
-@Collection('bands')
-class Band {
-  id: string;
-  name: string;
-  formationYear: number;
-  lastShow: Date;
-  genres: Array<string>;
-
-  @SubCollection(Album)
-  albums?: ISubCollection<Album>;
-
-  getLastShowYear() {
-    return this.lastShow.getFullYear();
-  }
-
-  getPopularGenre() {
-    return this.genres[0];
-  }
-}
+import {Band} from '../test/BandCollection'
 
 // Just a test type to prevent using any other method than
 // runTransaction in this file
@@ -52,11 +26,11 @@ describe('BaseFirestoreTransactionRepository', () => {
 
     const firestore = firebase.firestore();
     monkeyPatchFirestoreTran(firestore);
-    Initialize(firestore, store);
+    Initialize(firestore);
     bandRepository = new BandRepository('bands');
   });
 
-  describe('limit', () => {
+  context('limit', () => {
     it('must throw when using limit', async () => {
       await bandRepository.runTransaction(async tran => {
         expect(() => tran.limit()).to.throw;
@@ -64,7 +38,7 @@ describe('BaseFirestoreTransactionRepository', () => {
     });
   });
 
-  describe('orderBy*', () => {
+  context('orderBy*', () => {
     it('must throw when using orderByAscending', async () => {
       await bandRepository.runTransaction(async tran => {
         expect(() => tran.orderByAscending()).to.throw;
@@ -78,7 +52,7 @@ describe('BaseFirestoreTransactionRepository', () => {
     });
   });
 
-  describe('findById', () => {
+  context('findById', () => {
     it('must find by id', async () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
@@ -103,7 +77,7 @@ describe('BaseFirestoreTransactionRepository', () => {
     });
   });
 
-  describe('create', () => {
+  context('create', () => {
     it('should return T when an item is created', async () => {
       const entity = new Band();
       entity.id = 'rush';
@@ -166,7 +140,7 @@ describe('BaseFirestoreTransactionRepository', () => {
     it('must be able to create document from anonymous object without id');
   });
 
-  describe('update', () => {
+  context('update', () => {
     it('must update and return updated item', async () => {
       await bandRepository.runTransaction(async tran => {
         const band = await tran.findById('porcupine-tree');
@@ -189,7 +163,7 @@ describe('BaseFirestoreTransactionRepository', () => {
     it('must throw if item is not found');
   });
 
-  describe('delete', () => {
+  context('delete', () => {
     it('must delete item', async () => {
       await bandRepository.runTransaction(async tran => {
         await tran.delete('porcupine-tree');
@@ -205,7 +179,7 @@ describe('BaseFirestoreTransactionRepository', () => {
     });
   });
 
-  describe('.where*', () => {
+  context('.where*', () => {
     it('whereEqualTo must accept function as first parameter', async () => {
       await bandRepository.runTransaction(async tran => {
         const list = await tran
@@ -299,7 +273,7 @@ describe('BaseFirestoreTransactionRepository', () => {
     });
   });
 
-  describe('miscellaneous', () => {
+  context('miscellaneous', () => {
     it('should correctly parse dates', async () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
@@ -309,7 +283,7 @@ describe('BaseFirestoreTransactionRepository', () => {
     });
   });
 
-  describe('must handle subcollections', () => {
+  context('must handle subcollections', () => {
     it('should initialize subcollections', async () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
@@ -394,7 +368,7 @@ describe('BaseFirestoreTransactionRepository', () => {
       });
     });
 
-    describe('miscellaneous', () => {
+    context('miscellaneous', () => {
       it('should correctly parse dates', async () => {
         await bandRepository.runTransaction(async tran => {
           const pt = await tran.findById('porcupine-tree');

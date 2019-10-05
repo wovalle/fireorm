@@ -1,42 +1,14 @@
-import BaseFirestoreRepository from './BaseFirestoreRepository';
-import { getFixture, Album, Coordinates } from '../test/fixture';
 import { expect } from 'chai';
-import { Collection, SubCollection, ISubCollection, Initialize } from '.';
-import { Type } from './';
-import { MetadataStorage, StoreScopes } from './MetadataStorage';
 const MockFirebase = require('mock-cloud-firestore');
+
+import { Initialize } from './MetadataStorage';
+import { getFixture, Album, Coordinates } from '../test/fixture';
 import monkeyPatchFirestoreTran from '../test/monkey-patch-firestore-transaction';
-
-const store = { metadataStorage: new MetadataStorage(), scope: StoreScopes.local };
-Initialize(null, store);
-
-@Collection('bands')
-class Band {
-  id: string;
-  name: string;
-  formationYear: number;
-  lastShow: Date;
-
-  // Todo create fireorm bypass decorator
-  @Type(() => Coordinates)
-  lastShowCoordinates: Coordinates;
-  genres: Array<string>;
-
-  @SubCollection(Album)
-  albums?: ISubCollection<Album>;
-
-  getLastShowYear() {
-    return this.lastShow.getFullYear();
-  }
-
-  getPopularGenre() {
-    return this.genres[0];
-  }
-}
-
-class BandRepository extends BaseFirestoreRepository<Band> {}
+import { BaseFirestoreRepository } from './BaseFirestoreRepository';
+import { Band } from '../test/BandCollection';
 
 describe('BaseFirestoreRepository', () => {
+  class BandRepository extends BaseFirestoreRepository<Band> {}
   let bandRepository: BaseFirestoreRepository<Band> = null;
 
   beforeEach(() => {
@@ -47,11 +19,11 @@ describe('BaseFirestoreRepository', () => {
 
     const firestore = firebase.firestore();
     monkeyPatchFirestoreTran(firestore);
-    Initialize(firestore, store);
+    Initialize(firestore);
     bandRepository = new BandRepository('bands');
   });
 
-  describe('limit', () => {
+  context('limit', () => {
     it('must limit the documents in a collection', async () => {
       const twoBands = await bandRepository.limit(2).find();
       expect(twoBands.length).to.equal(2);
@@ -93,7 +65,7 @@ describe('BaseFirestoreRepository', () => {
     it('must throw if the limit is less than 0');
   });
 
-  describe('orderByAscending', () => {
+  context('orderByAscending', () => {
     it('must order repository objects', async () => {
       const bands = await bandRepository
         .orderByAscending('formationYear')
@@ -140,7 +112,7 @@ describe('BaseFirestoreRepository', () => {
     });
   });
 
-  describe('orderByDescending', () => {
+  context('orderByDescending', () => {
     it('must order repository objects', async () => {
       const bands = await bandRepository
         .orderByDescending('formationYear')
@@ -187,7 +159,7 @@ describe('BaseFirestoreRepository', () => {
     });
   });
 
-  describe('findById', () => {
+  context('findById', () => {
     it('must find by id', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
       expect(pt).instanceOf(Band);
@@ -206,7 +178,7 @@ describe('BaseFirestoreRepository', () => {
     });
   });
 
-  describe('create', () => {
+  context('create', () => {
     it('should return T when an item is created', async () => {
       const entity = new Band();
       entity.id = 'rush';
@@ -260,7 +232,7 @@ describe('BaseFirestoreRepository', () => {
     });
   });
 
-  describe('update', () => {
+  context('update', () => {
     it('must update and return updated item', async () => {
       const band = await bandRepository.findById('porcupine-tree');
       band.name = 'Steven Wilson';
@@ -271,7 +243,7 @@ describe('BaseFirestoreRepository', () => {
     it('must throw if item is not found');
   });
 
-  describe('delete', () => {
+  context('delete', () => {
     it('must delete item', async () => {
       await bandRepository.delete('porcupine-tree');
       const roy = await bandRepository.findById('porcupine-tree');
@@ -284,7 +256,7 @@ describe('BaseFirestoreRepository', () => {
     });
   });
 
-  describe('.where*', () => {
+  context('.where*', () => {
     it('whereEqualTo must accept function as first parameter', async () => {
       const list = await bandRepository
         .whereEqualTo(b => b.name, 'Porcupine Tree')
@@ -364,7 +336,7 @@ describe('BaseFirestoreRepository', () => {
     });
   });
 
-  describe('miscellaneous', () => {
+  context('miscellaneous', () => {
     it('should correctly parse dates', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
       expect(pt.lastShow).to.be.instanceOf(Date);
@@ -379,7 +351,7 @@ describe('BaseFirestoreRepository', () => {
     });
   });
 
-  describe('transactions', () => {
+  context('transactions', () => {
     it('should be able to open transactions', async () => {
       await bandRepository.runTransaction(async tran => {
         const band = await tran.findById('porcupine-tree');
@@ -398,7 +370,7 @@ describe('BaseFirestoreRepository', () => {
     });
   });
 
-  describe('batch', () => {
+  context('batch', () => {
     it('should be able to create batched transactions', async () => {
       const batch = bandRepository.createBatch();
 
@@ -441,7 +413,7 @@ describe('BaseFirestoreRepository', () => {
     });
   });
 
-  describe('must handle subcollections', () => {
+  context('must handle subcollections', () => {
     it('should initialize subcollections', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
       expect(pt.name).to.equal('Porcupine Tree');
@@ -515,7 +487,7 @@ describe('BaseFirestoreRepository', () => {
       expect(updatedBandAlbums.length).to.eql(3);
     });
 
-    describe('miscellaneous', () => {
+    context('miscellaneous', () => {
       it('should correctly parse dates', async () => {
         const pt = await bandRepository.findById('porcupine-tree');
         const { releaseDate } = await pt.albums.findById('deadwing');

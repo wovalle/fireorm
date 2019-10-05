@@ -1,17 +1,18 @@
-import CustomRepository from './CustomRepository';
 import { expect } from 'chai';
-import { MetadataStorage, Initialize, StoreScopes } from '../MetadataStorage';
-import { BaseFirestoreRepository } from '..';
+import { CustomRepository } from './CustomRepository';
+import {
+  Initialize,
+  getGlobalStore,
+  clearMetadataStore,
+} from '../MetadataStorage';
+import { BaseFirestoreRepository } from '../BaseFirestoreRepository';
 
 describe('CustomRepositoryDecorator', () => {
-  const store = {
-    metadataStorage: new MetadataStorage(),
-    scope: StoreScopes.local,
-  };
+  const store = getGlobalStore();
 
   beforeEach(() => {
-    store.metadataStorage = new MetadataStorage();
-    Initialize(null, store);
+    clearMetadataStore();
+    Initialize(null);
   });
 
   it('should register custom repositories', () => {

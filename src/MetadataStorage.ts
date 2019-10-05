@@ -1,21 +1,11 @@
 import { Firestore } from '@google-cloud/firestore';
 import { BaseRepository } from './BaseRepository';
-import { type } from 'os';
-let store: IMetadataStore = null;
-
-export const StoreScopes = {
-  global: 'global' as const,
-  local: 'local' as const,
-};
-export type MetadataStoreScope = keyof typeof StoreScopes;
 
 export interface IMetadataStore {
   metadataStorage: MetadataStorage;
-  scope: MetadataStoreScope;
 }
 
-function getGlobalStore(): IMetadataStore {
-  (global as any).scope = 'global';
+export function getGlobalStore(): IMetadataStore {
   return global as any;
 }
 
@@ -97,37 +87,36 @@ export class MetadataStorage {
   public firestoreRef: Firestore = null;
 }
 
+/**
+ * Return exisiting metadataStorage, otherwise create if not present
+ */
 export const getMetadataStorage = (): MetadataStorage => {
-  if (!store) {
+  const store = getGlobalStore();
+
+  if (!store.metadataStorage) {
     initializeMetadataStorage();
   }
 
   return store.metadataStorage;
 };
 
-export function initializeMetadataStorage(localMetadataStore?: IMetadataStore) {
-  if (storeIntializedOnGlobal() && localMetadataStore) {
-    throw new Error(
-      'The store scope has already been initialized on the gloabl scope'
-    );
-  }
-
-  store = localMetadataStore || getGlobalStore();
+function initializeMetadataStorage() {
+  const store = getGlobalStore();
 
   if (!store.metadataStorage) {
     store.metadataStorage = new MetadataStorage();
   }
 }
 
-export const Initialize = (
-  firestore: Firestore,
-  localMetadataStore?: IMetadataStore
-): void => {
-  initializeMetadataStorage(localMetadataStore);
-
-  store.metadataStorage.firestoreRef = firestore;
-};
-
-function storeIntializedOnGlobal() {
-  return store && store.scope === StoreScopes.global;
+/**
+ * Used for testing to reset metadataStore to clean state
+ */
+export function clearMetadataStore() {
+  const store = getGlobalStore();
+  store.metadataStorage = null;
 }
+
+export const Initialize = (firestore: Firestore): void => {
+  initializeMetadataStorage();
+  getGlobalStore().metadataStorage.firestoreRef = firestore;
+};
