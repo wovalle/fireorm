@@ -66,16 +66,26 @@ export interface IQueryBuilder<T extends IEntity> {
     prop: IWherePropParam<T>,
     val: IFirestoreVal
   ): IQueryBuilder<T>;
+  limit(limitVal: number): IQueryBuilder<T>;
   orderByAscending(prop: IWherePropParam<T>): IQueryBuilder<T>;
   orderByDescending(prop: IWherePropParam<T>): IQueryBuilder<T>;
-  limit(limitVal: number): IQueryBuilder<T>;
+  startAt(prop: any): IQueryBuilder<T>;
+  startAfter(prop: any): IQueryBuilder<T>;
+  endAt(prop: any): IQueryBuilder<T>;
   find(): Promise<T[]>;
+  findOne(): Promise<T>;
+  count(): Promise<number>;
 }
 
 export interface IQueryExecutor<T> {
   execute(
     queries: IFireOrmQueryLine[],
     limitVal?: number,
+    countVal?: boolean,
+    offsetVal?: number,
+    startAtVal?: any,
+    startAfterVal?: any,
+    endAtVal?: any,
     orderByObj?: IOrderByParams
   ): Promise<T[]>;
 }

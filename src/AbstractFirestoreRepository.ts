@@ -268,6 +268,17 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
     return new QueryBuilder<T>(this).orderByDescending(prop);
   }
 
+  startAt(prop: number): IQueryBuilder<T> {
+    return new QueryBuilder<T>(this).startAt(prop);
+  }
+  startAfter(prop: number): IQueryBuilder<T> {
+    return new QueryBuilder<T>(this).startAfter(prop);
+  }
+
+  endAt(prop: number): IQueryBuilder<T> {
+    return new QueryBuilder<T>(this).endAt(prop);
+  }
+
   /**
    * Execute the query and applies all the filters (if specified)
    *
@@ -279,6 +290,14 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
     return new QueryBuilder<T>(this).find();
   }
 
+  count(): Promise<number> {
+    return new QueryBuilder<T>(this).count();
+  }
+
+  findOne(): Promise<T> {
+    return new QueryBuilder<T>(this).findOne();
+  }
+
   /**
    * Takes all the queries stored by QueryBuilder and executes them.
    * Must be implemented by base repositores
@@ -288,15 +307,31 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
    * QueryBuilder
    * @param {number} [limitVal] (Optional) if a limit constraint
    * should be applied
+   * @param {boolean} [countVal] queries list of queries stored in
+   * QueryBuilder
+   * @param {number} [offsetVal] queries list of queries stored in
+   * QueryBuilder
+   * @param {number} [startAtVal] queries list of queries stored in
+   * QueryBuilder
+   * @param {number} [startAfterVal] queries list of queries stored in
+   * QueryBuilder
+   * @param {number} [endAtVal] queries list of queries stored in
+   * QueryBuilder
    * @param {IOrderByParams} [orderByObj] (Optional) if a sortBy
    * clause should be applied
    * @returns {Promise<T[]>} results from firestore converted into
    * entities <T>
    * @memberof AbstractFirestoreRepository
    */
+
   abstract execute(
     queries: IFireOrmQueryLine[],
     limitVal?: number,
-    orderByObj?: IOrderByParams
-  ): Promise<T[]>;
+    countVal?: boolean,
+    offsetVal?: number,
+    startAtVal?: any,
+    startAfterVal?: any,
+    endAtVal?: any,
+    orderByObj?: IOrderByParams): Promise<T[]>;
+
 }

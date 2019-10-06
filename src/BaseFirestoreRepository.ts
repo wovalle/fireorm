@@ -42,6 +42,14 @@ export default class BaseFirestoreRepository<T extends IEntity>
     }
   }
 
+  getCollectionPath() {
+    return this.firestoreColRef.path;
+  }
+
+  getCollectionName() {
+    return this.colName;
+  }
+
   findById(id: string): Promise<T> {
     return this.firestoreColRef
       .doc(id)
@@ -108,23 +116,43 @@ export default class BaseFirestoreRepository<T extends IEntity>
     );
   }
 
-  execute(
+  async execute(
     queries: Array<IFireOrmQueryLine>,
     limitVal?: number,
+    countVal?: boolean,
+    offsetVal?: number,
+    startAtVal?: any,
+    startAfterVal?: any,
+    endAtVal?: any,
     orderByObj?: IOrderByParams
   ): Promise<T[]> {
     let query = queries.reduce((acc, cur) => {
       const op = cur.operator as WhereFilterOp;
       return acc.where(cur.prop, op, cur.val);
     }, this.firestoreColRef);
-
     if (orderByObj) {
       query = query.orderBy(orderByObj.fieldPath, orderByObj.directionStr);
     }
-
     if (limitVal) {
       query = query.limit(limitVal);
     }
-    return query.get().then(this.extractTFromColSnap);
+    if (offsetVal) {
+      query = query.offset(offsetVal);
+    }
+    if (startAtVal) {
+      query = query.startAt(startAtVal);
+    }
+    if (startAfterVal) {
+      query = query.startAfter(startAfterVal);
+    }
+    if (endAtVal) {
+      query = query.endAt(endAtVal);
+    }
+    const result = await query.get();
+    if (countVal) {
+      return [result.size] as any[];
+    }
+
+    return this.extractTFromColSnap(result);
   }
 }

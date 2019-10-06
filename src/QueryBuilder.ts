@@ -15,6 +15,11 @@ export default class QueryBuilder<T extends IEntity>
   implements IQueryBuilder<T> {
   protected queries: Array<IFireOrmQueryLine> = [];
   protected limitVal: number;
+  protected countVal: boolean;
+  protected offsetVal: number;
+  protected startAtVal: any;
+  protected startAfterVal: any;
+  protected endAtVal: any;
   protected orderByObj: IOrderByParams;
 
   constructor(protected executor: IQueryExecutor<T>) {}
@@ -100,6 +105,38 @@ export default class QueryBuilder<T extends IEntity>
     return this;
   }
 
+  offset(offsetVal: number): QueryBuilder<T> {
+    if (this.offsetVal) {
+      throw new Error('A offset function cannot be called more than once in the same query expression');
+    }
+    this.offsetVal = offsetVal;
+    return this;
+  }
+
+  startAt(startAt: any): QueryBuilder<T>{
+    if (this.startAtVal) {
+      throw new Error('A startAt function cannot be called more than once in the same query expression');
+    }
+    this.startAtVal = startAt;
+    return this;
+  }
+
+  startAfter(startAfter: any): QueryBuilder<T>{
+    if (this.startAfterVal) {
+      throw new Error('A startAfter function cannot be called more than once in the same query expression');
+    }
+    this.startAfterVal = startAfter;
+    return this;
+  }
+
+  endAt(endAt: any): QueryBuilder<T>{
+    if (this.endAtVal) {
+      throw new Error('A endAt function cannot be called more than once in the same query expression');
+    }
+    this.endAtVal = endAt;
+    return this;
+  }
+
   orderByAscending(prop: IWherePropParam<T>): QueryBuilder<T> {
     if (this.orderByObj) {
       throw new Error(
@@ -129,8 +166,15 @@ export default class QueryBuilder<T extends IEntity>
 
     return this;
   }
+  count(): Promise<number>{
+    return this.executor.execute(this.queries, this.limitVal, true, this.offsetVal, this.startAtVal, this.startAfterVal, this.endAtVal, this.orderByObj).then(count => count.pop()) as Promise<any>;
+  }
 
   find(): Promise<T[]> {
-    return this.executor.execute(this.queries, this.limitVal, this.orderByObj);
+    return this.executor.execute(this.queries, this.limitVal,  this.countVal,  this.offsetVal, this.startAtVal, this.startAfterVal, this.endAtVal, this.orderByObj);
+  }
+
+  findOne(): Promise<T> {
+    return this.executor.execute(this.queries, this.limitVal, this.countVal, this.offsetVal, this.startAtVal, this.startAfterVal, this.endAtVal, this.orderByObj).then(res => res.pop());
   }
 }
