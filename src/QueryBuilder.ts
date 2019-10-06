@@ -167,7 +167,7 @@ export default class QueryBuilder<T extends IEntity>
     return this;
   }
   count(): Promise<number>{
-    return this.executor.execute(this.queries, this.limitVal, true, this.offsetVal, this.startAtVal, this.startAfterVal, this.endAtVal, this.orderByObj).then(count => count.pop()) as Promise<any>;
+    return this.executor.execute(this.queries, this.limitVal, true, this.offsetVal, this.startAtVal, this.startAfterVal, this.endAtVal, this.orderByObj).then(count => count.pop()) as Promise<number>;
   }
 
   find(): Promise<T[]> {
