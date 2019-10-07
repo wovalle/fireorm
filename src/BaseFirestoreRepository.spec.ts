@@ -5,12 +5,13 @@ import { initialize, getMetadataStorage } from './MetadataStorage';
 import { getFixture, Album, Coordinates } from '../test/fixture';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { Band } from '../test/BandCollection';
+import { Firestore } from '@google-cloud/firestore';
 
 describe('BaseFirestoreRepository', () => {
   class BandRepository extends BaseFirestoreRepository<Band> {}
   let bandRepository: BaseFirestoreRepository<Band> = null;
-  let firestore;
   let defaultMetadataConfig;
+  let firestore: Firestore = null;
 
   beforeEach(() => {
     const fixture = Object.assign({}, getFixture());
@@ -229,7 +230,10 @@ describe('BaseFirestoreRepository', () => {
 
       entity.contactEmail = 'Not an email';
 
-      await expect(bandRepository.create(entity)).to.be.rejectedWith(Error, 'failed the validation');
+      await expect(bandRepository.create(entity)).to.be.rejectedWith(
+        Error,
+        'failed the validation'
+      );
     });
 
     it('must fail validation if an invalid object is given', async () => {
@@ -238,7 +242,10 @@ describe('BaseFirestoreRepository', () => {
         id: '1234',
       };
 
-      await expect(bandRepository.create(entity as Band)).to.be.rejectedWith(Error, 'failed the validation');;
+      await expect(bandRepository.create(entity as Band)).to.be.rejectedWith(
+        Error,
+        'failed the validation'
+      );
     });
 
     it('must create items when id is passed', async () => {
@@ -315,9 +322,10 @@ describe('BaseFirestoreRepository', () => {
       const updatedBand: Partial<Band> = {
         ...band,
         contactEmail: 'test@email.com',
-      }
+      };
 
-      await expect(bandRepository.update(updatedBand as Band)).not.to.be.rejected;
+      await expect(bandRepository.update(updatedBand as Band)).not.to.be
+        .rejected;
     });
 
     it('must fail validation if an invalid class is given', async () => {
@@ -325,7 +333,10 @@ describe('BaseFirestoreRepository', () => {
 
       band.contactEmail = 'Not an email';
 
-      await expect(bandRepository.update(band)).to.be.rejectedWith(Error, 'failed the validation');
+      await expect(bandRepository.update(band)).to.be.rejectedWith(
+        Error,
+        'failed the validation'
+      );
     });
 
     it('must fail validation if an invalid object is given', async () => {
@@ -333,9 +344,11 @@ describe('BaseFirestoreRepository', () => {
       const updatedBand: Partial<Band> = {
         ...band,
         contactEmail: 'Not an email',
-      }
+      };
 
-      await expect(bandRepository.update(updatedBand as Band)).to.be.rejectedWith(Error, 'failed the validation');
+      await expect(
+        bandRepository.update(updatedBand as Band)
+      ).to.be.rejectedWith(Error, 'failed the validation');
     });
 
     it('must only update changed fields'); // TODO: Discuss
@@ -433,6 +446,21 @@ describe('BaseFirestoreRepository', () => {
       expect(list.length).to.equal(1);
       expect(list[0].id).to.equal('red-hot-chili-peppers');
     });
+
+    it.only('must support document references in where methods', async () => {
+      const docRef = firestore.collection('bands').doc('porcupine-tree');
+
+      const band = await bandRepository.findById('porcupine-tree');
+      band.randomReference = docRef;
+      await bandRepository.update(band);
+
+      const byReference = await bandRepository
+        .whereEqualTo('randomReference', docRef)
+        .find();
+
+      expect(byReference.length).to.equal(1);
+      expect(byReference[0].name).to.equal('Porcupine Tree');
+    });
   });
 
   describe('findOne', () => {
@@ -454,9 +482,7 @@ describe('BaseFirestoreRepository', () => {
 
     it('should work within transactions', async () => {
       await bandRepository.runTransaction(async tran => {
-        const result = await tran
-          .whereLessThan('formationYear', 0)
-          .findOne();
+        const result = await tran.whereLessThan('formationYear', 0).findOne();
         expect(result).to.be.null;
       });
     });
