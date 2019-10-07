@@ -1,4 +1,4 @@
-import { OrderByDirection } from '@google-cloud/firestore';
+import { OrderByDirection, DocumentReference } from '@google-cloud/firestore';
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
@@ -18,7 +18,12 @@ export type WithOptionalId<T extends { id: unknown }> = Pick<
 > &
   Partial<Pick<T, 'id'>>;
 
-export type IFirestoreVal = string | number | Date | Boolean;
+export type IFirestoreVal =
+  | string
+  | number
+  | Date
+  | Boolean
+  | DocumentReference;
 
 export enum FirestoreOperators {
   equal = '==',
