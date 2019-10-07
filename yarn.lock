@@ -4927,10 +4927,10 @@ mocha@^6.1.4:
     yargs-parser "13.0.0"
     yargs-unparser "1.5.0"
 
-mock-cloud-firestore@^0.9.0:
-  version "0.9.3"
-  resolved "https://registry.yarnpkg.com/mock-cloud-firestore/-/mock-cloud-firestore-0.9.3.tgz#806d945260e53ba13dbef220591398b1b5447499"
-  integrity sha512-AHix5HCvwC/FJ78jvUBONC18Klyh5WvG31BpnXr9ogCSPx4qOdgVG1sEFJtdQctDAGXWbBh3Jk6ibI80eVMR+g==
+mock-cloud-firestore@^0.10.0:
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/mock-cloud-firestore/-/mock-cloud-firestore-0.10.0.tgz#ef580ee89e86baea41579be020c921b00f6cbef3"
+  integrity sha512-6htOrO+nh7VgXJoeseTEhngC/rdW3ySBcwg+PRe2p+I/gFtVARMrTmn8U1dh+cQRaShN/5hpAmJ0vQWZKxfZgA==
 
 modify-values@^1.0.0:
   version "1.0.1"
