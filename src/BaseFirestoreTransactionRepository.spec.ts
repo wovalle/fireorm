@@ -4,7 +4,6 @@ import { expect } from 'chai';
 import { Collection, SubCollection, ISubCollection, Initialize } from '.';
 import { MetadataStorage } from './MetadataStorage';
 const MockFirebase = require('mock-cloud-firestore');
-import monkeyPatchFirestoreTran from '../test/monkey-patch-firestore-transaction';
 
 const store = { metadataStorage: new MetadataStorage() };
 Initialize(null, store);
@@ -48,7 +47,6 @@ describe('BaseFirestoreTransactionRepository', () => {
     });
 
     const firestore = firebase.firestore();
-    monkeyPatchFirestoreTran(firestore);
     Initialize(firestore, store);
     bandRepository = new BandRepository('bands');
   });
