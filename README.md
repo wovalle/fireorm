@@ -16,10 +16,12 @@ You can read more about the motivations and features of fireorm [on its introduc
 1.  Install the npm package:
 
 ```bash
-yarn add fireorm  #or npm install fireorm
+yarn add fireorm reflect-metadata #or npm install fireorm reflect-metadata
+
+# note: reflect-metadata shim is required
 ```
 
-2.  [Initialize](https://firebase.google.com/docs/firestore/quickstart#initialize) your firestore application:
+2. [Initialize](https://firebase.google.com/docs/firestore/quickstart#initialize) your firestore application:
 
 ```typescript
 import * as admin from 'firebase-admin';
@@ -97,7 +99,7 @@ git clone git@github.com:wovalle/fireorm.git
 2.  Install the dependencies.
 
 ```bash
-yarn install # npm install
+yarn # npm install
 ```
 
 ### Testing
