@@ -5,7 +5,7 @@ export interface IMetadataStore {
   metadataStorage: MetadataStorage;
 }
 
-export function getGlobalStore(): IMetadataStore {
+export function getStore(): IMetadataStore {
   return global as any;
 }
 
@@ -91,7 +91,7 @@ export class MetadataStorage {
  * Return exisiting metadataStorage, otherwise create if not present
  */
 export const getMetadataStorage = (): MetadataStorage => {
-  const store = getGlobalStore();
+  const store = getStore();
 
   if (!store.metadataStorage) {
     initializeMetadataStorage();
@@ -101,7 +101,7 @@ export const getMetadataStorage = (): MetadataStorage => {
 };
 
 function initializeMetadataStorage() {
-  const store = getGlobalStore();
+  const store = getStore();
 
   if (!store.metadataStorage) {
     store.metadataStorage = new MetadataStorage();
@@ -111,12 +111,12 @@ function initializeMetadataStorage() {
 /**
  * Used for testing to reset metadataStore to clean state
  */
-export function clearMetadataStore() {
-  const store = getGlobalStore();
+export function clearMetadataStorage() {
+  const store = getStore();
   store.metadataStorage = null;
 }
 
 export const Initialize = (firestore: Firestore): void => {
   initializeMetadataStorage();
-  getGlobalStore().metadataStorage.firestoreRef = firestore;
+  getStore().metadataStorage.firestoreRef = firestore;
 };

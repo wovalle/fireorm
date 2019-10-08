@@ -1,15 +1,11 @@
 import { expect } from 'chai';
-import {
-  Initialize,
-  getGlobalStore,
-  clearMetadataStore,
-} from '../MetadataStorage';
+import { Initialize, getStore, clearMetadataStorage } from '../MetadataStorage';
 import { Collection } from './Collection';
 
 describe('CollectionDecorator', () => {
-  const store = getGlobalStore();
+  const store = getStore();
   beforeEach(() => {
-    clearMetadataStore();
+    clearMetadataStorage();
     Initialize(null);
   });
 

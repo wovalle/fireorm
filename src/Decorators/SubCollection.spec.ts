@@ -1,16 +1,12 @@
 import { SubCollection } from './SubCollection';
 import { expect } from 'chai';
-import {
-  Initialize,
-  clearMetadataStore,
-  getGlobalStore,
-} from '../MetadataStorage';
+import { Initialize, clearMetadataStorage, getStore } from '../MetadataStorage';
 
 describe('SubCollectionDecorator', () => {
-  const store = getGlobalStore();
+  const store = getStore();
 
   beforeEach(() => {
-    clearMetadataStore();
+    clearMetadataStorage();
     Initialize(null);
   });
 

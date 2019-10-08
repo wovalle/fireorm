@@ -43,7 +43,7 @@ export class BaseFirestoreRepository<T extends IEntity>
   }
 
   async findById(id: string): Promise<T> {
-    return await this.firestoreColRef
+    return this.firestoreColRef
       .doc(id)
       .get()
       .then(this.extractTFromDocSnap);
@@ -92,8 +92,8 @@ export class BaseFirestoreRepository<T extends IEntity>
   async runTransaction(
     executor: (tran: TransactionRepository<T>) => Promise<void>
   ) {
-    return await this.firestoreColRef.firestore.runTransaction(async t => {
-      return await executor(
+    return this.firestoreColRef.firestore.runTransaction(async t => {
+      return executor(
         new TransactionRepository<T>(
           this.firestoreColRef,
           t,
@@ -128,8 +128,6 @@ export class BaseFirestoreRepository<T extends IEntity>
       query = query.limit(limitVal);
     }
 
-    const queryRes = await query.get();
-
-    return this.extractTFromColSnap(queryRes);
+    return query.get().then(this.extractTFromColSnap);
   }
 }

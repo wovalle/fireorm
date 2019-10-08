@@ -23,7 +23,7 @@ describe('BaseFirestoreRepository', () => {
     bandRepository = new BandRepository('bands');
   });
 
-  context('limit', () => {
+  describe('limit', () => {
     it('must limit the documents in a collection', async () => {
       const twoBands = await bandRepository.limit(2).find();
       expect(twoBands.length).to.equal(2);
@@ -65,7 +65,7 @@ describe('BaseFirestoreRepository', () => {
     it('must throw if the limit is less than 0');
   });
 
-  context('orderByAscending', () => {
+  describe('orderByAscending', () => {
     it('must order repository objects', async () => {
       const bands = await bandRepository
         .orderByAscending('formationYear')
@@ -112,7 +112,7 @@ describe('BaseFirestoreRepository', () => {
     });
   });
 
-  context('orderByDescending', () => {
+  describe('orderByDescending', () => {
     it('must order repository objects', async () => {
       const bands = await bandRepository
         .orderByDescending('formationYear')
@@ -159,7 +159,7 @@ describe('BaseFirestoreRepository', () => {
     });
   });
 
-  context('findById', () => {
+  describe('findById', () => {
     it('must find by id', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
       expect(pt).instanceOf(Band);
@@ -178,7 +178,7 @@ describe('BaseFirestoreRepository', () => {
     });
   });
 
-  context('create', () => {
+  describe('create', () => {
     it('should return T when an item is created', async () => {
       const entity = new Band();
       entity.id = 'rush';
@@ -232,7 +232,7 @@ describe('BaseFirestoreRepository', () => {
     });
   });
 
-  context('update', () => {
+  describe('update', () => {
     it('must update and return updated item', async () => {
       const band = await bandRepository.findById('porcupine-tree');
       band.name = 'Steven Wilson';
@@ -243,7 +243,7 @@ describe('BaseFirestoreRepository', () => {
     it('must throw if item is not found');
   });
 
-  context('delete', () => {
+  describe('delete', () => {
     it('must delete item', async () => {
       await bandRepository.delete('porcupine-tree');
       const roy = await bandRepository.findById('porcupine-tree');
@@ -256,7 +256,7 @@ describe('BaseFirestoreRepository', () => {
     });
   });
 
-  context('.where*', () => {
+  describe('.where*', () => {
     it('whereEqualTo must accept function as first parameter', async () => {
       const list = await bandRepository
         .whereEqualTo(b => b.name, 'Porcupine Tree')
@@ -336,7 +336,7 @@ describe('BaseFirestoreRepository', () => {
     });
   });
 
-  context('miscellaneous', () => {
+  describe('miscellaneous', () => {
     it('should correctly parse dates', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
       expect(pt.lastShow).to.be.instanceOf(Date);
@@ -351,7 +351,7 @@ describe('BaseFirestoreRepository', () => {
     });
   });
 
-  context('transactions', () => {
+  describe('transactions', () => {
     it('should be able to open transactions', async () => {
       await bandRepository.runTransaction(async tran => {
         const band = await tran.findById('porcupine-tree');
@@ -370,7 +370,7 @@ describe('BaseFirestoreRepository', () => {
     });
   });
 
-  context('batch', () => {
+  describe('batch', () => {
     it('should be able to create batched transactions', async () => {
       const batch = bandRepository.createBatch();
 
@@ -413,7 +413,7 @@ describe('BaseFirestoreRepository', () => {
     });
   });
 
-  context('must handle subcollections', () => {
+  describe('must handle subcollections', () => {
     it('should initialize subcollections', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
       expect(pt.name).to.equal('Porcupine Tree');
@@ -487,7 +487,7 @@ describe('BaseFirestoreRepository', () => {
       expect(updatedBandAlbums.length).to.eql(3);
     });
 
-    context('miscellaneous', () => {
+    describe('miscellaneous', () => {
       it('should correctly parse dates', async () => {
         const pt = await bandRepository.findById('porcupine-tree');
         const { releaseDate } = await pt.albums.findById('deadwing');

@@ -1,17 +1,13 @@
 import { expect } from 'chai';
 import { CustomRepository } from './CustomRepository';
-import {
-  Initialize,
-  getGlobalStore,
-  clearMetadataStore,
-} from '../MetadataStorage';
+import { Initialize, getStore, clearMetadataStorage } from '../MetadataStorage';
 import { BaseFirestoreRepository } from '../BaseFirestoreRepository';
 
 describe('CustomRepositoryDecorator', () => {
-  const store = getGlobalStore();
+  const store = getStore();
 
   beforeEach(() => {
-    clearMetadataStore();
+    clearMetadataStorage();
     Initialize(null);
   });
 

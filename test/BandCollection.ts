@@ -1,7 +1,7 @@
-import { Type } from 'class-transformer';
 import { Collection, SubCollection } from '../src/Decorators';
 import { Album, Coordinates } from './fixture';
 import { ISubCollection } from '../src/types';
+import { Type } from '../src';
 
 @Collection('bands')
 export class Band {
