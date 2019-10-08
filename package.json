@@ -69,7 +69,6 @@
   "peerDependencies": {
     "reflect-metadata": "^0.1.13"
   },
-  "resolutions": {},
   "files": [
     "/lib",
     "!**/*.map",
