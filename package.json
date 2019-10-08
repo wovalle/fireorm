@@ -25,6 +25,7 @@
     "build:docsify": "yarn ts-node docgen/build.ts",
     "build:documentation": "yarn rimraf docs && yarn build:typedoc && yarn build:docsify && cp CNAME docs/CNAME",
     "serve:documentation": "yarn docsify serve docgen",
+    "deploy:documentation": "gh-pages-deploy",
     "build:watch": "tsc -w --incremental",
     "lint": "tslint --project tsconfig.json",
     "lint:md": "remark README.md -o README.md",
@@ -39,11 +40,10 @@
     "ts-object-path": "^0.1.2"
   },
   "devDependencies": {
-    "@commitlint/cli": "^7.6.1",
-    "@commitlint/config-conventional": "^7.6.0",
-    "@commitlint/travis-cli": "^7.6.1",
-    "@google-cloud/firestore": "^2.2.1",
-    "@qiwi/semantic-release-gh-pages-plugin": "^1.9.1",
+    "@commitlint/cli": "^8.2.0",
+    "@commitlint/config-conventional": "^8.2.0",
+    "@commitlint/travis-cli": "^8.2.0",
+    "@google-cloud/firestore": "^2.4.0",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.7",
     "@types/pluralize": "^0.0.29",
@@ -52,11 +52,11 @@
     "docsify-cli": "^4.3.0",
     "dotenv": "^8.1.0",
     "firebase-admin": "^8.1.0",
-    "husky": "^2.3.0",
+    "gh-pages-deploy": "^0.5.1",
+    "husky": "^3.0.8",
     "mocha": "^6.1.4",
-    "mock-cloud-firestore": "^0.9.0",
+    "mock-cloud-firestore": "^0.10.0",
     "reflect-metadata": "^0.1.13",
-    "remark-cli": "^6.0.1",
     "rimraf": "^3.0.0",
     "semantic-release": "^15.13.12",
     "ts-node": "^8.3.0",
@@ -68,9 +68,6 @@
   },
   "peerDependencies": {
     "reflect-metadata": "^0.1.13"
-  },
-  "resolutions": {
-    "@google-cloud/firestore": "2.2.1"
   },
   "files": [
     "/lib",
@@ -95,8 +92,15 @@
       "@semantic-release/npm",
       "@semantic-release/github",
       "@semantic-release/commit-analyzer",
-      "@semantic-release/release-notes-generator",
-      "@qiwi/semantic-release-gh-pages-plugin"
+      "@semantic-release/release-notes-generator"
     ]
+  },
+  "gh-pages-deploy": {
+    "staticpath": "docs",
+    "prep": [
+      "build:documentation"
+    ],
+    "commit": "chore(docs): Updating documentation",
+    "noprompt": true
   }
 }

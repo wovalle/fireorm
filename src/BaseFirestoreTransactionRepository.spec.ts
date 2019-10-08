@@ -3,7 +3,6 @@ const MockFirebase = require('mock-cloud-firestore');
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { getFixture, Album } from '../test/fixture';
 import { Initialize } from './MetadataStorage';
-import monkeyPatchFirestoreTran from '../test/monkey-patch-firestore-transaction';
 import { Band } from '../test/BandCollection';
 
 // Just a test type to prevent using any other method than
@@ -25,7 +24,6 @@ describe('BaseFirestoreTransactionRepository', () => {
     });
 
     const firestore = firebase.firestore();
-    monkeyPatchFirestoreTran(firestore);
     Initialize(firestore);
     bandRepository = new BandRepository('bands');
   });
