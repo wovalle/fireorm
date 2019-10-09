@@ -135,20 +135,18 @@ export default class QueryBuilder<T extends IEntity>
   }
 
   findOne(): Promise<T | null> {
-    let execution = this.executor.execute(this.queries, this.limitVal, this.orderByObj, true);
+    const execution = this.executor.execute(this.queries, this.limitVal, this.orderByObj, true);
     
     return new Promise<T | null>((resolve, reject) => {
-      try {
-        execution.then(singleOrNone => {
-          if (singleOrNone.length == 1) {
-            resolve(singleOrNone[0]);
-          } else {
-            resolve(null);
-          }
-        });
-      } catch (e) {
+      execution.then(singleOrNone => {
+        if (singleOrNone.length === 1) {
+          resolve(singleOrNone[0]);
+        } else {
+          resolve(null);
+        }
+      }).catch(e => {
         reject(e);
-      }
+      });
     });
   }
 }

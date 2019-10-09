@@ -124,10 +124,8 @@ export default class BaseFirestoreRepository<T extends IEntity>
     }
 
     if (single) {
-      limitVal = 1;
-    }
-
-    if (limitVal) {
+      query = query.limit(1);
+    } else if (limitVal) {
       query = query.limit(limitVal);
     }
     return query.get().then(this.extractTFromColSnap);
