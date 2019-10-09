@@ -334,6 +334,33 @@ describe('BaseFirestoreRepository', () => {
     });
   });
 
+  describe('findOne', () => {
+    it('must return T', async () => {
+      const result = await bandRepository
+        .whereLessOrEqualThan('formationYear', 1983)
+        .whereArrayContains('genres', 'funk-rock')
+        .findOne();
+      expect(result).to.be.instanceOf(Band);
+      expect(result.id).to.equal('red-hot-chili-peppers');
+    });
+
+    it('must return null if not found', async () => {
+      const result = await bandRepository
+        .whereLessThan('formationYear', 0)
+        .findOne();
+      expect(result).to.be.null;
+    });
+
+    it('should work within transactions', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const result = await tran
+          .whereLessThan('formationYear', 0)
+          .findOne();
+        expect(result).to.be.null;
+      });
+    });
+  });
+
   describe('miscellaneous', () => {
     it('should correctly parse dates', async () => {
       const pt = await bandRepository.findById('porcupine-tree');

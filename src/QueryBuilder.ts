@@ -133,4 +133,10 @@ export default class QueryBuilder<T extends IEntity>
   find(): Promise<T[]> {
     return this.executor.execute(this.queries, this.limitVal, this.orderByObj);
   }
+
+  async findOne(): Promise<T | null> {
+    const queryResult = await this.executor.execute(this.queries, this.limitVal, this.orderByObj, true);
+    
+    return queryResult.length ? queryResult[0] : null;
+  }
 }

@@ -113,7 +113,8 @@ export class BaseFirestoreRepository<T extends IEntity>
   async execute(
     queries: Array<IFireOrmQueryLine>,
     limitVal?: number,
-    orderByObj?: IOrderByParams
+    orderByObj?: IOrderByParams,
+    single?: boolean,
   ): Promise<T[]> {
     let query = queries.reduce((acc, cur) => {
       const op = cur.operator as WhereFilterOp;
@@ -124,7 +125,9 @@ export class BaseFirestoreRepository<T extends IEntity>
       query = query.orderBy(orderByObj.fieldPath, orderByObj.directionStr);
     }
 
-    if (limitVal) {
+    if (single) {
+      query = query.limit(1);
+    } else if (limitVal) {
       query = query.limit(limitVal);
     }
 
