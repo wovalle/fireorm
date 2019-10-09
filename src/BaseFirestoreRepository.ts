@@ -111,7 +111,8 @@ export default class BaseFirestoreRepository<T extends IEntity>
   execute(
     queries: Array<IFireOrmQueryLine>,
     limitVal?: number,
-    orderByObj?: IOrderByParams
+    orderByObj?: IOrderByParams,
+    single?: boolean,
   ): Promise<T[]> {
     let query = queries.reduce((acc, cur) => {
       const op = cur.operator as WhereFilterOp;
@@ -120,6 +121,10 @@ export default class BaseFirestoreRepository<T extends IEntity>
 
     if (orderByObj) {
       query = query.orderBy(orderByObj.fieldPath, orderByObj.directionStr);
+    }
+
+    if (single) {
+      limitVal = 1;
     }
 
     if (limitVal) {

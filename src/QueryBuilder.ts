@@ -133,4 +133,22 @@ export default class QueryBuilder<T extends IEntity>
   find(): Promise<T[]> {
     return this.executor.execute(this.queries, this.limitVal, this.orderByObj);
   }
+
+  findOne(): Promise<T | null> {
+    let execution = this.executor.execute(this.queries, this.limitVal, this.orderByObj, true);
+    
+    return new Promise<T | null>((resolve, reject) => {
+      try {
+        execution.then(singleOrNone => {
+          if (singleOrNone.length == 1) {
+            resolve(singleOrNone[0]);
+          } else {
+            resolve(null);
+          }
+        });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
 }
