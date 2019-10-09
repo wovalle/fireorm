@@ -56,6 +56,12 @@ describe('Integration test: Simple Repository', () => {
       .find();
     expect(byWebsite[0].id).to.equal('dream-theater');
 
+    // Find one band matching some criteria
+    const byWebsiteOne = await bandRepository
+      .whereEqualTo(a => a.name, "DreamTheater")
+      .findOne();
+    expect(byWebsiteOne.id).to.equal('dream-theater');
+
     // Should be able to run transactions
     await bandRepository.runTransaction(async tran => {
       const band = await tran.findById('dream-theater');
