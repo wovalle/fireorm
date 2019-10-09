@@ -110,7 +110,7 @@ const getCollectionBoilerplate = (entity: string, hash: object) => ({
   },
 });
 
-const getBandFixture = (): Band[] => {
+export const getBandFixture = (): Band[] => {
   const initialData = getInitialData();
 
   const objectifyList = (arr: Array<any>, cb) =>
@@ -122,5 +122,6 @@ const getBandFixture = (): Band[] => {
   }));
 };
 
-export const getFixture = () =>
-  getCollectionBoilerplate('bands', getBandFixture());
+export const getFixture = () => {
+  return getCollectionBoilerplate('bands', getBandFixture());
+};

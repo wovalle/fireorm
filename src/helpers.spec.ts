@@ -1,19 +1,14 @@
+import { Firestore } from '@google-cloud/firestore';
 import { expect } from 'chai';
 
-import CustomRepository from './Decorators/CustomRepository';
-import Collection from './Decorators/Collection';
-
-import BaseFirestoreRepository from './BaseFirestoreRepository';
+import { Collection, CustomRepository } from './Decorators';
+import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { GetRepository, GetBaseRepository } from './helpers';
-import { Initialize, MetadataStorage } from './MetadataStorage';
-import { Firestore } from '@google-cloud/firestore';
+import { Initialize, clearMetadataStorage } from './MetadataStorage';
 
 describe('Helpers', () => {
-  let store = null;
-
   beforeEach(() => {
-    store = { metadataStorage: new MetadataStorage() };
-    Initialize(new Firestore(), store);
+    Initialize(new Firestore());
   });
 
   it('GetRepository: should get custom repositories', () => {

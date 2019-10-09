@@ -1,10 +1,7 @@
 import { getMetadataStorage } from '../MetadataStorage';
 import { plural } from 'pluralize';
 
-export default function SubCollection(
-  entity: Function,
-  entityName?: string
-): Function {
+export function SubCollection(entity: Function, entityName?: string): Function {
   return function(target: Function, propertyKey: string) {
     getMetadataStorage().setSubCollection({
       entity,

@@ -1,12 +1,13 @@
 import { Firestore } from '@google-cloud/firestore';
 import { BaseRepository } from './BaseRepository';
-let store: IMetadataStore = null;
 
 export interface IMetadataStore {
   metadataStorage: MetadataStorage;
 }
 
-const globalStore = global as any;
+export function getStore(): IMetadataStore {
+  return global as any;
+}
 
 export interface CollectionMetadata {
   entity: Function;
@@ -86,25 +87,36 @@ export class MetadataStorage {
   public firestoreRef: Firestore = null;
 }
 
+/**
+ * Return exisiting metadataStorage, otherwise create if not present
+ */
 export const getMetadataStorage = (): MetadataStorage => {
-  if (!store) {
-    throw new Error(
-      'Application has not been initialized. Call Initialize() method'
-    );
+  const store = getStore();
+
+  if (!store.metadataStorage) {
+    initializeMetadataStorage();
   }
 
   return store.metadataStorage;
 };
 
-export const Initialize = (
-  firestore: Firestore,
-  metadataStore: IMetadataStore = globalStore
-): void => {
-  store = metadataStore;
+function initializeMetadataStorage() {
+  const store = getStore();
 
   if (!store.metadataStorage) {
     store.metadataStorage = new MetadataStorage();
   }
+}
 
-  store.metadataStorage.firestoreRef = firestore;
+/**
+ * Used for testing to reset metadataStore to clean state
+ */
+export function clearMetadataStorage() {
+  const store = getStore();
+  store.metadataStorage = null;
+}
+
+export const Initialize = (firestore: Firestore): void => {
+  initializeMetadataStorage();
+  getStore().metadataStorage.firestoreRef = firestore;
 };

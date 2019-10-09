@@ -1,13 +1,13 @@
-import SubCollection from './SubCollection';
+import { SubCollection } from './SubCollection';
 import { expect } from 'chai';
-import { MetadataStorage, Initialize } from '../MetadataStorage';
+import { Initialize, clearMetadataStorage, getStore } from '../MetadataStorage';
 
 describe('SubCollectionDecorator', () => {
-  const store = { metadataStorage: new MetadataStorage() };
+  const store = getStore();
 
   beforeEach(() => {
-    store.metadataStorage = new MetadataStorage();
-    Initialize(null, store);
+    clearMetadataStorage();
+    Initialize(null);
   });
 
   it('should register collections', () => {
