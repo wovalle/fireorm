@@ -58,7 +58,7 @@ describe('Integration test: Simple Repository', () => {
 
     // Find one band matching some criteria
     const byWebsiteOne = await bandRepository
-      .whereEqualTo(a => a.name, "DreamTheater")
+      .whereEqualTo(a => a.name, 'Dream Theater')
       .findOne();
     expect(byWebsiteOne.id).to.equal('dream-theater');
 

@@ -78,7 +78,7 @@ export interface IQueryExecutor<T> {
     queries: IFireOrmQueryLine[],
     limitVal?: number,
     orderByObj?: IOrderByParams,
-    single?: boolean,
+    single?: boolean
   ): Promise<T[]>;
 }
 

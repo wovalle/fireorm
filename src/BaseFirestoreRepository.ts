@@ -114,7 +114,7 @@ export class BaseFirestoreRepository<T extends IEntity>
     queries: Array<IFireOrmQueryLine>,
     limitVal?: number,
     orderByObj?: IOrderByParams,
-    single?: boolean,
+    single?: boolean
   ): Promise<T[]> {
     let query = queries.reduce((acc, cur) => {
       const op = cur.operator as WhereFilterOp;

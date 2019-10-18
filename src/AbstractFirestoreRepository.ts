@@ -280,19 +280,17 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
   }
 
   /**
-   * Execute the query to find at least one document matching all 
+   * Execute the query to find at least one document matching all
    * filters (if specified)
    *
-   * @returns {Promise<T | null>} One document that matched the filters 
+   * @returns {Promise<T | null>} One document that matched the filters
    * (if specified), or null if none exists.
-   * 
+   *
    * @memberof AbstractFirestoreRepository
    */
   findOne(): Promise<T | null> {
     return new QueryBuilder<T>(this).findOne();
   }
-
-  
 
   /**
    * Takes all the queries stored by QueryBuilder and executes them.
@@ -313,6 +311,6 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
     queries: IFireOrmQueryLine[],
     limitVal?: number,
     orderByObj?: IOrderByParams,
-    single?: boolean,
+    single?: boolean
   ): Promise<T[]>;
 }
