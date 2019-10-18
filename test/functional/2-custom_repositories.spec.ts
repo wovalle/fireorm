@@ -9,7 +9,7 @@ import { expect } from 'chai';
 import { getUniqueColName } from '../setup';
 
 describe('Integration test: Custom Repository', () => {
-  @Collection(getUniqueColName('band'))
+  @Collection(getUniqueColName('band-custom-repository'))
   class Band extends BandEntity {}
 
   @CustomRepository(Band)
