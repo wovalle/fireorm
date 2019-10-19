@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import { getUniqueColName } from '../setup';
 
 describe('Integration test: Transactions', () => {
-  @Collection(getUniqueColName('transactions'))
+  @Collection(getUniqueColName('band-with-transactions'))
   class Band extends BandEntity {
     extra?: { website: string };
   }

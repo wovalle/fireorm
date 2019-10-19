@@ -1,41 +1,13 @@
-import BaseFirestoreRepository from './BaseFirestoreRepository';
-import { getFixture, Album, Coordinates } from '../test/fixture';
 import { expect } from 'chai';
-import { Collection, SubCollection, ISubCollection, Initialize } from '.';
-import { Type } from './';
-import { MetadataStorage } from './MetadataStorage';
 const MockFirebase = require('mock-cloud-firestore');
 
-const store = { metadataStorage: new MetadataStorage() };
-Initialize(null, store);
-
-@Collection('bands')
-class Band {
-  id: string;
-  name: string;
-  formationYear: number;
-  lastShow: Date;
-
-  // Todo create fireorm bypass decorator
-  @Type(() => Coordinates)
-  lastShowCoordinates: Coordinates;
-  genres: Array<string>;
-
-  @SubCollection(Album)
-  albums?: ISubCollection<Album>;
-
-  getLastShowYear() {
-    return this.lastShow.getFullYear();
-  }
-
-  getPopularGenre() {
-    return this.genres[0];
-  }
-}
-
-class BandRepository extends BaseFirestoreRepository<Band> {}
+import { Initialize } from './MetadataStorage';
+import { getFixture, Album, Coordinates } from '../test/fixture';
+import { BaseFirestoreRepository } from './BaseFirestoreRepository';
+import { Band } from '../test/BandCollection';
 
 describe('BaseFirestoreRepository', () => {
+  class BandRepository extends BaseFirestoreRepository<Band> {}
   let bandRepository: BaseFirestoreRepository<Band> = null;
 
   beforeEach(() => {
@@ -45,7 +17,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     const firestore = firebase.firestore();
-    Initialize(firestore, store);
+    Initialize(firestore);
     bandRepository = new BandRepository('bands');
   });
 
@@ -359,6 +331,33 @@ describe('BaseFirestoreRepository', () => {
         .find();
       expect(list.length).to.equal(1);
       expect(list[0].id).to.equal('red-hot-chili-peppers');
+    });
+  });
+
+  describe('findOne', () => {
+    it('must return T', async () => {
+      const result = await bandRepository
+        .whereLessOrEqualThan('formationYear', 1983)
+        .whereArrayContains('genres', 'funk-rock')
+        .findOne();
+      expect(result).to.be.instanceOf(Band);
+      expect(result.id).to.equal('red-hot-chili-peppers');
+    });
+
+    it('must return null if not found', async () => {
+      const result = await bandRepository
+        .whereLessThan('formationYear', 0)
+        .findOne();
+      expect(result).to.be.null;
+    });
+
+    it('should work within transactions', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const result = await tran
+          .whereLessThan('formationYear', 0)
+          .findOne();
+        expect(result).to.be.null;
+      });
     });
   });
 

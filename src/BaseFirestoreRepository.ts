@@ -16,7 +16,7 @@ import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
 import { TransactionRepository } from './BaseFirestoreTransactionRepository';
 import { FirestoreBatchRepository } from './BatchFirestoreRepository';
 
-export default class BaseFirestoreRepository<T extends IEntity>
+export class BaseFirestoreRepository<T extends IEntity>
   extends AbstractFirestoreRepository<T>
   implements IRepository<T> {
   private readonly firestoreColRef: CollectionReference;
@@ -42,7 +42,7 @@ export default class BaseFirestoreRepository<T extends IEntity>
     }
   }
 
-  findById(id: string): Promise<T> {
+  async findById(id: string): Promise<T> {
     return this.firestoreColRef
       .doc(id)
       .get()
@@ -89,8 +89,10 @@ export default class BaseFirestoreRepository<T extends IEntity>
     await this.firestoreColRef.doc(id).delete();
   }
 
-  runTransaction(executor: (tran: TransactionRepository<T>) => Promise<void>) {
-    return this.firestoreColRef.firestore.runTransaction(t => {
+  async runTransaction(
+    executor: (tran: TransactionRepository<T>) => Promise<void>
+  ) {
+    return this.firestoreColRef.firestore.runTransaction(async t => {
       return executor(
         new TransactionRepository<T>(
           this.firestoreColRef,
@@ -108,10 +110,11 @@ export default class BaseFirestoreRepository<T extends IEntity>
     );
   }
 
-  execute(
+  async execute(
     queries: Array<IFireOrmQueryLine>,
     limitVal?: number,
-    orderByObj?: IOrderByParams
+    orderByObj?: IOrderByParams,
+    single?: boolean
   ): Promise<T[]> {
     let query = queries.reduce((acc, cur) => {
       const op = cur.operator as WhereFilterOp;
@@ -122,9 +125,12 @@ export default class BaseFirestoreRepository<T extends IEntity>
       query = query.orderBy(orderByObj.fieldPath, orderByObj.directionStr);
     }
 
-    if (limitVal) {
+    if (single) {
+      query = query.limit(1);
+    } else if (limitVal) {
       query = query.limit(limitVal);
     }
+
     return query.get().then(this.extractTFromColSnap);
   }
 }

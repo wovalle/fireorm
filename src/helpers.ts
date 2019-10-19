@@ -1,5 +1,5 @@
 import { getMetadataStorage } from './MetadataStorage';
-import BaseFirestoreRepository from './BaseFirestoreRepository';
+import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { IEntity } from './types';
 
 export function GetRepository<T extends IEntity>(

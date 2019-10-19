@@ -70,13 +70,15 @@ export interface IQueryBuilder<T extends IEntity> {
   orderByDescending(prop: IWherePropParam<T>): IQueryBuilder<T>;
   limit(limitVal: number): IQueryBuilder<T>;
   find(): Promise<T[]>;
+  findOne(): Promise<T | null>;
 }
 
 export interface IQueryExecutor<T> {
   execute(
     queries: IFireOrmQueryLine[],
     limitVal?: number,
-    orderByObj?: IOrderByParams
+    orderByObj?: IOrderByParams,
+    single?: boolean
   ): Promise<T[]>;
 }
 

@@ -1,32 +1,9 @@
-import BaseFirestoreRepository from './BaseFirestoreRepository';
-import { getFixture, Album, Coordinates } from '../test/fixture';
 import { expect } from 'chai';
-import { Collection, SubCollection, ISubCollection, Initialize } from '.';
-import { MetadataStorage } from './MetadataStorage';
 const MockFirebase = require('mock-cloud-firestore');
-
-const store = { metadataStorage: new MetadataStorage() };
-Initialize(null, store);
-
-@Collection('bands')
-class Band {
-  id: string;
-  name: string;
-  formationYear: number;
-  lastShow: Date;
-  genres: Array<string>;
-
-  @SubCollection(Album)
-  albums?: ISubCollection<Album>;
-
-  getLastShowYear() {
-    return this.lastShow.getFullYear();
-  }
-
-  getPopularGenre() {
-    return this.genres[0];
-  }
-}
+import { BaseFirestoreRepository } from './BaseFirestoreRepository';
+import { getFixture, Album } from '../test/fixture';
+import { Initialize } from './MetadataStorage';
+import { Band } from '../test/BandCollection';
 
 // Just a test type to prevent using any other method than
 // runTransaction in this file
@@ -47,7 +24,7 @@ describe('BaseFirestoreTransactionRepository', () => {
     });
 
     const firestore = firebase.firestore();
-    Initialize(firestore, store);
+    Initialize(firestore);
     bandRepository = new BandRepository('bands');
   });
 
