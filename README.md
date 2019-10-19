@@ -3,7 +3,7 @@
 [![NPM Version](https://img.shields.io/npm/v/fireorm.svg?style=flat)](https://www.npmjs.com/package/fireorm)
 [![Build Status](https://travis-ci.com/wovalle/fireorm.svg?token=KsyisFHzgCusk2sapuJe&branch=master)](https://travis-ci.com/wovalle/fireorm)
 [![Typescript lang](https://img.shields.io/badge/Language-Typescript-Blue.svg)](https://www.typescriptlang.org)
-[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors)
+[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors)
 [![License](https://img.shields.io/npm/l/fireorm.svg?style=flat)](https://www.npmjs.com/package/fireorm)
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/fireorm/community)
 
@@ -166,7 +166,15 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore -->
-<table><tr><td align="center"><a href="http://twitter.com/wovalle"><img src="https://avatars0.githubusercontent.com/u/7854116?v=4" width="100px;" alt="Willy Ovalle"/><br /><sub><b>Willy Ovalle</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=wovalle" title="Code">💻</a> <a href="https://github.com/wovalle/fireorm/commits?author=wovalle" title="Documentation">📖</a> <a href="#example-wovalle" title="Examples">💡</a> <a href="#ideas-wovalle" title="Ideas, Planning, & Feedback">🤔</a> <a href="#review-wovalle" title="Reviewed Pull Requests">👀</a> <a href="https://github.com/wovalle/fireorm/commits?author=wovalle" title="Tests">⚠️</a></td><td align="center"><a href="https://github.com/mamodom"><img src="https://avatars3.githubusercontent.com/u/5097424?v=4" width="100px;" alt="Maximo Dominguez"/><br /><sub><b>Maximo Dominguez</b></sub></a><br /><a href="#ideas-mamodom" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/wovalle/fireorm/commits?author=mamodom" title="Code">💻</a></td><td align="center"><a href="https://github.com/jonesnc"><img src="https://avatars0.githubusercontent.com/u/1293145?v=4" width="100px;" alt="Nathan Jones"/><br /><sub><b>Nathan Jones</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=jonesnc" title="Code">💻</a></td><td align="center"><a href="https://github.com/skalashnyk"><img src="https://avatars3.githubusercontent.com/u/18640514?v=4" width="100px;" alt="Sergii Kalashnyk"/><br /><sub><b>Sergii Kalashnyk</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=skalashnyk" title="Code">💻</a></td></tr></table>
+<table>
+  <tr>
+    <td align="center"><a href="http://twitter.com/wovalle"><img src="https://avatars0.githubusercontent.com/u/7854116?v=4" width="100px;" alt="Willy Ovalle"/><br /><sub><b>Willy Ovalle</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=wovalle" title="Code">💻</a> <a href="https://github.com/wovalle/fireorm/commits?author=wovalle" title="Documentation">📖</a> <a href="#example-wovalle" title="Examples">💡</a> <a href="#ideas-wovalle" title="Ideas, Planning, & Feedback">🤔</a> <a href="#review-wovalle" title="Reviewed Pull Requests">👀</a> <a href="https://github.com/wovalle/fireorm/commits?author=wovalle" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://github.com/mamodom"><img src="https://avatars3.githubusercontent.com/u/5097424?v=4" width="100px;" alt="Maximo Dominguez"/><br /><sub><b>Maximo Dominguez</b></sub></a><br /><a href="#ideas-mamodom" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/wovalle/fireorm/commits?author=mamodom" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/jonesnc"><img src="https://avatars0.githubusercontent.com/u/1293145?v=4" width="100px;" alt="Nathan Jones"/><br /><sub><b>Nathan Jones</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=jonesnc" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/skalashnyk"><img src="https://avatars3.githubusercontent.com/u/18640514?v=4" width="100px;" alt="Sergii Kalashnyk"/><br /><sub><b>Sergii Kalashnyk</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=skalashnyk" title="Code">💻</a></td>
+    <td align="center"><a href="http://skneko.moe/"><img src="https://avatars1.githubusercontent.com/u/13376606?v=4" width="100px;" alt="SaltyKawaiiNeko"/><br /><sub><b>SaltyKawaiiNeko</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=skneko" title="Code">💻</a> <a href="#ideas-skneko" title="Ideas, Planning, & Feedback">🤔</a></td>
+  </tr>
+</table>
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
