@@ -13,12 +13,12 @@ describe('SubCollectionDecorator', () => {
   it('should register collections', () => {
     class SubEntity {}
     class Entity {
-      @SubCollection(SubEntity, 'subentities')
+      @SubCollection(SubEntity, 'subs')
       readonly subentity: null;
     }
 
     expect(store.metadataStorage.subCollections.length).to.eql(1);
-    expect(store.metadataStorage.subCollections[0].name).to.eql('subentities');
+    expect(store.metadataStorage.subCollections[0].name).to.eql('subs');
     expect(store.metadataStorage.subCollections[0].parentEntity).to.eql(Entity);
     expect(store.metadataStorage.subCollections[0].entity).to.eql(SubEntity);
     expect(store.metadataStorage.subCollections[0].propertyKey).to.eql(

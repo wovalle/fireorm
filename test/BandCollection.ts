@@ -1,7 +1,16 @@
 import { Collection, SubCollection } from '../src/Decorators';
-import { Album, Coordinates } from './fixture';
+import { Album as AlbumEntity, Coordinates } from './fixture';
 import { ISubCollection } from '../src/types';
 import { Type } from '../src';
+
+// Why I do this? Because by using the instance of Album
+// located in fixture.ts, you have the risk to reuse the
+// same class in many tests and every method that depends
+// in the instance of the class being unique might clash
+// with each other (happened with GetRepository)
+//
+// Hours lost debugging this: 2
+class Album extends AlbumEntity {}
 
 @Collection('bands')
 export class Band {
