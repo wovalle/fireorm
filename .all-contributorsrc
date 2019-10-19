@@ -46,6 +46,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "skneko",
+      "name": "SaltyKawaiiNeko",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/13376606?v=4",
+      "profile": "http://skneko.moe/",
+      "contributions": [
+        "code",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
