@@ -6,7 +6,7 @@ By default, fireorm repositories have methods to create, read, update and delete
 import {
   BaseFirestoreRepository,
   CustomRepository,
-  GetRepository,
+  getRepository,
 } from 'fireorm';
 import Band from './models/Band';
 
@@ -17,12 +17,12 @@ class CustomBandRepository extends BaseFirestoreRepository<Band> {
   }
 }
 
-const bandRepository = GetRepository(Band) as CustomBandRepository;
+const bandRepository = getRepository(Band) as CustomBandRepository;
 const bands = await bandRepository.getProgressiveRockBands();
 ```
 
-Now, `GetRepository(Band)` will return the custom repository for Band with the _getProgressiveRockBands_ method. If a model doesn’t have a custom repository, the base repository will be returned. Fireorm also provides `GetCustomRepository` and `GetBaseRepository` helpers if we don’t want the default behavior.
+Now, `getRepository(Band)` will return the custom repository for Band with the _getProgressiveRockBands_ method. If a model doesn’t have a custom repository, the base repository will be returned. Fireorm also provides `getCustomRepository` and `getBaseRepository` helpers if we don’t want the default behavior.
 
 ## Casting
 
-As you can see, we have to cast the repository returned by the `GetRepository` as the custom repository we want to use (_CustomBandRepository_).
+As you can see, we have to cast the repository returned by the `getRepository` as the custom repository we want to use (_CustomBandRepository_).

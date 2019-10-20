@@ -4,7 +4,7 @@ import {
   getInitialData,
 } from '../fixture';
 import {
-  GetRepository,
+  getRepository,
   Collection,
   SubCollection,
   ISubCollection,
@@ -21,7 +21,7 @@ describe('Integration test: SubCollections', () => {
     albums: ISubCollection<Album>;
   }
 
-  const fullBandRepository = GetRepository(FullBand);
+  const fullBandRepository = getRepository(FullBand);
 
   before(async () => {
     const seed = getInitialData().map(({ albums, ...band }) => ({

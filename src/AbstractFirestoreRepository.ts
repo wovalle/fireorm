@@ -83,11 +83,11 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
 
   protected initializeSubCollections = (entity: T) => {
     // Requiring here to prevent circular dependency
-    const { GetRepository } = require('./helpers');
+    const { getRepository } = require('./helpers');
 
     this.subColMetadata.forEach(subCol => {
       Object.assign(entity, {
-        [subCol.propertyKey]: GetRepository(
+        [subCol.propertyKey]: getRepository(
           subCol.entity as any,
           entity.id,
           subCol.name
