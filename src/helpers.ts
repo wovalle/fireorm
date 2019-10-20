@@ -2,7 +2,7 @@ import { getMetadataStorage } from './MetadataStorage';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { IEntity } from './types';
 
-export function GetRepository<T extends IEntity>(
+export function getRepository<T extends IEntity>(
   entity: { new (): T },
   docId?: string,
   subColName?: string
@@ -10,7 +10,7 @@ export function GetRepository<T extends IEntity>(
   return _getRepository(entity, 'default', docId, subColName);
 }
 
-export function GetCustomRepository<T extends IEntity>(
+export function getCustomRepository<T extends IEntity>(
   entity: { new (): T },
   docId?: string,
   subColName?: string
@@ -18,7 +18,7 @@ export function GetCustomRepository<T extends IEntity>(
   return _getRepository(entity, 'custom', docId, subColName);
 }
 
-export function GetBaseRepository<T extends IEntity>(
+export function getBaseRepository<T extends IEntity>(
   entity: { new (): T },
   docId?: string,
   subColName?: string
