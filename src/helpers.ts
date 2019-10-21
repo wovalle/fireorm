@@ -34,18 +34,13 @@ function _getRepository<T extends IEntity>(
   docId?: string,
   subColName?: string
 ): BaseFirestoreRepository<T> {
-  const {
-    firestoreRef,
-    getRepository,
-    getSubCollection,
-    getCollection,
-  } = getMetadataStorage();
+  const metadataStorage = getMetadataStorage();
 
-  if (!firestoreRef) {
+  if (!metadataStorage.firestoreRef) {
     throw new Error('Firestore must be initialized first');
   }
 
-  const repository = getRepository(entity);
+  const repository = metadataStorage.getRepository(entity);
 
   if (repositoryType === 'custom' && !repository) {
     throw new Error(`'${entity.name}' does not have a custom repository.`);
@@ -55,13 +50,13 @@ function _getRepository<T extends IEntity>(
 
   // If docId exists, this is a subcollection. Get parent collection name
   if (docId) {
-    const subCollection = getSubCollection(entity);
+    const subCollection = metadataStorage.getSubCollection(entity);
 
     if (!subCollection) {
       throw new Error(`'${entity.name}' is not a valid subcollection.`);
     }
 
-    const parentCollection = getCollection(subCollection.parentEntity);
+    const parentCollection = metadataStorage.getCollection(subCollection.parentEntity);
 
     if (!parentCollection) {
       throw new Error(
@@ -70,7 +65,7 @@ function _getRepository<T extends IEntity>(
     }
     collectionName = parentCollection.name;
   } else {
-    const collection = getCollection(entity);
+    const collection = metadataStorage.getCollection(entity);
 
     if (!collection) {
       throw new Error(`'${entity.name}' is not a valid collection`);

@@ -1,5 +1,5 @@
 import * as admin from 'firebase-admin';
-import { Initialize } from '../src';
+import { initialize } from '../src';
 
 const serviceAccount = {
   projectId: process.env.FIRESTORE_PROJECT_ID,
@@ -18,7 +18,7 @@ admin.initializeApp({
 });
 
 const firestore = admin.firestore();
-Initialize(firestore);
+initialize(firestore);
 
 after(async () => {
   console.info('Deleting collections', uniqueCollections);
