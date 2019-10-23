@@ -2,7 +2,7 @@ import { expect } from 'chai';
 const MockFirebase = require('mock-cloud-firestore');
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { getFixture, Album } from '../test/fixture';
-import { Initialize } from './MetadataStorage';
+import { initialize } from './MetadataStorage';
 import { Band } from '../test/BandCollection';
 
 // Just a test type to prevent using any other method than
@@ -24,7 +24,7 @@ describe('BaseFirestoreTransactionRepository', () => {
     });
 
     const firestore = firebase.firestore();
-    Initialize(firestore);
+    initialize(firestore);
     bandRepository = new BandRepository('bands');
   });
 

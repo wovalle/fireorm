@@ -116,7 +116,7 @@ export function clearMetadataStorage() {
   store.metadataStorage = null;
 }
 
-export const Initialize = (firestore: Firestore): void => {
+export const initialize = (firestore: Firestore): void => {
   initializeMetadataStorage();
   getStore().metadataStorage.firestoreRef = firestore;
 };

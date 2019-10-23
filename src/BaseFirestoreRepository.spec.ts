@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 const MockFirebase = require('mock-cloud-firestore');
 
-import { Initialize } from './MetadataStorage';
+import { initialize } from './MetadataStorage';
 import { getFixture, Album, Coordinates } from '../test/fixture';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { Band } from '../test/BandCollection';
@@ -17,7 +17,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     const firestore = firebase.firestore();
-    Initialize(firestore);
+    initialize(firestore);
     bandRepository = new BandRepository('bands');
   });
 
