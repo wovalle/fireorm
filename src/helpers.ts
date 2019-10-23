@@ -10,6 +10,11 @@ export function getRepository<T extends IEntity>(
   return _getRepository(entity, 'default', docId, subColName);
 }
 
+/**
+ * @deprecated Use getRepository
+ */
+export const GetRepository = getRepository;
+
 export function getCustomRepository<T extends IEntity>(
   entity: { new (): T },
   docId?: string,
@@ -18,6 +23,11 @@ export function getCustomRepository<T extends IEntity>(
   return _getRepository(entity, 'custom', docId, subColName);
 }
 
+/**
+ * @deprecated Use getCustomRepository
+ */
+export const GetCustomRepository = getCustomRepository;
+
 export function getBaseRepository<T extends IEntity>(
   entity: { new (): T },
   docId?: string,
@@ -25,6 +35,11 @@ export function getBaseRepository<T extends IEntity>(
 ) {
   return _getRepository(entity, 'base', docId, subColName);
 }
+
+/**
+ * @deprecated Use getBaseRepository
+ */
+export const GetBaseRepository = getBaseRepository;
 
 type RepositoryType = 'default' | 'base' | 'custom';
 
