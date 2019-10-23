@@ -7,7 +7,7 @@ import { Type } from '../src';
 // located in fixture.ts, you have the risk to reuse the
 // same class in many tests and every method that depends
 // in the instance of the class being unique might clash
-// with each other (happened with GetRepository)
+// with each other (happened with getRepository)
 //
 // Hours lost debugging this: 2
 class Album extends AlbumEntity {}

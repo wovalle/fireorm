@@ -1,4 +1,4 @@
-import { GetRepository, Collection } from '../../src';
+import { getRepository, Collection } from '../../src';
 import { Band as BandEntity } from '../fixture';
 import { expect } from 'chai';
 import { getUniqueColName } from '../setup';
@@ -9,7 +9,7 @@ describe('Integration test: Simple Repository', () => {
     extra?: { website: string };
   }
 
-  const bandRepository = GetRepository(Band);
+  const bandRepository = getRepository(Band);
 
   it('should do crud operations', async () => {
     // Create a band

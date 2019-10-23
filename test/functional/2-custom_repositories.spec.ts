@@ -2,7 +2,7 @@ import { getInitialData, Band as BandEntity } from '../fixture';
 import {
   CustomRepository,
   BaseFirestoreRepository,
-  GetRepository,
+  getRepository,
   Collection,
 } from '../../src';
 import { expect } from 'chai';
@@ -19,11 +19,11 @@ describe('Integration test: Custom Repository', () => {
     }
   }
 
-  // GetRepository will return the custom repository of Band
+  // getRepository will return the custom repository of Band
   // (if it has the @CustomRepository decorator). Since typescript
   // cannot guess dynamic types, we'll have to cast it to the
   // custom repository
-  const rockBandRepository = GetRepository(Band) as CustomRockBandRepository;
+  const rockBandRepository = getRepository(Band) as CustomRockBandRepository;
 
   before(async () => {
     const seed = getInitialData().map(b => rockBandRepository.create(b));

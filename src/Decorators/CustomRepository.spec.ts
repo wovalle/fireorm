@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { CustomRepository } from './CustomRepository';
-import { Initialize, getStore, clearMetadataStorage } from '../MetadataStorage';
+import { initialize, getStore, clearMetadataStorage } from '../MetadataStorage';
 import { BaseFirestoreRepository } from '../BaseFirestoreRepository';
 
 describe('CustomRepositoryDecorator', () => {
@@ -8,7 +8,7 @@ describe('CustomRepositoryDecorator', () => {
 
   beforeEach(() => {
     clearMetadataStorage();
-    Initialize(null);
+    initialize(null);
   });
 
   it('should register custom repositories', () => {
