@@ -56,7 +56,7 @@ export class TransactionRepository<T extends IEntity>
       item.id = doc.id;
     }
 
-    this.transaction.set(doc, this.toSerializableObject(item as T));
+    await this.transaction.set(doc, this.toSerializableObject(item as T));
 
     if (this.collectionType === FirestoreCollectionType.collection) {
       this.initializeSubCollections(item as T);
@@ -67,12 +67,12 @@ export class TransactionRepository<T extends IEntity>
 
   async update(item: T): Promise<T> {
     const query = this.collection.doc(item.id);
-    this.transaction.update(query, this.toSerializableObject(item));
+    await this.transaction.update(query, this.toSerializableObject(item));
     return item;
   }
 
   async delete(id: string): Promise<void> {
-    this.transaction.delete(this.collection.doc(id));
+    await this.transaction.delete(this.collection.doc(id));
   }
 
   limit(): IQueryBuilder<T> {
