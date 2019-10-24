@@ -50,38 +50,56 @@ export class BaseFirestoreRepository<T extends IEntity>
   }
 
   async create(item: T): Promise<T> {
-    if (item.id) {
-      const found = await this.findById(item.id);
-      if (found) {
-        return Promise.reject(
-          new Error(`A document with id ${item.id} already exists.`)
-        );
+    try {
+      if (item.id) {
+        const found = await this.findById(item.id);
+        if (found) {
+          throw `A document with id ${item.id} already exists.`;
+        }
+      };
+       
+      const errors = await this.validate(item);
+
+      if (errors.length) {
+        throw errors;
       }
+
+      const doc = item.id
+        ? this.firestoreColRef.doc(item.id)
+        : this.firestoreColRef.doc();
+
+      if (!item.id) {
+        item.id = doc.id;
+      }
+  
+      await doc.set(this.toSerializableObject(item));
+
+      if (this.collectionType === FirestoreCollectionType.collection) {
+        this.initializeSubCollections(item);
+      }
+
+      return item;
+    } catch (error) {
+      throw new Error(error);
     }
-
-    const doc = item.id
-      ? this.firestoreColRef.doc(item.id)
-      : this.firestoreColRef.doc();
-
-    if (!item.id) {
-      item.id = doc.id;
-    }
-
-    await doc.set(this.toSerializableObject(item));
-
-    if (this.collectionType === FirestoreCollectionType.collection) {
-      this.initializeSubCollections(item);
-    }
-
-    return item;
   }
 
   async update(item: T): Promise<T> {
-    // TODO: handle errors
-    await this.firestoreColRef
-      .doc(item.id)
-      .update(this.toSerializableObject(item));
-    return item;
+    try {
+      const errors = await this.validate(item);
+
+      if (errors.length) {
+        throw errors;
+      }
+  
+      // TODO: handle errors
+      await this.firestoreColRef
+        .doc(item.id)
+        .update(this.toSerializableObject(item));
+      return item;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
   async delete(id: string): Promise<void> {

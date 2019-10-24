@@ -19,6 +19,7 @@ import {
 
 import { BaseRepository } from './BaseRepository';
 import QueryBuilder from './QueryBuilder';
+import { ValidationError, validate } from 'class-validator';
 
 export abstract class AbstractFirestoreRepository<T extends IEntity>
   extends BaseRepository
@@ -290,6 +291,25 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
    */
   findOne(): Promise<T | null> {
     return new QueryBuilder<T>(this).findOne();
+  }
+
+  /**
+   * Uses class-validator to validate an entity using decorators set in the collection class
+   * 
+   * @param item class or object representing an entity
+   * @returns {Promise<ValidationError[]>} An array of class-validator errors
+   */
+  async validate(item: T): Promise<ValidationError[]> {
+    const { entity: Entity } = this.colMetadata;
+
+    /**
+     * Instantiate plain objects into an entity class
+     */
+    const entity = item instanceof Entity
+        ? item
+        : Object.assign(new Entity(), item);
+
+    return validate(entity);
   }
 
   /**
