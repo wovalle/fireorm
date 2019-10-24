@@ -90,6 +90,26 @@ describe('BaseFirestoreTransactionRepository', () => {
       });
     });
 
+    it('must validate the item if a class is given', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const entity = new Band();
+  
+        entity.contactEmail = 'Not an email';
+  
+        await expect(tran.create(entity)).to.be.rejectedWith(Error);
+      })
+    });
+
+    it('must validate the item if an object is given', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const entity: Partial<Band> = {
+          contactEmail: 'Not an email',
+        }
+  
+        await expect(tran.create(entity as Band)).to.be.rejectedWith(Error);
+      })
+    });
+
     it('must create items when id is passed', async () => {
       const entity = new Band();
       entity.id = 'perfect-circle';
@@ -156,6 +176,28 @@ describe('BaseFirestoreTransactionRepository', () => {
         const updatedBand = await tran.findById('porcupine-tree');
         expect(band.name).to.equal(updatedBand.name);
       });
+    });
+
+    it('must validate the item if a class is given', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const band = await tran.findById('porcupine-tree');
+  
+        band.contactEmail = 'Not an email';
+  
+        await expect(tran.update(band)).to.be.rejectedWith(Error);
+      })
+    });
+
+    it('must validate the item if an object is given', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const band = await tran.findById('porcupine-tree');
+        const updatedBand: Partial<Band> = {
+          ...band,
+          contactEmail: 'Not an email',
+        }
+  
+        await expect(tran.update(updatedBand as Band)).to.be.rejectedWith(Error);
+      })
     });
 
     it('must throw if item is not found');

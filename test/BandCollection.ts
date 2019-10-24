@@ -2,6 +2,7 @@ import { Collection, SubCollection } from '../src/Decorators';
 import { Album as AlbumEntity, Coordinates } from './fixture';
 import { ISubCollection } from '../src/types';
 import { Type } from '../src';
+import { IsEmail, IsOptional } from 'class-validator';
 
 // Why I do this? Because by using the instance of Album
 // located in fixture.ts, you have the risk to reuse the
@@ -18,6 +19,10 @@ export class Band {
   name: string;
   formationYear: number;
   lastShow: Date;
+
+  @IsOptional()
+  @IsEmail()
+  contactEmail?: string;
 
   // Todo create fireorm bypass decorator
   @Type(() => Coordinates)

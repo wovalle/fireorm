@@ -1,5 +1,6 @@
 import { Firestore } from '@google-cloud/firestore';
 import { BaseRepository } from './BaseRepository';
+import { InstanstiableIEntity } from './types';
 
 export interface IMetadataStore {
   metadataStorage: MetadataStorage;
@@ -10,7 +11,7 @@ export function getStore(): IMetadataStore {
 }
 
 export interface CollectionMetadata {
-  entity: Function;
+  entity: InstanstiableIEntity;
   name: string;
 }
 

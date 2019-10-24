@@ -189,6 +189,23 @@ describe('BaseFirestoreRepository', () => {
       expect(band.getPopularGenre()).to.equal('progressive-rock');
     });
 
+    it('must validate the item if a class is given', async () => {
+      const entity = new Band();
+
+      entity.contactEmail = 'Not an email';
+
+      await expect(bandRepository.create(entity)).to.be.rejectedWith(Error);
+    });
+
+    it('must validate the item if an object is given', async () => {
+      const entity: Partial<Band> = {
+        contactEmail: 'Not an email',
+        id: '1234',
+      };
+
+      await expect(bandRepository.create(entity as Band)).to.be.rejectedWith(Error);
+    });
+
     it('must create items when id is passed', async () => {
       const entity = new Band();
       entity.id = 'perfect-circle';
@@ -237,6 +254,25 @@ describe('BaseFirestoreRepository', () => {
       const updatedBand = await bandRepository.update(band);
       expect(band.name).to.equal(updatedBand.name);
     });
+
+    it('must validate the item if a class is given', async () => {
+      const band = await bandRepository.findById('porcupine-tree');
+
+      band.contactEmail = 'Not an email';
+
+      await expect(bandRepository.update(band)).to.be.rejectedWith(Error);
+    });
+
+    it('must validate the item if an object is given', async () => {
+      const band = await bandRepository.findById('porcupine-tree');
+      const updatedBand: Partial<Band> = {
+        ...band,
+        contactEmail: 'Not an email',
+      }
+
+      await expect(bandRepository.update(updatedBand as Band)).to.be.rejectedWith(Error);
+    });
+
     it('must only update changed fields'); // TODO: Discuss
     it('must throw if item is not found');
   });
