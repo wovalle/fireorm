@@ -11,6 +11,7 @@ import {
   IQueryBuilder,
   IRepository,
   FirestoreCollectionType,
+  InstanstiableIEntity,
 } from './types';
 
 import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
@@ -21,7 +22,7 @@ export class TransactionRepository<T extends IEntity>
   constructor(
     private collection: CollectionReference,
     private transaction: Transaction,
-    entityConstructor: Function
+    entityConstructor: InstanstiableIEntity
   ) {
     super(entityConstructor);
   }
@@ -41,34 +42,53 @@ export class TransactionRepository<T extends IEntity>
   }
 
   async create(item: WithOptionalId<T>): Promise<T> {
-    if (item.id) {
-      const found = await this.findById(item.id);
-      if (found) {
-        return Promise.reject(
-          new Error(`A document with id ${item.id} already exists.`)
-        );
+    try {
+      const errors = await this.validate(item as T);
+
+      if (errors.length) {
+        throw errors;
       }
+
+      if (item.id) {
+        const found = await this.findById(item.id);
+        if (found) {
+          throw `A document with id ${item.id} already exists.`;
+        }
+      }
+  
+      const doc = item.id ? this.collection.doc(item.id) : this.collection.doc();
+  
+      if (!item.id) {
+        item.id = doc.id;
+      }
+  
+      await this.transaction.set(doc, this.toSerializableObject(item as T));
+  
+      if (this.collectionType === FirestoreCollectionType.collection) {
+        this.initializeSubCollections(item as T);
+      }
+  
+      return item as T;
+    } catch (error) {
+      throw new Error(error);
     }
-
-    const doc = item.id ? this.collection.doc(item.id) : this.collection.doc();
-
-    if (!item.id) {
-      item.id = doc.id;
-    }
-
-    await this.transaction.set(doc, this.toSerializableObject(item as T));
-
-    if (this.collectionType === FirestoreCollectionType.collection) {
-      this.initializeSubCollections(item as T);
-    }
-
-    return item as T;
   }
 
   async update(item: T): Promise<T> {
-    const query = this.collection.doc(item.id);
-    await this.transaction.update(query, this.toSerializableObject(item));
-    return item;
+    try {
+      const errors = await this.validate(item);
+
+      if (errors.length) {
+        throw errors;
+      }
+
+      const query = this.collection.doc(item.id);
+      await this.transaction.update(query, this.toSerializableObject(item));
+
+      return item;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
   async delete(id: string): Promise<void> {
