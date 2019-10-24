@@ -178,7 +178,29 @@ describe('BaseFirestoreTransactionRepository', () => {
       });
     });
 
-    it('must validate the item if a class is given', async () => {
+    it('must pass validation if a valid class is given', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const band = await tran.findById('porcupine-tree');
+  
+        band.contactEmail = 'test@email.com';
+  
+        await expect(tran.update(band)).not.to.be.rejected;
+      })
+    });
+
+    it('must pass validation if a valid object is given', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const band = await tran.findById('porcupine-tree');
+        const updatedBand: Partial<Band> = {
+          ...band,
+          contactEmail: 'test@email.com',
+        }
+  
+        await expect(tran.update(updatedBand as Band)).not.to.be.rejected;
+      })
+    });
+
+    it('must fail validation if an invalid class is given', async () => {
       await bandRepository.runTransaction(async tran => {
         const band = await tran.findById('porcupine-tree');
   
@@ -188,7 +210,7 @@ describe('BaseFirestoreTransactionRepository', () => {
       })
     });
 
-    it('must validate the item if an object is given', async () => {
+    it('must fail validation if an invalid object is given', async () => {
       await bandRepository.runTransaction(async tran => {
         const band = await tran.findById('porcupine-tree');
         const updatedBand: Partial<Band> = {

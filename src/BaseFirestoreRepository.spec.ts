@@ -189,7 +189,24 @@ describe('BaseFirestoreRepository', () => {
       expect(band.getPopularGenre()).to.equal('progressive-rock');
     });
 
-    it('must validate the item if a class is given', async () => {
+    it('must pass validation if a valid class is given', async () => {
+      const entity = new Band();
+
+      entity.contactEmail = 'test@email.com';
+
+      await expect(bandRepository.create(entity)).not.to.be.rejected;
+    });
+
+    it('must pass validation if a valid object is given', async () => {
+      const entity: Partial<Band> = {
+        contactEmail: 'test@email.com',
+        id: '1234',
+      };
+
+      await expect(bandRepository.create(entity as Band)).not.to.be.rejected;
+    });
+
+    it('must fail validation if an invalid class is given', async () => {
       const entity = new Band();
 
       entity.contactEmail = 'Not an email';
@@ -197,7 +214,7 @@ describe('BaseFirestoreRepository', () => {
       await expect(bandRepository.create(entity)).to.be.rejectedWith(Error);
     });
 
-    it('must validate the item if an object is given', async () => {
+    it('must fail validation if an invalid object is given', async () => {
       const entity: Partial<Band> = {
         contactEmail: 'Not an email',
         id: '1234',
@@ -255,7 +272,25 @@ describe('BaseFirestoreRepository', () => {
       expect(band.name).to.equal(updatedBand.name);
     });
 
-    it('must validate the item if a class is given', async () => {
+    it('must pass validation if a valid class is given', async () => {
+      const band = await bandRepository.findById('porcupine-tree');
+
+      band.contactEmail = 'test@email.com';
+
+      await expect(bandRepository.update(band)).not.to.be.rejected;
+    });
+
+    it('must pass validation if a valid object is given', async () => {
+      const band = await bandRepository.findById('porcupine-tree');
+      const updatedBand: Partial<Band> = {
+        ...band,
+        contactEmail: 'test@email.com',
+      }
+
+      await expect(bandRepository.update(updatedBand as Band)).not.to.be.rejected;
+    });
+
+    it('must fail validation if an invalid class is given', async () => {
       const band = await bandRepository.findById('porcupine-tree');
 
       band.contactEmail = 'Not an email';
@@ -263,7 +298,7 @@ describe('BaseFirestoreRepository', () => {
       await expect(bandRepository.update(band)).to.be.rejectedWith(Error);
     });
 
-    it('must validate the item if an object is given', async () => {
+    it('must fail validation if an invalid object is given', async () => {
       const band = await bandRepository.findById('porcupine-tree');
       const updatedBand: Partial<Band> = {
         ...band,
