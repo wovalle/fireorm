@@ -90,7 +90,27 @@ describe('BaseFirestoreTransactionRepository', () => {
       });
     });
 
-    it('must validate the item if a class is given', async () => {
+    it('must pass validation if a valid class is given', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const entity = new Band();
+  
+        entity.contactEmail = 'test@email.com';
+  
+        await expect(tran.create(entity)).not.to.be.rejected;
+      })
+    });
+
+    it('must pass validation if a valid object is given', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const entity: Partial<Band> = {
+          contactEmail: 'Not an email',
+        }
+  
+        await expect(tran.create(entity as Band)).not.to.be.rejected;
+      })
+    });
+
+    it('must fail validation if an invalid class is given', async () => {
       await bandRepository.runTransaction(async tran => {
         const entity = new Band();
   
@@ -100,7 +120,7 @@ describe('BaseFirestoreTransactionRepository', () => {
       })
     });
 
-    it('must validate the item if an object is given', async () => {
+    it('must fail validation if an invalid object is given', async () => {
       await bandRepository.runTransaction(async tran => {
         const entity: Partial<Band> = {
           contactEmail: 'Not an email',
