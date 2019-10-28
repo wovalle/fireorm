@@ -18,6 +18,8 @@ admin.initializeApp({
 });
 
 const firestore = admin.firestore();
+// TODO: document this hack
+(global as any).firestoreRef = firestore;
 initialize(firestore);
 
 after(async () => {

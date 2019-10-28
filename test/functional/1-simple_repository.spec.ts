@@ -43,7 +43,7 @@ describe('Integration test: Simple Repository', () => {
     expect(foundBand.id).to.equal(dt.id);
     expect(foundBand.name).to.equal(dt.name);
 
-    // Update a todo
+    // Update a band
     dt.name = 'Dream Theater';
     const updatedDt = await bandRepository.update(dt);
     const updatedDtInDb = await bandRepository.findById(dt.id);
