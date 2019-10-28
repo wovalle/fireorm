@@ -103,7 +103,7 @@ describe('BaseFirestoreTransactionRepository', () => {
     it('must pass validation if a valid object is given', async () => {
       await bandRepository.runTransaction(async tran => {
         const entity: Partial<Band> = {
-          contactEmail: 'Not an email',
+          contactEmail: 'test@email.com',
         }
   
         await expect(tran.create(entity as Band)).not.to.be.rejected;
@@ -116,7 +116,7 @@ describe('BaseFirestoreTransactionRepository', () => {
   
         entity.contactEmail = 'Not an email';
   
-        await expect(tran.create(entity)).to.be.rejectedWith(Error);
+        await expect(tran.create(entity)).to.be.rejectedWith(Error, 'failed the validation');
       })
     });
 
@@ -126,7 +126,7 @@ describe('BaseFirestoreTransactionRepository', () => {
           contactEmail: 'Not an email',
         }
   
-        await expect(tran.create(entity as Band)).to.be.rejectedWith(Error);
+        await expect(tran.create(entity as Band)).to.be.rejectedWith(Error, 'failed the validation');
       })
     });
 
