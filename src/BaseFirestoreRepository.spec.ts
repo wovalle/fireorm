@@ -448,7 +448,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it.only('must support document references in where methods', async () => {
-      const docRef = firestore.collection('bands').doc('porcupine-tree');
+      const docRef = firestore.collection('bands').doc('opeth');
 
       const band = await bandRepository.findById('porcupine-tree');
       band.randomReference = docRef;

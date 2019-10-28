@@ -3,6 +3,7 @@ import { Album as AlbumEntity, Coordinates } from './fixture';
 import { ISubCollection } from '../src/types';
 import { Type } from '../src';
 import { IsEmail, IsOptional } from 'class-validator';
+import { DocumentReference } from '@google-cloud/firestore';
 
 // Why I do this? Because by using the instance of Album
 // located in fixture.ts, you have the risk to reuse the
@@ -31,6 +32,9 @@ export class Band {
 
   @SubCollection(Album)
   albums?: ISubCollection<Album>;
+
+  // TODO: add something meaningful here
+  randomReference?: DocumentReference;
 
   getLastShowYear() {
     return this.lastShow.getFullYear();
