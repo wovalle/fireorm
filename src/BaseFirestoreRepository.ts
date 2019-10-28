@@ -50,56 +50,48 @@ export class BaseFirestoreRepository<T extends IEntity>
   }
 
   async create(item: T): Promise<T> {
-    try {
-      const errors = await this.validate(item);
+    const errors = await this.validate(item);
 
-      if (errors.length) {
-        throw errors;
-      }
-
-      if (item.id) {
-        const found = await this.findById(item.id);
-        if (found) {
-          throw `A document with id ${item.id} already exists.`;
-        }
-      };
-       
-      const doc = item.id
-        ? this.firestoreColRef.doc(item.id)
-        : this.firestoreColRef.doc();
-
-      if (!item.id) {
-        item.id = doc.id;
-      }
-  
-      await doc.set(this.toSerializableObject(item));
-
-      if (this.collectionType === FirestoreCollectionType.collection) {
-        this.initializeSubCollections(item);
-      }
-
-      return item;
-    } catch (error) {
-      throw new Error(error);
+    if (errors.length) {
+      throw new Error(errors.toString());
     }
+
+    if (item.id) {
+      const found = await this.findById(item.id);
+      if (found) {
+        throw new Error(`A document with id ${item.id} already exists.`);
+      }
+    };
+      
+    const doc = item.id
+      ? this.firestoreColRef.doc(item.id)
+      : this.firestoreColRef.doc();
+
+    if (!item.id) {
+      item.id = doc.id;
+    }
+
+    await doc.set(this.toSerializableObject(item));
+
+    if (this.collectionType === FirestoreCollectionType.collection) {
+      this.initializeSubCollections(item);
+    }
+
+    return item;
   }
 
   async update(item: T): Promise<T> {
-    try {
-      const errors = await this.validate(item);
+    const errors = await this.validate(item);
 
-      if (errors.length) {
-        throw errors;
-      }
-  
-      // TODO: handle errors
-      await this.firestoreColRef
-        .doc(item.id)
-        .update(this.toSerializableObject(item));
-      return item;
-    } catch (error) {
-      throw new Error(error);
+    if (errors.length) {
+      throw new Error(errors.toString());
     }
+
+    // TODO: handle errors
+    await this.firestoreColRef
+      .doc(item.id)
+      .update(this.toSerializableObject(item));
+    return item;
   }
 
   async delete(id: string): Promise<void> {
