@@ -62,7 +62,7 @@ export class BaseFirestoreRepository<T extends IEntity>
         throw new Error(`A document with id ${item.id} already exists.`);
       }
     }
-      
+
     const doc = item.id
       ? this.firestoreColRef.doc(item.id)
       : this.firestoreColRef.doc();
