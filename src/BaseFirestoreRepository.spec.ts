@@ -211,7 +211,7 @@ describe('BaseFirestoreRepository', () => {
 
       entity.contactEmail = 'Not an email';
 
-      await expect(bandRepository.create(entity)).to.be.rejectedWith(Error);
+      await expect(bandRepository.create(entity)).to.be.rejectedWith(Error, 'failed the validation');
     });
 
     it('must fail validation if an invalid object is given', async () => {
@@ -220,7 +220,7 @@ describe('BaseFirestoreRepository', () => {
         id: '1234',
       };
 
-      await expect(bandRepository.create(entity as Band)).to.be.rejectedWith(Error);
+      await expect(bandRepository.create(entity as Band)).to.be.rejectedWith(Error, 'failed the validation');;
     });
 
     it('must create items when id is passed', async () => {
@@ -295,7 +295,7 @@ describe('BaseFirestoreRepository', () => {
 
       band.contactEmail = 'Not an email';
 
-      await expect(bandRepository.update(band)).to.be.rejectedWith(Error);
+      await expect(bandRepository.update(band)).to.be.rejectedWith(Error, 'failed the validation');
     });
 
     it('must fail validation if an invalid object is given', async () => {
@@ -305,7 +305,7 @@ describe('BaseFirestoreRepository', () => {
         contactEmail: 'Not an email',
       }
 
-      await expect(bandRepository.update(updatedBand as Band)).to.be.rejectedWith(Error);
+      await expect(bandRepository.update(updatedBand as Band)).to.be.rejectedWith(Error, 'failed the validation');
     });
 
     it('must only update changed fields'); // TODO: Discuss
