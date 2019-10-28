@@ -51,6 +51,12 @@ export class BaseFirestoreRepository<T extends IEntity>
 
   async create(item: T): Promise<T> {
     try {
+      const errors = await this.validate(item);
+
+      if (errors.length) {
+        throw errors;
+      }
+
       if (item.id) {
         const found = await this.findById(item.id);
         if (found) {
@@ -58,12 +64,6 @@ export class BaseFirestoreRepository<T extends IEntity>
         }
       };
        
-      const errors = await this.validate(item);
-
-      if (errors.length) {
-        throw errors;
-      }
-
       const doc = item.id
         ? this.firestoreColRef.doc(item.id)
         : this.firestoreColRef.doc();
