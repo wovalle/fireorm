@@ -2,7 +2,7 @@ import { expect } from 'chai';
 const MockFirebase = require('mock-cloud-firestore');
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { getFixture, Album } from '../test/fixture';
-import { initialize } from './MetadataStorage';
+import { initialize, defaultConfig } from './MetadataStorage';
 import { Band } from '../test/BandCollection';
 
 // Just a test type to prevent using any other method than
@@ -16,6 +16,7 @@ class BandRepository extends BaseFirestoreRepository<Band> {}
 
 describe('BaseFirestoreTransactionRepository', () => {
   let bandRepository: TestTransactionRepository<Band> = null;
+  let firestore;
 
   beforeEach(() => {
     const fixture = Object.assign({}, getFixture());
@@ -23,8 +24,8 @@ describe('BaseFirestoreTransactionRepository', () => {
       isNaiveSnapshotListenerEnabled: false,
     });
 
-    const firestore = firebase.firestore();
-    initialize(firestore);
+    firestore = firebase.firestore();
+    initialize(firestore, defaultConfig);
     bandRepository = new BandRepository('bands');
   });
 
@@ -88,6 +89,18 @@ describe('BaseFirestoreTransactionRepository', () => {
         expect(band).to.be.instanceOf(Band);
         expect(band.getPopularGenre()).to.equal('progressive-rock');
       });
+    });
+
+    it('must not validate if the validate config property is false', async () => {
+      initialize(firestore, { validate: false });
+
+      await bandRepository.runTransaction(async tran => {
+        const entity = new Band();
+  
+        entity.contactEmail = 'Not an email';
+  
+        await expect(tran.create(entity)).not.to.be.rejected;
+      })
     });
 
     it('must pass validation if a valid class is given', async () => {
@@ -196,6 +209,18 @@ describe('BaseFirestoreTransactionRepository', () => {
         const updatedBand = await tran.findById('porcupine-tree');
         expect(band.name).to.equal(updatedBand.name);
       });
+    });
+
+    it('must not validate if the validate config property is false', async () => {
+      initialize(firestore, { validate: false });
+
+      await bandRepository.runTransaction(async tran => {
+        const band = await tran.findById('porcupine-tree');
+  
+        band.contactEmail = 'Not an email';
+  
+        await expect(tran.update(band)).not.to.be.rejected;
+      })
     });
 
     it('must pass validation if a valid class is given', async () => {
