@@ -38,7 +38,7 @@ const firestore = admin.firestore();
 firestore.settings({
   timestampsInSnapshots: true,
 });
-fireorm.Initialize(firestore);
+fireorm.initialize(firestore);
 ```
 
 3.  Create your firestore models!
