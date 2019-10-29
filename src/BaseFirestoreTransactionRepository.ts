@@ -42,10 +42,12 @@ export class TransactionRepository<T extends IEntity>
   }
 
   async create(item: WithOptionalId<T>): Promise<T> {
-    const errors = await this.validate(item as T);
-
-    if (errors.length) {
-      throw new Error(errors.toString());
+    if (this.config.validate) {
+      const errors = await this.validate(item as T);
+  
+      if (errors.length) {
+        throw new Error(errors.toString());
+      }
     }
 
     if (item.id) {
@@ -71,10 +73,12 @@ export class TransactionRepository<T extends IEntity>
   }
 
   async update(item: T): Promise<T> {
-    const errors = await this.validate(item);
-
-    if (errors.length) {
-      throw new Error(errors.toString());
+    if (this.config.validate) {
+      const errors = await this.validate(item);
+  
+      if (errors.length) {
+        throw new Error(errors.toString());
+      }
     }
 
     const query = this.collection.doc(item.id);

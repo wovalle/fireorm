@@ -15,6 +15,7 @@ import {
   getMetadataStorage,
   CollectionMetadata,
   SubCollectionMetadata,
+  Config,
 } from './MetadataStorage';
 
 import { BaseRepository } from './BaseRepository';
@@ -30,6 +31,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
   protected readonly colName: string;
   protected readonly docId: string;
   protected readonly subColName: string;
+  protected readonly config: Config;
 
   constructor(
     nameOrConstructor: string | Function,
@@ -46,8 +48,10 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
     this.docId = docId;
     this.subColName = subColName;
 
-    const { getCollection, getSubCollectionsFromParent } = getMetadataStorage();
+    const { getCollection, getSubCollectionsFromParent, config } = getMetadataStorage();
+
     this.colMetadata = getCollection(nameOrConstructor);
+    this.config = config;
 
     if (!this.colMetadata) {
       throw new Error(`There is no metadata stored for "${this.colName}"`);

@@ -50,10 +50,12 @@ export class BaseFirestoreRepository<T extends IEntity>
   }
 
   async create(item: T): Promise<T> {
-    const errors = await this.validate(item);
-
-    if (errors.length) {
-      throw new Error(errors.toString());
+    if (this.config.validate) {
+      const errors = await this.validate(item);
+  
+      if (errors.length) {
+        throw new Error(errors.toString());
+      }
     }
 
     if (item.id) {
@@ -81,10 +83,12 @@ export class BaseFirestoreRepository<T extends IEntity>
   }
 
   async update(item: T): Promise<T> {
-    const errors = await this.validate(item);
-
-    if (errors.length) {
-      throw new Error(errors.toString());
+    if (this.config.validate) {
+      const errors = await this.validate(item);
+  
+      if (errors.length) {
+        throw new Error(errors.toString());
+      }
     }
 
     // TODO: handle errors
