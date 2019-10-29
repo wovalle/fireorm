@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 const MockFirebase = require('mock-cloud-firestore');
 
-import { initialize } from './MetadataStorage';
+import { initialize, defaultConfig, clearMetadataStorage } from './MetadataStorage';
 import { getFixture, Album, Coordinates } from '../test/fixture';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { Band } from '../test/BandCollection';
@@ -9,6 +9,7 @@ import { Band } from '../test/BandCollection';
 describe('BaseFirestoreRepository', () => {
   class BandRepository extends BaseFirestoreRepository<Band> {}
   let bandRepository: BaseFirestoreRepository<Band> = null;
+  let firestore;
 
   beforeEach(() => {
     const fixture = Object.assign({}, getFixture());
@@ -16,8 +17,8 @@ describe('BaseFirestoreRepository', () => {
       isNaiveSnapshotListenerEnabled: false,
     });
 
-    const firestore = firebase.firestore();
-    initialize(firestore);
+    firestore = firebase.firestore();
+    initialize(firestore, defaultConfig);
     bandRepository = new BandRepository('bands');
   });
 
@@ -189,6 +190,18 @@ describe('BaseFirestoreRepository', () => {
       expect(band.getPopularGenre()).to.equal('progressive-rock');
     });
 
+    it('must not validate if the validate config property is false', async () => {
+      initialize(firestore, { validate: false });
+
+      bandRepository = new BandRepository('bands');
+
+      const entity = new Band();
+
+      entity.contactEmail = 'Not an email';
+
+      await expect(bandRepository.create(entity)).not.to.be.rejected;
+    });
+
     it('must pass validation if a valid class is given', async () => {
       const entity = new Band();
 
@@ -270,6 +283,18 @@ describe('BaseFirestoreRepository', () => {
       band.name = 'Steven Wilson';
       const updatedBand = await bandRepository.update(band);
       expect(band.name).to.equal(updatedBand.name);
+    });
+
+    it('must not validate if the validate config property is false', async () => {
+      initialize(firestore, { validate: false });
+
+      bandRepository = new BandRepository('bands');
+
+      const band = await bandRepository.findById('porcupine-tree');
+
+      band.contactEmail = 'test@email.com';
+
+      await expect(bandRepository.update(band)).not.to.be.rejected;
     });
 
     it('must pass validation if a valid class is given', async () => {
