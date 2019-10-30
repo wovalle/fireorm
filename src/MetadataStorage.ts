@@ -120,3 +120,8 @@ export const initialize = (firestore: Firestore): void => {
   initializeMetadataStorage();
   getStore().metadataStorage.firestoreRef = firestore;
 };
+
+/**
+ * @deprecated Use initialize. This will be removed in a future version.
+ */
+export const Initialize = initialize;
