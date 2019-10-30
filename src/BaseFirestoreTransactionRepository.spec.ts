@@ -2,7 +2,7 @@ import { expect } from 'chai';
 const MockFirebase = require('mock-cloud-firestore');
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { getFixture, Album } from '../test/fixture';
-import { initialize, defaultConfig } from './MetadataStorage';
+import { initialize, MetadataStorageConfig, getMetadataStorage } from './MetadataStorage';
 import { Band } from '../test/BandCollection';
 
 // Just a test type to prevent using any other method than
@@ -17,6 +17,7 @@ class BandRepository extends BaseFirestoreRepository<Band> {}
 describe('BaseFirestoreTransactionRepository', () => {
   let bandRepository: TestTransactionRepository<Band> = null;
   let firestore;
+  let defaultMetadataConfig: MetadataStorageConfig;
 
   beforeEach(() => {
     const fixture = Object.assign({}, getFixture());
@@ -25,7 +26,11 @@ describe('BaseFirestoreTransactionRepository', () => {
     });
 
     firestore = firebase.firestore();
-    initialize(firestore, defaultConfig);
+    initialize(firestore, defaultMetadataConfig);
+
+    // Save the default config to reset any changes made in tests
+    defaultMetadataConfig = getMetadataStorage().config;
+
     bandRepository = new BandRepository('bands');
   });
 
@@ -92,7 +97,7 @@ describe('BaseFirestoreTransactionRepository', () => {
     });
 
     it('must not validate if the validate config property is false', async () => {
-      initialize(firestore, { validate: false });
+      initialize(firestore, { validateModels: false });
 
       await bandRepository.runTransaction(async tran => {
         const entity = new Band();
@@ -212,7 +217,7 @@ describe('BaseFirestoreTransactionRepository', () => {
     });
 
     it('must not validate if the validate config property is false', async () => {
-      initialize(firestore, { validate: false });
+      initialize(firestore, { validateModels: false });
 
       await bandRepository.runTransaction(async tran => {
         const band = await tran.findById('porcupine-tree');

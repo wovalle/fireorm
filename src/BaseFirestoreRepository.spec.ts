@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 const MockFirebase = require('mock-cloud-firestore');
 
-import { initialize, defaultConfig, clearMetadataStorage } from './MetadataStorage';
+import { initialize, getMetadataStorage } from './MetadataStorage';
 import { getFixture, Album, Coordinates } from '../test/fixture';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { Band } from '../test/BandCollection';
@@ -10,6 +10,7 @@ describe('BaseFirestoreRepository', () => {
   class BandRepository extends BaseFirestoreRepository<Band> {}
   let bandRepository: BaseFirestoreRepository<Band> = null;
   let firestore;
+  let defaultMetadataConfig;
 
   beforeEach(() => {
     const fixture = Object.assign({}, getFixture());
@@ -18,7 +19,11 @@ describe('BaseFirestoreRepository', () => {
     });
 
     firestore = firebase.firestore();
-    initialize(firestore, defaultConfig);
+    initialize(firestore, defaultMetadataConfig);
+
+    // Save the default config to reset any changes made in tests
+    defaultMetadataConfig = getMetadataStorage().config;
+
     bandRepository = new BandRepository('bands');
   });
 
@@ -191,7 +196,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must not validate if the validate config property is false', async () => {
-      initialize(firestore, { validate: false });
+      initialize(firestore, { validateModels: false });
 
       bandRepository = new BandRepository('bands');
 
@@ -286,13 +291,13 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must not validate if the validate config property is false', async () => {
-      initialize(firestore, { validate: false });
+      initialize(firestore, { validateModels: false });
 
       bandRepository = new BandRepository('bands');
 
       const band = await bandRepository.findById('porcupine-tree');
 
-      band.contactEmail = 'test@email.com';
+      band.contactEmail = 'Not an email';
 
       await expect(bandRepository.update(band)).not.to.be.rejected;
     });

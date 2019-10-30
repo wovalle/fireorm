@@ -15,7 +15,7 @@ import {
   getMetadataStorage,
   CollectionMetadata,
   SubCollectionMetadata,
-  Config,
+  MetadataStorageConfig,
 } from './MetadataStorage';
 
 import { BaseRepository } from './BaseRepository';
@@ -31,7 +31,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
   protected readonly colName: string;
   protected readonly docId: string;
   protected readonly subColName: string;
-  protected readonly config: Config;
+  protected readonly config: MetadataStorageConfig;
 
   constructor(
     nameOrConstructor: string | Function,
