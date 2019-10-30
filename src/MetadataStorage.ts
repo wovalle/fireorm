@@ -27,20 +27,18 @@ export interface RepositoryMetadata {
   entity: Function;
 }
 
-export interface Config {
+export interface MetadataStorageConfig {
   validate?: boolean;
 }
-
-export const defaultConfig: Config = {
-  validate: true,
-};
 
 export class MetadataStorage {
   readonly collections: Array<CollectionMetadata> = [];
   readonly subCollections: Array<SubCollectionMetadata> = [];
   readonly repositories: Map<unknown, RepositoryMetadata> = new Map();
 
-  public config: Config = defaultConfig;
+  public config: MetadataStorageConfig = {
+    validate: true,
+  };
 
   public getCollection = (param: string | Function) => {
     if (typeof param === 'string') {
@@ -127,7 +125,7 @@ export function clearMetadataStorage() {
   store.metadataStorage = null;
 }
 
-export const initialize = (firestore: Firestore, config?: Config): void => {
+export const initialize = (firestore: Firestore, config?: MetadataStorageConfig): void => {
   initializeMetadataStorage();
 
   const { metadataStorage } = getStore();
