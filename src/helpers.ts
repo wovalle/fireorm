@@ -11,7 +11,7 @@ export function getRepository<T extends IEntity>(
 }
 
 /**
- * @deprecated Use getRepository
+ * @deprecated Use getRepository. This will be removed in a future version.
  */
 export const GetRepository = getRepository;
 
@@ -24,7 +24,7 @@ export function getCustomRepository<T extends IEntity>(
 }
 
 /**
- * @deprecated Use getCustomRepository
+ * @deprecated Use getCustomRepository. This will be removed in a future version.
  */
 export const GetCustomRepository = getCustomRepository;
 
@@ -37,7 +37,7 @@ export function getBaseRepository<T extends IEntity>(
 }
 
 /**
- * @deprecated Use getBaseRepository
+ * @deprecated Use getBaseRepository. This will be removed in a future version.
  */
 export const GetBaseRepository = getBaseRepository;
 
