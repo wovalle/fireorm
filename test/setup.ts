@@ -18,8 +18,9 @@ admin.initializeApp({
 });
 
 const firestore = admin.firestore();
-// TODO: document this hack
+// To understand this, see 5-document-references.spec.ts
 (global as any).firestoreRef = firestore;
+
 initialize(firestore);
 
 after(async () => {

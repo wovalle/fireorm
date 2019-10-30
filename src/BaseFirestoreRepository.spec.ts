@@ -2,7 +2,12 @@ import { expect } from 'chai';
 const MockFirebase = require('mock-cloud-firestore');
 
 import { initialize, getMetadataStorage } from './MetadataStorage';
-import { getFixture, Album, Coordinates } from '../test/fixture';
+import {
+  getFixture,
+  Album,
+  Coordinates,
+  FirestoreDocumentReference,
+} from '../test/fixture';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { Band } from '../test/BandCollection';
 import { Firestore } from '@google-cloud/firestore';
@@ -447,15 +452,15 @@ describe('BaseFirestoreRepository', () => {
       expect(list[0].id).to.equal('red-hot-chili-peppers');
     });
 
-    it.only('must support document references in where methods', async () => {
-      const docRef = firestore.collection('bands').doc('opeth');
+    it('must support document references in where methods', async () => {
+      const docRef = firestore.collection('bands').doc('steven-wilson');
 
       const band = await bandRepository.findById('porcupine-tree');
-      band.randomReference = docRef;
+      band.relatedBand = docRef;
       await bandRepository.update(band);
 
       const byReference = await bandRepository
-        .whereEqualTo('randomReference', docRef)
+        .whereEqualTo(b => b.relatedBand, docRef)
         .find();
 
       expect(byReference.length).to.equal(1);
@@ -500,6 +505,23 @@ describe('BaseFirestoreRepository', () => {
       expect(pt.lastShowCoordinates).to.be.instanceOf(Coordinates);
       expect(pt.lastShowCoordinates.latitude).to.equal(51.5009088);
       expect(pt.lastShowCoordinates.longitude).to.equal(-0.1795547);
+    });
+
+    it('should correctly parse references', async () => {
+      const docRef = firestore.collection('bands').doc('opeth');
+
+      const band = await bandRepository.findById('porcupine-tree');
+      band.relatedBand = docRef;
+      await bandRepository.update(band);
+
+      const foundBand = await bandRepository.findById('porcupine-tree');
+
+      expect(foundBand.relatedBand).to.be.instanceOf(
+        FirestoreDocumentReference
+      );
+      expect(foundBand.relatedBand.id).to.equal('opeth');
+      // firestore mock doesn't set this property, it should be bands/opeth
+      expect(foundBand.relatedBand.path).to.equal(undefined);
     });
   });
 

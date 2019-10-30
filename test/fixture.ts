@@ -2,6 +2,12 @@ export class Coordinates {
   latitude: number;
   longitude: number;
 }
+
+export class FirestoreDocumentReference {
+  id: string;
+  path: string;
+}
+
 export class Album {
   id: string;
   name: string;
