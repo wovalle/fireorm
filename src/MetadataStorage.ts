@@ -28,7 +28,7 @@ export interface RepositoryMetadata {
 }
 
 export interface MetadataStorageConfig {
-  validate?: boolean;
+  validateModels?: boolean;
 }
 
 export class MetadataStorage {
@@ -37,7 +37,7 @@ export class MetadataStorage {
   readonly repositories: Map<unknown, RepositoryMetadata> = new Map();
 
   public config: MetadataStorageConfig = {
-    validate: true,
+    validateModels: true,
   };
 
   public getCollection = (param: string | Function) => {
