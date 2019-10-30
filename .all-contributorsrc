@@ -66,6 +66,16 @@
         "code",
         "ideas"
       ]
+    },
+    {
+      "login": "joemckie",
+      "name": "Joe McKie",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/4980618?v=4",
+      "profile": "http://joemck.ie/",
+      "contributions": [
+        "code",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
