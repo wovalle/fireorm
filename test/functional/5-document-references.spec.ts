@@ -1,19 +1,26 @@
-import { getRepository, Collection } from '../../src';
-import { Band as BandEntity } from '../fixture';
+import { getRepository, Collection, Type } from '../../src';
+import { Band as BandEntity, FirestoreDocumentReference } from '../fixture';
 import { expect } from 'chai';
 import { getUniqueColName } from '../setup';
-import { DocumentReference, Firestore } from '@google-cloud/firestore';
+import { Firestore } from '@google-cloud/firestore';
 
 describe('Integration test: Using Document References', () => {
   const colName = getUniqueColName('document-references');
   @Collection(colName)
   class Band extends BandEntity {
-    relatedBands?: DocumentReference[];
+    @Type(() => FirestoreDocumentReference)
+    relatedBand?: FirestoreDocumentReference;
   }
 
   const bandRepository = getRepository(Band);
 
-  // TODO: document this hack
+  /*
+   * Yes, this is a hack.
+   * Since the firestore initialization is being done in
+   * setup.ts, I'm just storing the firestore instance
+   * so I can use the sdk to store references.
+   * After fireorm/issues/58 this will be removed
+   */
   const firestore = (global as any).firestoreRef as Firestore;
 
   it('should work with document references', async () => {
@@ -27,13 +34,18 @@ describe('Integration test: Using Document References', () => {
     const ptRef = firestore.collection(colName).doc(pt.id);
 
     const sw = new Band();
+    sw.id = 'steven-wilson';
     sw.name = 'Steven Wilson';
     sw.formationYear = 1987;
     sw.genres = ['progressive-rock', 'progressive-metal', 'psychedelic-rock'];
-    sw.relatedBands = [ptRef];
 
-    // Is able to store documents with references
     await bandRepository.create(sw);
+
+    // Manually storing arbitrary reference
+    await firestore
+      .collection(colName)
+      .doc('steven-wilson')
+      .update({ relatedBand: ptRef });
 
     // Is able to retrieve documents with references
     const swFromDb = await bandRepository
@@ -44,7 +56,7 @@ describe('Integration test: Using Document References', () => {
 
     // Is able to filter documents by references
     const band = await bandRepository
-      .whereArrayContains(b => b.relatedBands, ptRef)
+      .whereEqualTo(b => b.relatedBand, ptRef)
       .find();
 
     expect(band.length).to.eql(1);

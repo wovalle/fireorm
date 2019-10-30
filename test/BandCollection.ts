@@ -1,5 +1,9 @@
 import { Collection, SubCollection } from '../src/Decorators';
-import { Album as AlbumEntity, Coordinates } from './fixture';
+import {
+  Album as AlbumEntity,
+  Coordinates,
+  FirestoreDocumentReference,
+} from './fixture';
 import { ISubCollection } from '../src/types';
 import { Type } from '../src';
 import { IsEmail, IsOptional } from 'class-validator';
@@ -33,8 +37,8 @@ export class Band {
   @SubCollection(Album)
   albums?: ISubCollection<Album>;
 
-  // TODO: add something meaningful here
-  randomReference?: DocumentReference;
+  @Type(() => FirestoreDocumentReference)
+  relatedBand?: FirestoreDocumentReference;
 
   getLastShowYear() {
     return this.lastShow.getFullYear();
