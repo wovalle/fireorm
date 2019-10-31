@@ -11,7 +11,6 @@ import {
   IQueryBuilder,
   IRepository,
   FirestoreCollectionType,
-  InstanstiableIEntity,
 } from './types';
 
 import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
