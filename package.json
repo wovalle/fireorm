@@ -51,6 +51,7 @@
     "@types/uuid": "^3.4.5",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
+    "class-validator": "^0.10.2",
     "docsify-cli": "^4.3.0",
     "dotenv": "^8.1.0",
     "firebase-admin": "^8.1.0",
