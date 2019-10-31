@@ -307,7 +307,10 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
    * @returns {Promise<ValidationError[]>} An array of class-validator errors
    */
   async validate(item: T): Promise<ValidationError[]> {
-    const { entity: Entity } = this.colMetadata;
+    const { getSubCollection, getCollection } = getMetadataStorage();
+    const { entity: Entity } = this.subColName
+      ? getSubCollection(this.subColName)
+      : getCollection(this.colName);
 
     /**
      * Instantiate plain objects into an entity class

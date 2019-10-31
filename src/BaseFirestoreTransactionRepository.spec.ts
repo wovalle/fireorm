@@ -445,6 +445,24 @@ describe('BaseFirestoreTransactionRepository', () => {
       });
     });
 
+    it('should be able to validate subcollections on create', async () => {
+      const band = new Band();
+      band.id = '30-seconds-to-mars';
+      band.name = '30 Seconds To Mars';
+      band.formationYear = 1998;
+      band.genres = ['alternative-rock'];
+
+      const firstAlbum = new Album();
+      firstAlbum.id = 'invalid-album-name';
+      firstAlbum.name = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+      firstAlbum.releaseDate = new Date('2002-07-22');
+
+      await bandRepository.runTransaction(async tran => {
+        await tran.create(band);
+        await expect(band.albums.create(firstAlbum)).to.be.rejectedWith(Error, 'failed the validation');
+      });
+    });
+
     it('should be able to update subcollections', async () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
@@ -455,6 +473,17 @@ describe('BaseFirestoreTransactionRepository', () => {
 
         const updatedAlbum = await pt.albums.findById('fear-blank-planet');
         expect(updatedAlbum.comment).to.eql('Anesthethize is top 3 IMHO');
+      });
+    });
+
+    it('should be able to validate subcollections on update', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const pt = await tran.findById('porcupine-tree');
+        const album = await pt.albums.findById('fear-blank-planet');
+        
+        album.name = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+
+        await expect(pt.albums.update(album)).to.be.rejectedWith(Error, 'failed the validation');
       });
     });
 

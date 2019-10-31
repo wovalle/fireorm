@@ -11,7 +11,9 @@ describe('SubCollectionDecorator', () => {
   });
 
   it('should register collections', () => {
-    class SubEntity {}
+    class SubEntity {
+      public id: string;
+    }
     class Entity {
       @SubCollection(SubEntity, 'subs')
       readonly subentity: null;
@@ -27,7 +29,9 @@ describe('SubCollectionDecorator', () => {
   });
 
   it('should register collections with default name', () => {
-    class SubEntity {}
+    class SubEntity {
+      public id: string;
+    }
     class Entity {
       @SubCollection(SubEntity)
       readonly subentity: null;

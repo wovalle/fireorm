@@ -111,7 +111,7 @@ export class BaseFirestoreRepository<T extends IEntity>
         new TransactionRepository<T>(
           this.firestoreColRef,
           t,
-          this.colMetadata.entity
+          this.colName
         )
       );
     });

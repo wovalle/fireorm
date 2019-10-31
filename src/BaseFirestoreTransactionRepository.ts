@@ -22,9 +22,9 @@ export class TransactionRepository<T extends IEntity>
   constructor(
     private collection: CollectionReference,
     private transaction: Transaction,
-    entityConstructor: InstanstiableIEntity
+    colName: string
   ) {
-    super(entityConstructor);
+    super(colName);
   }
 
   execute(queries: IFireOrmQueryLine[]): Promise<T[]> {
