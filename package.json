@@ -36,7 +36,6 @@
   },
   "dependencies": {
     "class-transformer": "^0.2.0",
-    "class-validator": "^0.10.2",
     "pluralize": "^8.0.0",
     "ts-object-path": "^0.1.2"
   },
@@ -69,6 +68,7 @@
     "typescript": "^3.2.2"
   },
   "peerDependencies": {
+    "class-validator": "^0.8.0",
     "reflect-metadata": "^0.1.13"
   },
   "files": [
