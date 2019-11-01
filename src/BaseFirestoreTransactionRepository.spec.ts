@@ -101,30 +101,9 @@ describe('BaseFirestoreTransactionRepository', () => {
 
       await bandRepository.runTransaction(async tran => {
         const entity = new Band();
-  
         entity.contactEmail = 'Not an email';
-  
-        await expect(tran.create(entity)).not.to.be.rejected;
-      })
-    });
-
-    it('must pass validation if a valid class is given', async () => {
-      await bandRepository.runTransaction(async tran => {
-        const entity = new Band();
-  
-        entity.contactEmail = 'test@email.com';
-  
-        await expect(tran.create(entity)).not.to.be.rejected;
-      })
-    });
-
-    it('must pass validation if a valid object is given', async () => {
-      await bandRepository.runTransaction(async tran => {
-        const entity: Partial<Band> = {
-          contactEmail: 'test@email.com',
-        }
-  
-        await expect(tran.create(entity as Band)).not.to.be.rejected;
+        const band = await tran.create(entity);
+        expect(band.contactEmail).to.equal('Not an email');
       })
     });
 
@@ -133,8 +112,12 @@ describe('BaseFirestoreTransactionRepository', () => {
         const entity = new Band();
   
         entity.contactEmail = 'Not an email';
-  
-        await expect(tran.create(entity)).to.be.rejectedWith(Error, 'failed the validation');
+
+        try {
+          await tran.create(entity);
+        } catch (error) {
+          expect(error[0].constraints.isEmail).to.equal('Invalid email!');
+        }
       })
     });
 
@@ -143,8 +126,12 @@ describe('BaseFirestoreTransactionRepository', () => {
         const entity: Partial<Band> = {
           contactEmail: 'Not an email',
         }
-  
-        await expect(tran.create(entity as Band)).to.be.rejectedWith(Error, 'failed the validation');
+
+        try {
+          await tran.create(entity as Band);
+        } catch (error) {
+          expect(error[0].constraints.isEmail).to.equal('Invalid email!');
+        }
       })
     });
 
@@ -221,32 +208,10 @@ describe('BaseFirestoreTransactionRepository', () => {
 
       await bandRepository.runTransaction(async tran => {
         const band = await tran.findById('porcupine-tree');
-  
         band.contactEmail = 'Not an email';
-  
-        await expect(tran.update(band)).not.to.be.rejected;
-      })
-    });
-
-    it('must pass validation if a valid class is given', async () => {
-      await bandRepository.runTransaction(async tran => {
-        const band = await tran.findById('porcupine-tree');
-  
-        band.contactEmail = 'test@email.com';
-  
-        await expect(tran.update(band)).not.to.be.rejected;
-      })
-    });
-
-    it('must pass validation if a valid object is given', async () => {
-      await bandRepository.runTransaction(async tran => {
-        const band = await tran.findById('porcupine-tree');
-        const updatedBand: Partial<Band> = {
-          ...band,
-          contactEmail: 'test@email.com',
-        }
-  
-        await expect(tran.update(updatedBand as Band)).not.to.be.rejected;
+        await tran.update(band);
+        const updatedBand = await tran.findById('porcupine-tree');
+        expect(updatedBand.contactEmail).to.equal('Not an email');
       })
     });
 
@@ -255,8 +220,12 @@ describe('BaseFirestoreTransactionRepository', () => {
         const band = await tran.findById('porcupine-tree');
   
         band.contactEmail = 'Not an email';
-  
-        await expect(tran.update(band)).to.be.rejectedWith(Error);
+
+        try {
+          await tran.update(band);
+        } catch (error) {
+          expect(error[0].constraints.isEmail).to.equal('Invalid email!');
+        }
       })
     });
 
@@ -267,8 +236,12 @@ describe('BaseFirestoreTransactionRepository', () => {
           ...band,
           contactEmail: 'Not an email',
         }
-  
-        await expect(tran.update(updatedBand as Band)).to.be.rejectedWith(Error);
+
+        try {
+          await tran.update(band);
+        } catch (error) {
+          expect(error[0].constraints.isEmail).to.equal('Invalid email!');
+        }
       })
     });
 
@@ -445,6 +418,29 @@ describe('BaseFirestoreTransactionRepository', () => {
       });
     });
 
+    it('should be able to validate subcollections on create', async () => {
+      const band = new Band();
+      band.id = '30-seconds-to-mars';
+      band.name = '30 Seconds To Mars';
+      band.formationYear = 1998;
+      band.genres = ['alternative-rock'];
+
+      const firstAlbum = new Album();
+      firstAlbum.id = 'invalid-album-name';
+      firstAlbum.name = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+      firstAlbum.releaseDate = new Date('2002-07-22');
+
+      await bandRepository.runTransaction(async tran => {
+        await tran.create(band);
+
+        try {
+          await band.albums.create(firstAlbum);
+        } catch (error) {
+          expect(error[0].constraints.length).to.equal('Name is too long')
+        }
+      });
+    });
+
     it('should be able to update subcollections', async () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
@@ -455,6 +451,21 @@ describe('BaseFirestoreTransactionRepository', () => {
 
         const updatedAlbum = await pt.albums.findById('fear-blank-planet');
         expect(updatedAlbum.comment).to.eql('Anesthethize is top 3 IMHO');
+      });
+    });
+
+    it('should be able to validate subcollections on update', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const pt = await tran.findById('porcupine-tree');
+        const album = await pt.albums.findById('fear-blank-planet');
+        
+        album.name = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+
+        try {
+          await pt.albums.update(album);
+        } catch (error) {
+          expect(error[0].constraints.length).to.equal('Name is too long');
+        }
       });
     });
 

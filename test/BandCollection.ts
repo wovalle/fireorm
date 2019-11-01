@@ -6,8 +6,7 @@ import {
 } from './fixture';
 import { ISubCollection } from '../src/types';
 import { Type } from '../src';
-import { IsEmail, IsOptional } from 'class-validator';
-import { DocumentReference } from '@google-cloud/firestore';
+import { IsEmail, IsOptional, Length } from 'class-validator';
 
 // Why I do this? Because by using the instance of Album
 // located in fixture.ts, you have the risk to reuse the
@@ -16,7 +15,12 @@ import { DocumentReference } from '@google-cloud/firestore';
 // with each other (happened with getRepository)
 //
 // Hours lost debugging this: 2
-class Album extends AlbumEntity {}
+class Album extends AlbumEntity {
+  @Length(1, 50, {
+    message: 'Name is too long',
+  })
+  name: string;
+}
 
 @Collection('bands')
 export class Band {
@@ -26,7 +30,9 @@ export class Band {
   lastShow: Date;
 
   @IsOptional()
-  @IsEmail()
+  @IsEmail({}, {
+    message: 'Invalid email!',
+  })
   contactEmail?: string;
 
   // Todo create fireorm bypass decorator
