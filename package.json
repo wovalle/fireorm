@@ -69,7 +69,6 @@
     "typescript": "^3.2.2"
   },
   "peerDependencies": {
-    "class-validator": "^0.8.0",
     "reflect-metadata": "^0.1.13"
   },
   "files": [
