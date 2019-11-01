@@ -45,7 +45,7 @@ export class TransactionRepository<T extends IEntity>
       const errors = await this.validate(item as T);
   
       if (errors.length) {
-        throw new Error(errors.toString());
+        throw errors;
       }
     }
 
@@ -76,7 +76,7 @@ export class TransactionRepository<T extends IEntity>
       const errors = await this.validate(item);
   
       if (errors.length) {
-        throw new Error(errors.toString());
+        throw errors;
       }
     }
 

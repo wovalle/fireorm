@@ -52,9 +52,9 @@ export class BaseFirestoreRepository<T extends IEntity>
   async create(item: T): Promise<T> {
     if (this.config.validateModels) {
       const errors = await this.validate(item);
-  
+
       if (errors.length) {
-        throw new Error(errors.toString());
+        throw errors;
       }
     }
 
@@ -87,7 +87,7 @@ export class BaseFirestoreRepository<T extends IEntity>
       const errors = await this.validate(item);
   
       if (errors.length) {
-        throw new Error(errors.toString());
+        throw errors;
       }
     }
 

@@ -16,7 +16,9 @@ import { IsEmail, IsOptional, Length } from 'class-validator';
 //
 // Hours lost debugging this: 2
 class Album extends AlbumEntity {
-  @Length(1, 50)
+  @Length(1, 50, {
+    message: 'Name is too long',
+  })
   name: string;
 }
 
@@ -28,7 +30,9 @@ export class Band {
   lastShow: Date;
 
   @IsOptional()
-  @IsEmail()
+  @IsEmail({}, {
+    message: 'Invalid email!',
+  })
   contactEmail?: string;
 
   // Todo create fireorm bypass decorator

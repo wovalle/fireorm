@@ -207,27 +207,10 @@ describe('BaseFirestoreRepository', () => {
       bandRepository = new BandRepository('bands');
 
       const entity = new Band();
-
       entity.contactEmail = 'Not an email';
+      const band = await bandRepository.create(entity);
 
-      await expect(bandRepository.create(entity)).not.to.be.rejected;
-    });
-
-    it('must pass validation if a valid class is given', async () => {
-      const entity = new Band();
-
-      entity.contactEmail = 'test@email.com';
-
-      await expect(bandRepository.create(entity)).not.to.be.rejected;
-    });
-
-    it('must pass validation if a valid object is given', async () => {
-      const entity: Partial<Band> = {
-        contactEmail: 'test@email.com',
-        id: '1234',
-      };
-
-      await expect(bandRepository.create(entity as Band)).not.to.be.rejected;
+      expect(band.contactEmail).to.equal('Not an email');
     });
 
     it('must fail validation if an invalid class is given', async () => {
@@ -235,10 +218,11 @@ describe('BaseFirestoreRepository', () => {
 
       entity.contactEmail = 'Not an email';
 
-      await expect(bandRepository.create(entity)).to.be.rejectedWith(
-        Error,
-        'failed the validation'
-      );
+      try {
+        await bandRepository.create(entity);
+      } catch (error) {
+        expect(error[0].constraints.isEmail).to.equal('Invalid email!')
+      }
     });
 
     it('must fail validation if an invalid object is given', async () => {
@@ -247,10 +231,11 @@ describe('BaseFirestoreRepository', () => {
         id: '1234',
       };
 
-      await expect(bandRepository.create(entity as Band)).to.be.rejectedWith(
-        Error,
-        'failed the validation'
-      );
+      try {
+        await bandRepository.create(entity as Band);
+      } catch (error) {
+        expect(error[0].constraints.isEmail).to.equal('Invalid email!')
+      }
     });
 
     it('must create items when id is passed', async () => {
@@ -308,29 +293,12 @@ describe('BaseFirestoreRepository', () => {
       bandRepository = new BandRepository('bands');
 
       const band = await bandRepository.findById('porcupine-tree');
-
       band.contactEmail = 'Not an email';
 
-      await expect(bandRepository.update(band)).not.to.be.rejected;
-    });
+      await bandRepository.update(band);
+      const updatedBand = await bandRepository.findById('porcupine-tree');
 
-    it('must pass validation if a valid class is given', async () => {
-      const band = await bandRepository.findById('porcupine-tree');
-
-      band.contactEmail = 'test@email.com';
-
-      await expect(bandRepository.update(band)).not.to.be.rejected;
-    });
-
-    it('must pass validation if a valid object is given', async () => {
-      const band = await bandRepository.findById('porcupine-tree');
-      const updatedBand: Partial<Band> = {
-        ...band,
-        contactEmail: 'test@email.com',
-      };
-
-      await expect(bandRepository.update(updatedBand as Band)).not.to.be
-        .rejected;
+      expect(updatedBand.contactEmail).to.equal('Not an email');
     });
 
     it('must fail validation if an invalid class is given', async () => {
@@ -338,10 +306,11 @@ describe('BaseFirestoreRepository', () => {
 
       band.contactEmail = 'Not an email';
 
-      await expect(bandRepository.update(band)).to.be.rejectedWith(
-        Error,
-        'failed the validation'
-      );
+      try {
+        await bandRepository.update(band);
+      } catch (error) {
+        expect(error[0].constraints.isEmail).to.equal('Invalid email!')
+      }
     });
 
     it('must fail validation if an invalid object is given', async () => {
@@ -351,9 +320,11 @@ describe('BaseFirestoreRepository', () => {
         contactEmail: 'Not an email',
       };
 
-      await expect(
-        bandRepository.update(updatedBand as Band)
-      ).to.be.rejectedWith(Error, 'failed the validation');
+      try {
+        await bandRepository.create(updatedBand as Band);
+      } catch (error) {
+        expect(error[0].constraints.isEmail).to.equal('Invalid email!')
+      }
     });
 
     it('must only update changed fields'); // TODO: Discuss
@@ -646,7 +617,11 @@ describe('BaseFirestoreRepository', () => {
       firstAlbum.name = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
       firstAlbum.releaseDate = new Date('2002-07-22');
 
-      await expect(band.albums.create(firstAlbum)).to.be.rejectedWith(Error, 'failed the validation');
+      try {
+        await band.albums.create(firstAlbum);
+      } catch (error) {
+        expect(error[0].constraints.length).to.equal('Name is too long');
+      }
     });
 
     it('should be able to update subcollections', async () => {
@@ -666,7 +641,11 @@ describe('BaseFirestoreRepository', () => {
 
       album.name = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
 
-      await expect(pt.albums.update(album)).to.be.rejectedWith(Error, 'failed the validation');
+      try {
+        await pt.albums.update(album);
+      } catch (error) {
+        expect(error[0].constraints.length).to.equal('Name is too long');
+      }
     });
 
     it('should be able to update collections with subcollections', async () => {
