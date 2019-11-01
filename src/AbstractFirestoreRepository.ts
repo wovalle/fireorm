@@ -20,7 +20,7 @@ import {
 
 import { BaseRepository } from './BaseRepository';
 import QueryBuilder from './QueryBuilder';
-import { ValidationError, validate } from 'class-validator';
+import { ValidationError } from 'class-validator';
 
 export abstract class AbstractFirestoreRepository<T extends IEntity>
   extends BaseRepository
@@ -307,16 +307,30 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
    * @returns {Promise<ValidationError[]>} An array of class-validator errors
    */
   async validate(item: T): Promise<ValidationError[]> {
-    const { entity: Entity } = this.colMetadata;
-
-    /**
-     * Instantiate plain objects into an entity class
-     */
-    const entity = item instanceof Entity
-        ? item
-        : Object.assign(new Entity(), item);
-
-    return validate(entity);
+    try {
+      const classValidator = await import('class-validator');
+      const { getSubCollection, getCollection } = getMetadataStorage();
+      const { entity: Entity } = this.subColName
+        ? getSubCollection(this.subColName)
+        : getCollection(this.colName);
+  
+      /**
+       * Instantiate plain objects into an entity class
+       */
+      const entity = item instanceof Entity
+          ? item
+          : Object.assign(new Entity(), item);
+  
+      return classValidator.validate(entity);
+    } catch (error) {
+      if (error.code === 'MODULE_NOT_FOUND') {
+        throw new Error(
+          'It looks like class-validator is not installed. Please run `npm i -S class-validator` to fix this error, or initialize FireORM with `validateModels: false` to disable validation.'
+        );
+      }
+      
+      throw error;
+    }
   }
 
   /**

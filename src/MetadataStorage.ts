@@ -18,13 +18,13 @@ export interface CollectionMetadata {
 export interface SubCollectionMetadata {
   parentEntity: Function;
   name: string;
-  entity: Function;
+  entity: InstanstiableIEntity;
   propertyKey: string;
 }
 
 export interface RepositoryMetadata {
   target: Function;
-  entity: Function;
+  entity: InstanstiableIEntity;
 }
 
 export interface MetadataStorageConfig {

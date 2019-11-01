@@ -11,7 +11,6 @@ import {
   IQueryBuilder,
   IRepository,
   FirestoreCollectionType,
-  InstanstiableIEntity,
 } from './types';
 
 import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
@@ -22,9 +21,9 @@ export class TransactionRepository<T extends IEntity>
   constructor(
     private collection: CollectionReference,
     private transaction: Transaction,
-    entityConstructor: InstanstiableIEntity
+    colName: string
   ) {
-    super(entityConstructor);
+    super(colName);
   }
 
   execute(queries: IFireOrmQueryLine[]): Promise<T[]> {
@@ -46,7 +45,7 @@ export class TransactionRepository<T extends IEntity>
       const errors = await this.validate(item as T);
   
       if (errors.length) {
-        throw new Error(errors.toString());
+        throw errors;
       }
     }
 
@@ -77,7 +76,7 @@ export class TransactionRepository<T extends IEntity>
       const errors = await this.validate(item);
   
       if (errors.length) {
-        throw new Error(errors.toString());
+        throw errors;
       }
     }
 
