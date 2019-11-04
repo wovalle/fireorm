@@ -9,7 +9,7 @@ import { Type } from '../src';
 import { IsEmail, IsOptional, Length } from 'class-validator';
 
 @Collection()
-class AlbumImages {
+class AlbumImage {
   id: string;
   url: string;
 }
@@ -28,8 +28,8 @@ class Album extends AlbumEntity {
   })
   name: string;
 
-  @SubCollection(AlbumImages)
-  images?: ISubCollection<AlbumImages>;
+  @SubCollection(AlbumImage)
+  images?: ISubCollection<AlbumImage>;
 }
 
 @Collection('bands')

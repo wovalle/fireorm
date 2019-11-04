@@ -8,6 +8,11 @@ export class FirestoreDocumentReference {
   path: string;
 }
 
+export class AlbumImage {
+  id: string;
+  url: string;
+}
+
 export class Album {
   id: string;
   name: string;
@@ -38,21 +43,45 @@ export const getInitialData = () => {
           id: 'lightbulb-sun',
           name: 'Lightbulb Sun',
           releaseDate: new Date('2000-05-22'),
+          images: [
+            {
+              id: 'album-artwork',
+              url: 'http://lorempixel.com/100/100'
+            }
+          ]
         },
         {
           id: 'in-absentia',
           name: 'In Absentia',
           releaseDate: new Date('2002-09-24'),
+          images: [
+            {
+              id: 'album-artwork',
+              url: 'http://lorempixel.com/100/100'
+            }
+          ]
         },
         {
           id: 'deadwing',
           name: 'Deadwing',
           releaseDate: new Date('2005-03-25'),
+          images: [
+            {
+              id: 'album-artwork',
+              url: 'http://lorempixel.com/100/100'
+            }
+          ]
         },
         {
           id: 'fear-blank-planet',
           name: 'Fear of a Blank Planet',
           releaseDate: new Date('2007-04-16'),
+          images: [
+            {
+              id: 'album-artwork',
+              url: 'http://lorempixel.com/100/100'
+            }
+          ]
         },
       ],
     },
@@ -67,13 +96,35 @@ export const getInitialData = () => {
           id: 'dark-side-moon',
           name: 'The Dark Side of the Moon',
           releaseDate: new Date('1973-03-01'),
+          images: [
+            {
+              id: 'album-artwork',
+              url: 'http://lorempixel.com/100/100'
+            }
+          ]
         },
         {
           id: 'wish-you-were-here',
           name: 'Wish You Were Here',
           releaseDate: new Date('1975-09-12'),
+          images: [
+            {
+              id: 'album-artwork',
+              url: 'http://lorempixel.com/100/100'
+            }
+          ]
         },
-        { id: 'animals', name: 'Animals', releaseDate: new Date('1977-01-23') },
+        {
+          id: 'animals',
+          name: 'Animals',
+          releaseDate: new Date('1977-01-23'),
+          images: [
+            {
+              id: 'album-artwork',
+              url: 'http://lorempixel.com/100/100'
+            }
+          ]
+        },
         {
           id: 'the-wall',
           name: 'The Wall',
@@ -92,16 +143,34 @@ export const getInitialData = () => {
           id: 'californication',
           name: 'Californication',
           releaseDate: new Date('1999-06-08'),
+          images: [
+            {
+              id: 'album-artwork',
+              url: 'http://lorempixel.com/100/100'
+            }
+          ]
         },
         {
           id: 'by-the-way',
           name: 'By the Way',
           releaseDate: new Date('2002-07-09'),
+          images: [
+            {
+              id: 'album-artwork',
+              url: 'http://lorempixel.com/100/100'
+            }
+          ]
         },
         {
           id: 'stadium-arcadium',
           name: 'Stadium Arcadium',
           releaseDate: new Date('2006-05-09'),
+          images: [
+            {
+              id: 'album-artwork',
+              url: 'http://lorempixel.com/100/100'
+            }
+          ]
         },
       ],
     },
