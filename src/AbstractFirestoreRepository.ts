@@ -48,9 +48,9 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
     this.docId = docId;
     this.subColName = subColName;
 
-    const { getCollection, getSubCollectionsFromParent, config } = getMetadataStorage();
+    const { getCollection, getSubCollection, getSubCollectionsFromParent, config } = getMetadataStorage();
 
-    this.colMetadata = getCollection(nameOrConstructor);
+    this.colMetadata = getSubCollection(this.subColName) || getCollection(this.colName);
     this.config = config;
 
     if (!this.colMetadata) {
@@ -108,14 +108,15 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
     if (!doc.exists) {
       return null;
     }
+    
     // tslint:disable-next-line:no-unnecessary-type-assertion
     const entity = plainToClass(
-      this.colMetadata.entity as any,
+      this.colMetadata.entity,
       this.transformFirestoreTypes(doc.data() as T)
     ) as T;
-    if (this.collectionType === FirestoreCollectionType.collection) {
-      this.initializeSubCollections(entity);
-    }
+
+    this.initializeSubCollections(entity);
+
     return entity;
   };
 

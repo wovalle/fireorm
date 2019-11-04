@@ -565,6 +565,13 @@ describe('BaseFirestoreRepository', () => {
       expect(pt.albums).to.be.instanceOf(BaseFirestoreRepository);
     });
 
+    it('should initialize nested subcollections', async () => {
+      const pt = await bandRepository.findById('red-hot-chili-peppers');
+      const album = await pt.albums.findById('stadium-arcadium');
+
+      expect(album.images).to.be.instanceOf(BaseFirestoreRepository);
+    });
+
     it('should be able to execute operations in the subcollection', async () => {
       const band = await bandRepository.findById('red-hot-chili-peppers');
       const bestAlbum = await band.albums.findById('stadium-arcadium');

@@ -377,6 +377,15 @@ describe('BaseFirestoreTransactionRepository', () => {
       });
     });
 
+    it('should initialize nested subcollections', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const pt = await tran.findById('red-hot-chili-peppers');
+        const album = await pt.albums.findById('stadium-arcadium');
+  
+        expect(album.images).to.be.instanceOf(BaseFirestoreRepository);
+      })
+    });
+
     it('should be able to execute operations in the subcollection', async () => {
       await bandRepository.runTransaction(async tran => {
         const band = await tran.findById('red-hot-chili-peppers');
