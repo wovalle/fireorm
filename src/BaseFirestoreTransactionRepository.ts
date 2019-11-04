@@ -64,9 +64,7 @@ export class TransactionRepository<T extends IEntity>
 
     await this.transaction.set(doc, this.toSerializableObject(item as T));
 
-    if (this.collectionType === FirestoreCollectionType.collection) {
-      this.initializeSubCollections(item as T);
-    }
+    this.initializeSubCollections(item as T);
 
     return item as T;
   }

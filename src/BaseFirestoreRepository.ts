@@ -75,9 +75,7 @@ export class BaseFirestoreRepository<T extends IEntity>
 
     await doc.set(this.toSerializableObject(item));
 
-    if (this.collectionType === FirestoreCollectionType.collection) {
-      this.initializeSubCollections(item);
-    }
+    this.initializeSubCollections(item);
 
     return item;
   }
