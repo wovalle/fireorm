@@ -49,7 +49,7 @@ function _getRepository<T extends IEntity>(
 
   if (!metadataStorage.firestoreRef) {
     throw new Error('Firestore must be initialized first');
-  } 
+  }
 
   const repository = metadataStorage.getRepository(entity);
 
