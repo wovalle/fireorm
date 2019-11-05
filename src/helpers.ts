@@ -49,7 +49,7 @@ function _getRepository<T extends IEntity>(
 
   if (!metadataStorage.firestoreRef) {
     throw new Error('Firestore must be initialized first');
-  }
+  } 
 
   const repository = metadataStorage.getRepository(entity);
 
@@ -63,6 +63,16 @@ function _getRepository<T extends IEntity>(
 
   if (!collection) {
     throw new Error(`'${entity.name}' is not a valid collection`);
+  }
+
+  if (collection.parentEntity) {
+    const parentCollection = metadataStorage.getCollection(collection.parentEntity);
+
+    if (!parentCollection) {	
+      throw new Error(	
+        `'${entity.name}' does not have a valid parent collection.`	
+      );	
+    }
   }
 
   if (
