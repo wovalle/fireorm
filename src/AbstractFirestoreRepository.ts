@@ -14,7 +14,6 @@ import {
 import {
   getMetadataStorage,
   CollectionMetadata,
-  SubCollectionMetadata,
   MetadataStorageConfig,
 } from './MetadataStorage';
 
@@ -25,7 +24,7 @@ import { ValidationError } from 'class-validator';
 export abstract class AbstractFirestoreRepository<T extends IEntity>
   extends BaseRepository
   implements IQueryBuilder<T>, IQueryExecutor<T> {
-  protected readonly subColMetadata: SubCollectionMetadata[];
+  protected readonly subColMetadata: CollectionMetadata[];
   protected readonly colMetadata: CollectionMetadata;
   protected readonly collectionType: FirestoreCollectionType;
   protected readonly colName: string;

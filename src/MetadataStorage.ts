@@ -11,15 +11,10 @@ export function getStore(): IMetadataStore {
 }
 
 export interface CollectionMetadata {
-  entity: InstanstiableIEntity;
-  name: string;
-}
-
-export interface SubCollectionMetadata {
-  parentEntity: Function;
   name: string;
   entity: InstanstiableIEntity;
-  propertyKey: string;
+  parentEntity?: Function;
+  propertyKey?: string;
 }
 
 export interface RepositoryMetadata {
@@ -33,7 +28,7 @@ export interface MetadataStorageConfig {
 
 export class MetadataStorage {
   readonly collections: Array<CollectionMetadata> = [];
-  readonly subCollections: Array<SubCollectionMetadata> = [];
+  readonly subCollections: Array<CollectionMetadata> = [];
   readonly repositories: Map<unknown, RepositoryMetadata> = new Map();
 
   public config: MetadataStorageConfig = {
@@ -60,14 +55,14 @@ export class MetadataStorage {
 
   public getSubCollection = (
     param: string | Function
-  ): SubCollectionMetadata => {
+  ): CollectionMetadata => {
     if (typeof param === 'string') {
       return this.subCollections.find(c => c.name === param);
     }
     return this.subCollections.find(c => c.entity === param);
   };
 
-  public setSubCollection = (subCol: SubCollectionMetadata) => {
+  public setSubCollection = (subCol: CollectionMetadata) => {
     this.subCollections.push(subCol);
   };
 
