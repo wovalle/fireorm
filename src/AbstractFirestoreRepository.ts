@@ -14,7 +14,6 @@ import {
 import {
   getMetadataStorage,
   CollectionMetadata,
-  SubCollectionMetadata,
   MetadataStorageConfig,
 } from './MetadataStorage';
 
@@ -25,18 +24,18 @@ import { ValidationError } from 'class-validator';
 export abstract class AbstractFirestoreRepository<T extends IEntity>
   extends BaseRepository
   implements IQueryBuilder<T>, IQueryExecutor<T> {
-  protected readonly subColMetadata: SubCollectionMetadata[];
+  protected readonly subColMetadata: CollectionMetadata[];
   protected readonly colMetadata: CollectionMetadata;
   protected readonly collectionType: FirestoreCollectionType;
   protected readonly colName: string;
-  protected readonly docId: string;
-  protected readonly subColName: string;
   protected readonly config: MetadataStorageConfig;
+
+  // TODO: Make this private when transactions have been fixed
+  public readonly collectionPath: string;
 
   constructor(
     nameOrConstructor: string | Function,
-    docId?: string,
-    subColName?: string
+    collectionPath?: string,
   ) {
     super();
 
@@ -44,24 +43,18 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
       typeof nameOrConstructor === 'function'
         ? nameOrConstructor.name
         : nameOrConstructor;
+    
+    const { getCollection, getSubCollection, getSubCollectionsFromParent, config } = getMetadataStorage();
 
-    this.docId = docId;
-    this.subColName = subColName;
-
-    const { getCollection, getSubCollectionsFromParent, config } = getMetadataStorage();
-
-    this.colMetadata = getCollection(nameOrConstructor);
+    this.colMetadata = getSubCollection(this.colName) || getCollection(this.colName);
     this.config = config;
+    this.collectionPath = collectionPath || this.colName;
 
     if (!this.colMetadata) {
       throw new Error(`There is no metadata stored for "${this.colName}"`);
     }
 
     this.subColMetadata = getSubCollectionsFromParent(this.colMetadata.entity);
-
-    this.collectionType = this.docId
-      ? FirestoreCollectionType.subcollection
-      : FirestoreCollectionType.collection;
   }
 
   protected toSerializableObject = (obj: T): Object => {
@@ -96,9 +89,8 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
     this.subColMetadata.forEach(subCol => {
       Object.assign(entity, {
         [subCol.propertyKey]: getRepository(
-          subCol.entity as any,
-          entity.id,
-          subCol.name
+          subCol.entity,
+          `${this.collectionPath}/${entity.id}/${subCol.name}`
         ),
       });
     });
@@ -108,14 +100,15 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
     if (!doc.exists) {
       return null;
     }
+    
     // tslint:disable-next-line:no-unnecessary-type-assertion
     const entity = plainToClass(
-      this.colMetadata.entity as any,
+      this.colMetadata.entity,
       this.transformFirestoreTypes(doc.data() as T)
     ) as T;
-    if (this.collectionType === FirestoreCollectionType.collection) {
-      this.initializeSubCollections(entity);
-    }
+
+    this.initializeSubCollections(entity);
+
     return entity;
   };
 
@@ -310,9 +303,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
     try {
       const classValidator = await import('class-validator');
       const { getSubCollection, getCollection } = getMetadataStorage();
-      const { entity: Entity } = this.subColName
-        ? getSubCollection(this.subColName)
-        : getCollection(this.colName);
+      const { entity: Entity } = getSubCollection(this.colName) || getCollection(this.colName);
   
       /**
        * Instantiate plain objects into an entity class

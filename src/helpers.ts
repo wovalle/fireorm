@@ -4,10 +4,9 @@ import { IEntity } from './types';
 
 export function getRepository<T extends IEntity>(
   entity: { new (): T },
-  docId?: string,
-  subColName?: string
+  documentPath?: string,
 ) {
-  return _getRepository(entity, 'default', docId, subColName);
+  return _getRepository(entity, 'default', documentPath);
 }
 
 /**
@@ -17,10 +16,9 @@ export const GetRepository = getRepository;
 
 export function getCustomRepository<T extends IEntity>(
   entity: { new (): T },
-  docId?: string,
-  subColName?: string
+  documentPath?: string,
 ) {
-  return _getRepository(entity, 'custom', docId, subColName);
+  return _getRepository(entity, 'custom', documentPath);
 }
 
 /**
@@ -30,10 +28,9 @@ export const GetCustomRepository = getCustomRepository;
 
 export function getBaseRepository<T extends IEntity>(
   entity: { new (): T },
-  docId?: string,
-  subColName?: string
+  documentPath?: string,
 ) {
-  return _getRepository(entity, 'base', docId, subColName);
+  return _getRepository(entity, 'base', documentPath);
 }
 
 /**
@@ -46,8 +43,7 @@ type RepositoryType = 'default' | 'base' | 'custom';
 function _getRepository<T extends IEntity>(
   entity: { new (): T },
   repositoryType: RepositoryType,
-  docId?: string,
-  subColName?: string
+  documentPath: string,
 ): BaseFirestoreRepository<T> {
   const metadataStorage = getMetadataStorage();
 
@@ -61,40 +57,30 @@ function _getRepository<T extends IEntity>(
     throw new Error(`'${entity.name}' does not have a custom repository.`);
   }
 
-  let collectionName = null;
+  const collection = documentPath
+    ? metadataStorage.getSubCollection(entity)
+    : metadataStorage.getCollection(entity);
 
-  // If docId exists, this is a subcollection. Get parent collection name
-  if (docId) {
-    const subCollection = metadataStorage.getSubCollection(entity);
+  if (!collection) {
+    throw new Error(`'${entity.name}' is not a valid collection`);
+  }
 
-    if (!subCollection) {
-      throw new Error(`'${entity.name}' is not a valid subcollection.`);
-    }
-
-    const parentCollection = metadataStorage.getCollection(subCollection.parentEntity);
+  if (collection.parentEntity) {
+    const parentCollection = metadataStorage.getCollection(collection.parentEntity);
 
     if (!parentCollection) {
       throw new Error(
-        `'${entity.name}' does not have a valid parent collection.`
+        `'${entity.name}' does not have a valid parent collection.`	
       );
     }
-    collectionName = parentCollection.name;
-  } else {
-    const collection = metadataStorage.getCollection(entity);
-
-    if (!collection) {
-      throw new Error(`'${entity.name}' is not a valid collection`);
-    }
-
-    collectionName = collection.name;
   }
 
   if (
     repositoryType === 'custom' ||
     (repositoryType === 'default' && repository)
   ) {
-    return new (repository.target as any)(collectionName, docId, subColName);
+    return new (repository.target as any)(collection.name, documentPath);
   } else {
-    return new BaseFirestoreRepository<T>(collectionName, docId, subColName);
+    return new BaseFirestoreRepository<T>(collection.name, documentPath);
   }
 }
