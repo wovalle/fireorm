@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import { Collection, CustomRepository } from './Decorators';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { getRepository, getBaseRepository } from './helpers';
-import { initialize, clearMetadataStorage } from './MetadataStorage';
+import { initialize } from './MetadataStorage';
 
 describe('Helpers', () => {
   beforeEach(() => {

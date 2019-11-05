@@ -5,7 +5,6 @@ import { CollectionReference, WhereFilterOp } from '@google-cloud/firestore';
 
 import {
   IRepository,
-  FirestoreCollectionType,
   IFireOrmQueryLine,
   IOrderByParams,
   IEntity,
@@ -21,25 +20,16 @@ export class BaseFirestoreRepository<T extends IEntity>
   implements IRepository<T> {
   private readonly firestoreColRef: CollectionReference;
 
-  constructor(colName: string);
-  constructor(colName: string, docId: string, subColName: string);
+  constructor(colName: string, collectionPath?: string) {
+    super(colName, collectionPath);
 
-  constructor(colName: string, docId?: string, subColName?: string) {
-    super(colName, docId, subColName);
     const { firestoreRef } = getMetadataStorage();
 
     if (!firestoreRef) {
       throw new Error('Firestore must be initialized first');
     }
 
-    if (this.docId) {
-      this.firestoreColRef = firestoreRef
-        .collection(this.colName)
-        .doc(this.docId)
-        .collection(this.subColName);
-    } else {
-      this.firestoreColRef = firestoreRef.collection(this.colName);
-    }
+    this.firestoreColRef = firestoreRef.collection(collectionPath || colName);
   }
 
   async findById(id: string): Promise<T> {
