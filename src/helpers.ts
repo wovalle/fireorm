@@ -68,10 +68,10 @@ function _getRepository<T extends IEntity>(
   if (collection.parentEntity) {
     const parentCollection = metadataStorage.getCollection(collection.parentEntity);
 
-    if (!parentCollection) {	
-      throw new Error(	
+    if (!parentCollection) {
+      throw new Error(
         `'${entity.name}' does not have a valid parent collection.`	
-      );	
+      );
     }
   }
 
