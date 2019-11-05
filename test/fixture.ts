@@ -46,9 +46,9 @@ export const getInitialData = () => {
           images: [
             {
               id: 'album-artwork',
-              url: 'http://lorempixel.com/100/100'
-            }
-          ]
+              url: 'http://lorempixel.com/100/100',
+            },
+          ],
         },
         {
           id: 'in-absentia',
@@ -57,9 +57,9 @@ export const getInitialData = () => {
           images: [
             {
               id: 'album-artwork',
-              url: 'http://lorempixel.com/100/100'
-            }
-          ]
+              url: 'http://lorempixel.com/100/100',
+            },
+          ],
         },
         {
           id: 'deadwing',
@@ -68,9 +68,9 @@ export const getInitialData = () => {
           images: [
             {
               id: 'album-artwork',
-              url: 'http://lorempixel.com/100/100'
-            }
-          ]
+              url: 'http://lorempixel.com/100/100',
+            },
+          ],
         },
         {
           id: 'fear-blank-planet',
@@ -79,9 +79,9 @@ export const getInitialData = () => {
           images: [
             {
               id: 'album-artwork',
-              url: 'http://lorempixel.com/100/100'
-            }
-          ]
+              url: 'http://lorempixel.com/100/100',
+            },
+          ],
         },
       ],
     },
@@ -99,9 +99,9 @@ export const getInitialData = () => {
           images: [
             {
               id: 'album-artwork',
-              url: 'http://lorempixel.com/100/100'
-            }
-          ]
+              url: 'http://lorempixel.com/100/100',
+            },
+          ],
         },
         {
           id: 'wish-you-were-here',
@@ -110,9 +110,9 @@ export const getInitialData = () => {
           images: [
             {
               id: 'album-artwork',
-              url: 'http://lorempixel.com/100/100'
-            }
-          ]
+              url: 'http://lorempixel.com/100/100',
+            },
+          ],
         },
         {
           id: 'animals',
@@ -121,14 +121,15 @@ export const getInitialData = () => {
           images: [
             {
               id: 'album-artwork',
-              url: 'http://lorempixel.com/100/100'
-            }
-          ]
+              url: 'http://lorempixel.com/100/100',
+            },
+          ],
         },
         {
           id: 'the-wall',
           name: 'The Wall',
           releaseDate: new Date('1979-11-30'),
+          images: [],
         },
       ],
     },
@@ -146,9 +147,9 @@ export const getInitialData = () => {
           images: [
             {
               id: 'album-artwork',
-              url: 'http://lorempixel.com/100/100'
-            }
-          ]
+              url: 'http://lorempixel.com/100/100',
+            },
+          ],
         },
         {
           id: 'by-the-way',
@@ -157,9 +158,9 @@ export const getInitialData = () => {
           images: [
             {
               id: 'album-artwork',
-              url: 'http://lorempixel.com/100/100'
-            }
-          ]
+              url: 'http://lorempixel.com/100/100',
+            },
+          ],
         },
         {
           id: 'stadium-arcadium',
@@ -168,9 +169,9 @@ export const getInitialData = () => {
           images: [
             {
               id: 'album-artwork',
-              url: 'http://lorempixel.com/100/100'
-            }
-          ]
+              url: 'http://lorempixel.com/100/100',
+            },
+          ],
         },
       ],
     },
