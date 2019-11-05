@@ -8,6 +8,12 @@ import { ISubCollection } from '../src/types';
 import { Type } from '../src';
 import { IsEmail, IsOptional, Length } from 'class-validator';
 
+@Collection()
+class AlbumImage {
+  id: string;
+  url: string;
+}
+
 // Why I do this? Because by using the instance of Album
 // located in fixture.ts, you have the risk to reuse the
 // same class in many tests and every method that depends
@@ -15,11 +21,15 @@ import { IsEmail, IsOptional, Length } from 'class-validator';
 // with each other (happened with getRepository)
 //
 // Hours lost debugging this: 2
+@Collection()
 class Album extends AlbumEntity {
   @Length(1, 50, {
     message: 'Name is too long',
   })
   name: string;
+
+  @SubCollection(AlbumImage)
+  images?: ISubCollection<AlbumImage>;
 }
 
 @Collection('bands')

@@ -565,6 +565,13 @@ describe('BaseFirestoreRepository', () => {
       expect(pt.albums).to.be.instanceOf(BaseFirestoreRepository);
     });
 
+    it('should initialize nested subcollections', async () => {
+      const pt = await bandRepository.findById('red-hot-chili-peppers');
+      const album = await pt.albums.findById('stadium-arcadium');
+
+      expect(album.images).to.be.instanceOf(BaseFirestoreRepository);
+    });
+
     it('should be able to execute operations in the subcollection', async () => {
       const band = await bandRepository.findById('red-hot-chili-peppers');
       const bestAlbum = await band.albums.findById('stadium-arcadium');
@@ -601,6 +608,25 @@ describe('BaseFirestoreRepository', () => {
 
       const albums = await band.albums.find();
       expect(albums.length).to.eql(3);
+    });
+
+    it('should initialize nested subcollections on create', async () => {
+      const band = new Band();
+      band.id = '30-seconds-to-mars';
+      band.name = '30 Seconds To Mars';
+      band.formationYear = 1998;
+      band.genres = ['alternative-rock'];
+
+      await bandRepository.create(band);
+
+      const firstAlbum = new Album();
+      firstAlbum.id = '30-seconds-to-mars';
+      firstAlbum.name = '30 Seconds to Mars';
+      firstAlbum.releaseDate = new Date('2002-07-22');
+
+      const album = await band.albums.create(firstAlbum);
+
+      expect(album.images).to.be.instanceOf(BaseFirestoreRepository);
     });
 
     it('should be able to validate subcollections on create', async () => {
