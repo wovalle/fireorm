@@ -29,7 +29,9 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
   protected readonly collectionType: FirestoreCollectionType;
   protected readonly colName: string;
   protected readonly config: MetadataStorageConfig;
-  protected readonly collectionPath: string;
+
+  // TODO: Make this private when transactions have been fixed
+  public readonly collectionPath: string;
 
   constructor(
     nameOrConstructor: string | Function,

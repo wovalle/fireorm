@@ -1,4 +1,5 @@
 import { OrderByDirection, DocumentReference } from '@google-cloud/firestore';
+import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
@@ -87,8 +88,7 @@ export interface IQueryExecutor<T> {
   ): Promise<T[]>;
 }
 
-export type ISubCollection<T extends IEntity> = IRepository<T> &
-  IQueryBuilder<T>;
+export type ISubCollection<T extends IEntity> = BaseFirestoreRepository<T>;
 
 export interface IEntity {
   id: string;
