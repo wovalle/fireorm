@@ -3,8 +3,9 @@ import { expect } from 'chai';
 
 import { Collection, CustomRepository } from './Decorators';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
-import { getRepository, getBaseRepository } from './helpers';
+import { getRepository, getBaseRepository, runTransaction } from './helpers';
 import { initialize } from './MetadataStorage';
+import { TransactionRepository } from './BaseFirestoreTransactionRepository';
 
 describe('Helpers', () => {
   beforeEach(() => {
@@ -76,5 +77,12 @@ describe('Helpers', () => {
     expect(() => getRepository(Entity)).to.throw(
       "'Entity' is not a valid collection"
     );
+  });
+
+  it.only('runTransaction: ', () => {
+    runTransaction(transaction => {
+      expect(transaction.getRepository).to.be.instanceOf(Function);
+      expect(transaction.commit).to.be.instanceOf(Function);
+    });
   });
 });

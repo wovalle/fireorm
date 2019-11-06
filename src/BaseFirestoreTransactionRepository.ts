@@ -11,19 +11,22 @@ import {
   IQueryBuilder,
   IRepository,
   FirestoreCollectionType,
+  Instantiable,
 } from './types';
 
 import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
+import { getMetadataStorage } from './MetadataStorage';
 
 export class TransactionRepository<T extends IEntity>
   extends AbstractFirestoreRepository<T>
   implements IRepository<T> {
-  constructor(
-    private collection: CollectionReference,
-    private transaction: Transaction,
-    colName: string
-  ) {
-    super(colName);
+  private collection: CollectionReference;
+  private transaction: Transaction;
+
+  constructor(transaction: Transaction, entity: Instantiable<T>) {
+    // TODO: this is non-sense, detach TransactionRepository from AbstractFirestoreRepository
+    super(entity);
+    this.transaction = transaction;
   }
 
   execute(queries: IFireOrmQueryLine[]): Promise<T[]> {
@@ -43,7 +46,7 @@ export class TransactionRepository<T extends IEntity>
   async create(item: WithOptionalId<T>): Promise<T> {
     if (this.config.validateModels) {
       const errors = await this.validate(item as T);
-  
+
       if (errors.length) {
         throw errors;
       }
@@ -72,7 +75,7 @@ export class TransactionRepository<T extends IEntity>
   async update(item: T): Promise<T> {
     if (this.config.validateModels) {
       const errors = await this.validate(item);
-  
+
       if (errors.length) {
         throw errors;
       }

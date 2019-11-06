@@ -94,4 +94,5 @@ export interface IEntity {
   id: string;
 }
 
+export type Instantiable<T> = { new (): T };
 export type InstanstiableIEntity = { new (): IEntity };

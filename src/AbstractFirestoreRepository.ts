@@ -29,24 +29,25 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
   protected readonly collectionType: FirestoreCollectionType;
   protected readonly colName: string;
   protected readonly config: MetadataStorageConfig;
+  protected readonly collectionPath: string;
 
-  // TODO: Make this private when transactions have been fixed
-  public readonly collectionPath: string;
-
-  constructor(
-    nameOrConstructor: string | Function,
-    collectionPath?: string,
-  ) {
+  constructor(nameOrConstructor: string | Function, collectionPath?: string) {
     super();
 
     this.colName =
       typeof nameOrConstructor === 'function'
         ? nameOrConstructor.name
         : nameOrConstructor;
-    
-    const { getCollection, getSubCollection, getSubCollectionsFromParent, config } = getMetadataStorage();
 
-    this.colMetadata = getSubCollection(this.colName) || getCollection(this.colName);
+    const {
+      getCollection,
+      getSubCollection,
+      getSubCollectionsFromParent,
+      config,
+    } = getMetadataStorage();
+
+    this.colMetadata =
+      getSubCollection(this.colName) || getCollection(this.colName);
     this.config = config;
     this.collectionPath = collectionPath || this.colName;
 
@@ -101,7 +102,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
     if (!doc.exists) {
       return null;
     }
-    
+
     // tslint:disable-next-line:no-unnecessary-type-assertion
     const entity = plainToClass(
       this.colMetadata.entity,
@@ -296,7 +297,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
 
   /**
    * Uses class-validator to validate an entity using decorators set in the collection class
-   * 
+   *
    * @param item class or object representing an entity
    * @returns {Promise<ValidationError[]>} An array of class-validator errors
    */
@@ -304,15 +305,15 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
     try {
       const classValidator = await import('class-validator');
       const { getSubCollection, getCollection } = getMetadataStorage();
-      const { entity: Entity } = getSubCollection(this.colName) || getCollection(this.colName);
-  
+      const { entity: Entity } =
+        getSubCollection(this.colName) || getCollection(this.colName);
+
       /**
        * Instantiate plain objects into an entity class
        */
-      const entity = item instanceof Entity
-          ? item
-          : Object.assign(new Entity(), item);
-  
+      const entity =
+        item instanceof Entity ? item : Object.assign(new Entity(), item);
+
       return classValidator.validate(entity);
     } catch (error) {
       if (error.code === 'MODULE_NOT_FOUND') {
@@ -320,7 +321,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
           'It looks like class-validator is not installed. Please run `npm i -S class-validator` to fix this error, or initialize FireORM with `validateModels: false` to disable validation.'
         );
       }
-      
+
       throw error;
     }
   }

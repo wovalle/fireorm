@@ -1,10 +1,12 @@
 import { getMetadataStorage } from './MetadataStorage';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { IEntity } from './types';
+import { FirestoreTransaction } from './FirestoreTransaction';
+import { Band } from '../test/BandCollection';
 
 export function getRepository<T extends IEntity>(
   entity: { new (): T },
-  documentPath?: string,
+  documentPath?: string
 ) {
   return _getRepository(entity, 'default', documentPath);
 }
@@ -16,7 +18,7 @@ export const GetRepository = getRepository;
 
 export function getCustomRepository<T extends IEntity>(
   entity: { new (): T },
-  documentPath?: string,
+  documentPath?: string
 ) {
   return _getRepository(entity, 'custom', documentPath);
 }
@@ -28,7 +30,7 @@ export const GetCustomRepository = getCustomRepository;
 
 export function getBaseRepository<T extends IEntity>(
   entity: { new (): T },
-  documentPath?: string,
+  documentPath?: string
 ) {
   return _getRepository(entity, 'base', documentPath);
 }
@@ -43,7 +45,7 @@ type RepositoryType = 'default' | 'base' | 'custom';
 function _getRepository<T extends IEntity>(
   entity: { new (): T },
   repositoryType: RepositoryType,
-  documentPath: string,
+  documentPath: string
 ): BaseFirestoreRepository<T> {
   const metadataStorage = getMetadataStorage();
 
@@ -66,11 +68,13 @@ function _getRepository<T extends IEntity>(
   }
 
   if (collection.parentEntity) {
-    const parentCollection = metadataStorage.getCollection(collection.parentEntity);
+    const parentCollection = metadataStorage.getCollection(
+      collection.parentEntity
+    );
 
     if (!parentCollection) {
       throw new Error(
-        `'${entity.name}' does not have a valid parent collection.`	
+        `'${entity.name}' does not have a valid parent collection.`
       );
     }
   }
@@ -84,3 +88,17 @@ function _getRepository<T extends IEntity>(
     return new BaseFirestoreRepository<T>(collection.name, documentPath);
   }
 }
+
+export const runTransaction = (
+  executor: (tran: FirestoreTransaction) => Promise<void>
+) => {
+  const metadataStorage = getMetadataStorage();
+
+  if (!metadataStorage.firestoreRef) {
+    throw new Error('Firestore must be initialized first');
+  }
+
+  return metadataStorage.firestoreRef.runTransaction(async t => {
+    return executor(new FirestoreTransaction(t));
+  });
+};
