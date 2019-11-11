@@ -1,11 +1,10 @@
 import { getMetadataStorage } from './MetadataStorage';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
-import { IEntity } from './types';
+import { IEntity, Instantiable } from './types';
 import { FirestoreTransaction } from './FirestoreTransaction';
-import { Band } from '../test/BandCollection';
 
 export function getRepository<T extends IEntity>(
-  entity: { new (): T },
+  entity: Instantiable<T>,
   documentPath?: string
 ) {
   return _getRepository(entity, 'default', documentPath);
@@ -17,7 +16,7 @@ export function getRepository<T extends IEntity>(
 export const GetRepository = getRepository;
 
 export function getCustomRepository<T extends IEntity>(
-  entity: { new (): T },
+  entity: Instantiable<T>,
   documentPath?: string
 ) {
   return _getRepository(entity, 'custom', documentPath);
@@ -29,7 +28,7 @@ export function getCustomRepository<T extends IEntity>(
 export const GetCustomRepository = getCustomRepository;
 
 export function getBaseRepository<T extends IEntity>(
-  entity: { new (): T },
+  entity: Instantiable<T>,
   documentPath?: string
 ) {
   return _getRepository(entity, 'base', documentPath);
@@ -43,7 +42,7 @@ export const GetBaseRepository = getBaseRepository;
 type RepositoryType = 'default' | 'base' | 'custom';
 
 function _getRepository<T extends IEntity>(
-  entity: { new (): T },
+  entity: Instantiable<T>,
   repositoryType: RepositoryType,
   documentPath: string
 ): BaseFirestoreRepository<T> {

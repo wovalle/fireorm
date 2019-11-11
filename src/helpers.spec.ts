@@ -79,10 +79,9 @@ describe('Helpers', () => {
     );
   });
 
-  it.only('runTransaction: ', () => {
-    runTransaction(transaction => {
+  it('runTransaction: ', () => {
+    runTransaction(async transaction => {
       expect(transaction.getRepository).to.be.instanceOf(Function);
-      expect(transaction.commit).to.be.instanceOf(Function);
     });
   });
 });

@@ -53,9 +53,7 @@ export class MetadataStorage {
     return this.subCollections.filter(s => s.parentEntity === parentEntity);
   };
 
-  public getSubCollection = (
-    param: string | Function
-  ): CollectionMetadata => {
+  public getSubCollection = (param: string | Function): CollectionMetadata => {
     if (typeof param === 'string') {
       return this.subCollections.find(c => c.name === param);
     }
@@ -120,7 +118,10 @@ export function clearMetadataStorage() {
   store.metadataStorage = null;
 }
 
-export const initialize = (firestore: Firestore, config?: MetadataStorageConfig): void => {
+export const initialize = (
+  firestore: Firestore,
+  config?: MetadataStorageConfig
+): void => {
   initializeMetadataStorage();
 
   const { metadataStorage } = getStore();
@@ -128,7 +129,7 @@ export const initialize = (firestore: Firestore, config?: MetadataStorageConfig)
   metadataStorage.firestoreRef = firestore;
   metadataStorage.config = {
     ...metadataStorage.config,
-    ...config
+    ...config,
   };
 };
 

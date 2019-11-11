@@ -19,26 +19,35 @@ import { getMetadataStorage } from './MetadataStorage';
 export class TransactionRepository<T extends IEntity>
   extends AbstractFirestoreRepository<T>
   implements IRepository<T> {
-  private collection: CollectionReference;
+  private firestoreColRef: CollectionReference;
   private transaction: Transaction;
 
   constructor(transaction: Transaction, entity: Instantiable<T>) {
-    // TODO: this is non-sense, detach TransactionRepository from AbstractFirestoreRepository
     super(entity);
     this.transaction = transaction;
+
+    const { firestoreRef } = getMetadataStorage();
+
+    if (!firestoreRef) {
+      throw new Error('Firestore must be initialized first');
+    }
+
+    this.firestoreColRef = firestoreRef.collection(
+      this.collectionPath || this.colName
+    );
   }
 
   execute(queries: IFireOrmQueryLine[]): Promise<T[]> {
     const query = queries.reduce((acc, cur) => {
       const op = cur.operator as WhereFilterOp;
       return acc.where(cur.prop, op, cur.val);
-    }, this.collection);
+    }, this.firestoreColRef);
 
     return this.transaction.get(query).then(this.extractTFromColSnap);
   }
 
   findById(id: string): Promise<T> {
-    const query = this.collection.doc(id);
+    const query = this.firestoreColRef.doc(id);
     return this.transaction.get(query).then(this.extractTFromDocSnap);
   }
 
@@ -58,13 +67,15 @@ export class TransactionRepository<T extends IEntity>
       }
     }
 
-    const doc = item.id ? this.collection.doc(item.id) : this.collection.doc();
+    const doc = item.id
+      ? this.firestoreColRef.doc(item.id)
+      : this.firestoreColRef.doc();
 
     if (!item.id) {
       item.id = doc.id;
     }
 
-    await this.transaction.set(doc, this.toSerializableObject(item as T));
+    this.transaction.set(doc, this.toSerializableObject(item as T));
 
     this.initializeSubCollections(item as T);
 
@@ -80,14 +91,14 @@ export class TransactionRepository<T extends IEntity>
       }
     }
 
-    const query = this.collection.doc(item.id);
-    await this.transaction.update(query, this.toSerializableObject(item));
+    const query = this.firestoreColRef.doc(item.id);
+    this.transaction.update(query, this.toSerializableObject(item));
 
     return item;
   }
 
   async delete(id: string): Promise<void> {
-    await this.transaction.delete(this.collection.doc(id));
+    this.transaction.delete(this.firestoreColRef.doc(id));
   }
 
   limit(): IQueryBuilder<T> {

@@ -8,6 +8,7 @@ import {
   IFireOrmQueryLine,
   IOrderByParams,
   IEntity,
+  Instantiable,
 } from './types';
 
 import { getMetadataStorage } from './MetadataStorage';
@@ -73,7 +74,7 @@ export class BaseFirestoreRepository<T extends IEntity>
   async update(item: T): Promise<T> {
     if (this.config.validateModels) {
       const errors = await this.validate(item);
-  
+
       if (errors.length) {
         throw errors;
       }
@@ -91,17 +92,17 @@ export class BaseFirestoreRepository<T extends IEntity>
     await this.firestoreColRef.doc(id).delete();
   }
 
+  // TODO: deprecation notice
   async runTransaction(
     executor: (tran: TransactionRepository<T>) => Promise<void>
   ) {
-    return this.firestoreColRef.firestore.runTransaction(async t => {
-      return executor(
-        new TransactionRepository<T>(
-          this.firestoreColRef,
-          t,
-          this.colName
-        )
-      );
+    // Importing here to prevent circular dependency
+    const { runTransaction } = await import('./helpers');
+
+    return runTransaction(tran => {
+      const repository = tran.getRepository(this.colMetadata
+        .entity as Instantiable<T>);
+      return executor(repository);
     });
   }
 
