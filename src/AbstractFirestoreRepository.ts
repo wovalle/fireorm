@@ -32,11 +32,6 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
   constructor(nameOrConstructor: string | Function, collectionPath?: string) {
     super();
 
-    this.colName =
-      typeof nameOrConstructor === 'function'
-        ? nameOrConstructor.name
-        : nameOrConstructor;
-
     const {
       getCollection,
       getSubCollection,
@@ -44,8 +39,14 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
       config,
     } = getMetadataStorage();
 
+    //TODO: add tests to ensure that we can initialize this with name or constructor
+    //Also, I'm pretty sure getCollection types can be updated to be Instantiable<T>
+
     this.colMetadata =
-      getSubCollection(this.colName) || getCollection(this.colName);
+      getSubCollection(nameOrConstructor) || getCollection(nameOrConstructor);
+
+    this.colName = this.colMetadata.name;
+
     this.config = config;
     this.collectionPath = collectionPath || this.colName;
 
