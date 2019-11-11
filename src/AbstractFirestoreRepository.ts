@@ -1,7 +1,6 @@
 import { plainToClass } from 'class-transformer';
 import { DocumentSnapshot, QuerySnapshot } from '@google-cloud/firestore';
 import {
-  FirestoreCollectionType,
   IEntity,
   IQueryBuilder,
   IWherePropParam,
@@ -26,7 +25,6 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
   implements IQueryBuilder<T>, IQueryExecutor<T> {
   protected readonly subColMetadata: CollectionMetadata[];
   protected readonly colMetadata: CollectionMetadata;
-  protected readonly collectionType: FirestoreCollectionType;
   protected readonly colName: string;
   protected readonly config: MetadataStorageConfig;
   protected readonly collectionPath: string;

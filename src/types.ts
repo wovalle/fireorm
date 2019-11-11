@@ -35,10 +35,6 @@ export enum FirestoreOperators {
   arrayContains = 'array-contains',
 }
 
-export enum FirestoreCollectionType {
-  collection = 'collection',
-  subcollection = 'subcollection',
-}
 export interface IFireOrmQueryLine {
   prop: string;
   val: IFirestoreVal;
@@ -95,4 +91,4 @@ export interface IEntity {
 }
 
 export type Instantiable<T> = { new (): T };
-export type InstanstiableIEntity = { new (): IEntity };
+export type InstanstiableIEntity = Instantiable<IEntity>;

@@ -10,7 +10,6 @@ import {
   WithOptionalId,
   IQueryBuilder,
   IRepository,
-  FirestoreCollectionType,
   Instantiable,
 } from './types';
 
