@@ -20,6 +20,11 @@ import {
 import { BaseRepository } from './BaseRepository';
 import QueryBuilder from './QueryBuilder';
 
+function removeKey(obj, prop) {
+  let { [prop]: omit, ...res } = obj;
+  return res;
+}
+
 export abstract class AbstractFirestoreRepository<T extends IEntity>
   extends BaseRepository
   implements IQueryBuilder<T>, IQueryExecutor<T> {
@@ -60,10 +65,11 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
   }
 
   protected toSerializableObject = (obj: T): Object => {
+    const { ...serializedObj } = obj;
     this.subColMetadata.forEach(scm => {
-      delete obj[scm.propertyKey];
+      delete serializedObj[scm.propertyKey];
     });
-    return { ...obj };
+    return serializedObj;
   };
 
   protected transformFirestoreTypes = (obj: T): T => {
