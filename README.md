@@ -7,8 +7,6 @@
 [![License](https://img.shields.io/npm/l/fireorm.svg?style=flat)](https://www.npmjs.com/package/fireorm)
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/fireorm/community)
 
-_:warning::heavy_exclamation_mark: Caution: This project is in **active** development. Documentation may not be totally up to date. APIs may change until 1.0._
-
 Fireorm is a tiny wrapper on top of firebase-admin that makes life easier when dealing with a Firestore database. Fireorm tries to ease the development of apps that rely on Firestore at the database layer by abstracting the access layer providing and familiar repository pattern. It basically helps us not worrying about Firestore details and focusing in what matters: adding cool new features!
 
 You can read more about the motivations and features of fireorm [on its introductory post](https://medium.com/p/ba7734644684). Also, the [API documentation](https://wovalle.github.io/fireorm) is available.
@@ -18,10 +16,12 @@ You can read more about the motivations and features of fireorm [on its introduc
 1.  Install the npm package:
 
 ```bash
-yarn add fireorm  #or npm install fireorm
+yarn add fireorm reflect-metadata #or npm install fireorm reflect-metadata
+
+# note: reflect-metadata shim is required
 ```
 
-2.  [Initialize](https://firebase.google.com/docs/firestore/quickstart#initialize) your firestore application:
+2. [Initialize](https://firebase.google.com/docs/firestore/quickstart#initialize) your firestore application:
 
 ```typescript
 import * as admin from 'firebase-admin';
@@ -99,15 +99,15 @@ git clone git@github.com:wovalle/fireorm.git
 2.  Install the dependencies.
 
 ```bash
-yarn install # npm install
+yarn # npm install
 ```
 
 ### Testing
 
 Fireorm has two types of tests:
 
--   Unit tests: `yarn test # or npm test`
--   Integration tests: `yarn test:integration # or npm test:integration`
+- Unit tests: `yarn test # or npm test`
+- Integration tests: `yarn test:integration # or npm test:integration`
 
 To be able to run the integration tests you'll need to [create a firebase service account](https://firebase.google.com/docs/admin/setup#initialize_the_sdk) and declare some [environment variables](https://github.com/wovalle/fireorm/blob/master/test/setup.ts#L5-L13).
 
@@ -125,20 +125,20 @@ This repo uses [Sematic Release](https://github.com/semantic-release/semantic-re
   <summary>Manual Release</summary>
   If, by any reason, a manual release must be done, these are the instructions:
 
--   To release a new version to npm, first we have to create a new tag:
+- To release a new version to npm, first we have to create a new tag:
 
 ```bash
 npm version [ major | minor | patch ] -m "Relasing version"
 git push --follow-tags
 ```
 
--   Then we can publish the package to npm registry:
+- Then we can publish the package to npm registry:
 
 ```bash
 npm publish
 ```
 
--   To deploy the documentation
+- To deploy the documentation
 
 ```bash
 yarn deploy:documentation # or npm deploy:documentation
@@ -148,7 +148,7 @@ yarn deploy:documentation # or npm deploy:documentation
 
 ### Documentation
 
--   Fireorm uses [typedoc](https://typedoc.org/) to automatically build the API documentation, to generate it:
+- Fireorm uses [typedoc](https://typedoc.org/) to automatically build the API documentation, to generate it:
 
 ```bash
 yarn build:documentation # or npm build:documentation
