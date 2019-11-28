@@ -9,6 +9,7 @@ import {
   IQueryExecutor,
   IEntity,
   IWherePropParam,
+  Filter,
 } from './types';
 
 export default class QueryBuilder<T extends IEntity>
@@ -90,6 +91,30 @@ export default class QueryBuilder<T extends IEntity>
     return this;
   }
 
+  whereArrayContainsAny(
+    prop: IWherePropParam<T>,
+    val: Filter<IFirestoreVal, any[]>
+  ): QueryBuilder<T> {
+    this.queries.push({
+      prop: this.extractWhereParam(prop),
+      val,
+      operator: FirestoreOperators.arrayContainsAny,
+    });
+    return this;
+  }
+
+  whereValueIncludes(
+    prop: IWherePropParam<T>,
+    val: Filter<IFirestoreVal, any[]>
+  ): QueryBuilder<T> {
+    this.queries.push({
+      prop: this.extractWhereParam(prop),
+      val,
+      operator: FirestoreOperators.in,
+    });
+    return this;
+  }
+
   limit(limitVal: number): QueryBuilder<T> {
     if (this.limitVal) {
       throw new Error(
@@ -135,8 +160,13 @@ export default class QueryBuilder<T extends IEntity>
   }
 
   async findOne(): Promise<T | null> {
-    const queryResult = await this.executor.execute(this.queries, this.limitVal, this.orderByObj, true);
-    
+    const queryResult = await this.executor.execute(
+      this.queries,
+      this.limitVal,
+      this.orderByObj,
+      true
+    );
+
     return queryResult.length ? queryResult[0] : null;
   }
 }

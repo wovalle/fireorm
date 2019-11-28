@@ -2,6 +2,7 @@ import { OrderByDirection, DocumentReference } from '@google-cloud/firestore';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+export type Filter<T, U> = T extends U ? T : never;
 
 export interface IRepository<T extends { id: string }> {
   limit(limitVal: number): IQueryBuilder<T>;
@@ -22,6 +23,8 @@ export type WithOptionalId<T extends { id: unknown }> = Pick<
 export type IFirestoreVal =
   | string
   | number
+  | string[]
+  | number[]
   | Date
   | Boolean
   | DocumentReference;
@@ -33,6 +36,8 @@ export enum FirestoreOperators {
   lessThanEqual = '<=',
   greaterThanEqual = '>=',
   arrayContains = 'array-contains',
+  arrayContainsAny = 'array-contains-any',
+  in = 'in',
 }
 
 export enum FirestoreCollectionType {
