@@ -263,9 +263,14 @@ describe('BaseFirestoreRepository', () => {
   describe('update', () => {
     it('must update and return updated item', async () => {
       const band = await bandRepository.findById('porcupine-tree');
+      const albums = band.albums;
       band.name = 'Steven Wilson';
       const updatedBand = await bandRepository.update(band);
       expect(band.name).to.equal(updatedBand.name);
+      expect(band.albums).to.equal(
+        albums,
+        'should not mutate other fields or relations on updated item'
+      );
     });
     it('must only update changed fields'); // TODO: Discuss
     it('must throw if item is not found');
