@@ -1,14 +1,14 @@
-import CustomRepository from './CustomRepository';
 import { expect } from 'chai';
-import { MetadataStorage, Initialize } from '../MetadataStorage';
-import { BaseFirestoreRepository } from '..';
+import { CustomRepository } from './CustomRepository';
+import { initialize, getStore, clearMetadataStorage } from '../MetadataStorage';
+import { BaseFirestoreRepository } from '../BaseFirestoreRepository';
 
 describe('CustomRepositoryDecorator', () => {
-  const store = { metadataStorage: new MetadataStorage() };
+  const store = getStore();
 
   beforeEach(() => {
-    store.metadataStorage = new MetadataStorage();
-    Initialize(null, store);
+    clearMetadataStorage();
+    initialize(null);
   });
 
   it('should register custom repositories', () => {

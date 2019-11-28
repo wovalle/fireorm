@@ -1,4 +1,4 @@
-import { GetRepository, Collection } from '../../src';
+import { getRepository, Collection } from '../../src';
 import { Band as BandEntity } from '../fixture';
 import { expect } from 'chai';
 import { getUniqueColName } from '../setup';
@@ -9,7 +9,7 @@ describe('Integration test: Simple Repository', () => {
     extra?: { website: string };
   }
 
-  const bandRepository = GetRepository(Band);
+  const bandRepository = getRepository(Band);
 
   it('should do crud operations', async () => {
     // Create a band
@@ -43,7 +43,7 @@ describe('Integration test: Simple Repository', () => {
     expect(foundBand.id).to.equal(dt.id);
     expect(foundBand.name).to.equal(dt.name);
 
-    // Update a todo
+    // Update a band
     dt.name = 'Dream Theater';
     const updatedDt = await bandRepository.update(dt);
     const updatedDtInDb = await bandRepository.findById(dt.id);
@@ -55,6 +55,12 @@ describe('Integration test: Simple Repository', () => {
       .whereEqualTo(a => a.extra.website, 'www.dreamtheater.net')
       .find();
     expect(byWebsite[0].id).to.equal('dream-theater');
+
+    // Find one band matching some criteria
+    const byWebsiteOne = await bandRepository
+      .whereEqualTo(a => a.name, 'Dream Theater')
+      .findOne();
+    expect(byWebsiteOne.id).to.equal('dream-theater');
 
     // Should be able to run transactions
     await bandRepository.runTransaction(async tran => {

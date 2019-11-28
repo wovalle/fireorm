@@ -14,26 +14,28 @@ import {
 import {
   getMetadataStorage,
   CollectionMetadata,
-  SubCollectionMetadata,
+  MetadataStorageConfig,
 } from './MetadataStorage';
 
 import { BaseRepository } from './BaseRepository';
 import QueryBuilder from './QueryBuilder';
+import { ValidationError } from 'class-validator';
 
 export abstract class AbstractFirestoreRepository<T extends IEntity>
   extends BaseRepository
   implements IQueryBuilder<T>, IQueryExecutor<T> {
-  protected readonly subColMetadata: SubCollectionMetadata[];
+  protected readonly subColMetadata: CollectionMetadata[];
   protected readonly colMetadata: CollectionMetadata;
   protected readonly collectionType: FirestoreCollectionType;
   protected readonly colName: string;
-  protected readonly docId: string;
-  protected readonly subColName: string;
+  protected readonly config: MetadataStorageConfig;
+
+  // TODO: Make this private when transactions have been fixed
+  public readonly collectionPath: string;
 
   constructor(
     nameOrConstructor: string | Function,
-    docId?: string,
-    subColName?: string
+    collectionPath?: string,
   ) {
     super();
 
@@ -41,22 +43,18 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
       typeof nameOrConstructor === 'function'
         ? nameOrConstructor.name
         : nameOrConstructor;
+    
+    const { getCollection, getSubCollection, getSubCollectionsFromParent, config } = getMetadataStorage();
 
-    this.docId = docId;
-    this.subColName = subColName;
-
-    const { getCollection, getSubCollectionsFromParent } = getMetadataStorage();
-    this.colMetadata = getCollection(nameOrConstructor);
+    this.colMetadata = getSubCollection(this.colName) || getCollection(this.colName);
+    this.config = config;
+    this.collectionPath = collectionPath || this.colName;
 
     if (!this.colMetadata) {
       throw new Error(`There is no metadata stored for "${this.colName}"`);
     }
 
     this.subColMetadata = getSubCollectionsFromParent(this.colMetadata.entity);
-
-    this.collectionType = this.docId
-      ? FirestoreCollectionType.subcollection
-      : FirestoreCollectionType.collection;
   }
 
   protected toSerializableObject = (obj: T): Object => {
@@ -75,6 +73,9 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
       } else if (obj[key].constructor.name === 'GeoPoint') {
         const { latitude, longitude } = obj[key];
         obj[key] = { latitude, longitude };
+      } else if (obj[key].constructor.name === 'DocumentReference') {
+        const { id, path } = obj[key];
+        obj[key] = { id, path };
       } else if (typeof obj[key] === 'object') {
         this.transformFirestoreTypes(obj[key]);
       }
@@ -84,14 +85,13 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
 
   protected initializeSubCollections = (entity: T) => {
     // Requiring here to prevent circular dependency
-    const { GetRepository } = require('./helpers');
+    const { getRepository } = require('./helpers');
 
     this.subColMetadata.forEach(subCol => {
       Object.assign(entity, {
-        [subCol.propertyKey]: GetRepository(
-          subCol.entity as any,
-          entity.id,
-          subCol.name
+        [subCol.propertyKey]: getRepository(
+          subCol.entity,
+          `${this.collectionPath}/${entity.id}/${subCol.name}`
         ),
       });
     });
@@ -101,14 +101,15 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
     if (!doc.exists) {
       return null;
     }
+    
     // tslint:disable-next-line:no-unnecessary-type-assertion
     const entity = plainToClass(
-      this.colMetadata.entity as any,
+      this.colMetadata.entity,
       this.transformFirestoreTypes(doc.data() as T)
     ) as T;
-    if (this.collectionType === FirestoreCollectionType.collection) {
-      this.initializeSubCollections(entity);
-    }
+
+    this.initializeSubCollections(entity);
+
     return entity;
   };
 
@@ -281,6 +282,50 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
   }
 
   /**
+   * Execute the query to find at least one document matching all
+   * filters (if specified)
+   *
+   * @returns {Promise<T | null>} One document that matched the filters
+   * (if specified), or null if none exists.
+   *
+   * @memberof AbstractFirestoreRepository
+   */
+  findOne(): Promise<T | null> {
+    return new QueryBuilder<T>(this).findOne();
+  }
+
+  /**
+   * Uses class-validator to validate an entity using decorators set in the collection class
+   * 
+   * @param item class or object representing an entity
+   * @returns {Promise<ValidationError[]>} An array of class-validator errors
+   */
+  async validate(item: T): Promise<ValidationError[]> {
+    try {
+      const classValidator = await import('class-validator');
+      const { getSubCollection, getCollection } = getMetadataStorage();
+      const { entity: Entity } = getSubCollection(this.colName) || getCollection(this.colName);
+  
+      /**
+       * Instantiate plain objects into an entity class
+       */
+      const entity = item instanceof Entity
+          ? item
+          : Object.assign(new Entity(), item);
+  
+      return classValidator.validate(entity);
+    } catch (error) {
+      if (error.code === 'MODULE_NOT_FOUND') {
+        throw new Error(
+          'It looks like class-validator is not installed. Please run `npm i -S class-validator` to fix this error, or initialize FireORM with `validateModels: false` to disable validation.'
+        );
+      }
+      
+      throw error;
+    }
+  }
+
+  /**
    * Takes all the queries stored by QueryBuilder and executes them.
    * Must be implemented by base repositores
    *
@@ -298,6 +343,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
   abstract execute(
     queries: IFireOrmQueryLine[],
     limitVal?: number,
-    orderByObj?: IOrderByParams
+    orderByObj?: IOrderByParams,
+    single?: boolean
   ): Promise<T[]>;
 }

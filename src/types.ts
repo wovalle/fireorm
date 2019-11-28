@@ -1,4 +1,5 @@
-import { OrderByDirection } from '@google-cloud/firestore';
+import { OrderByDirection, DocumentReference } from '@google-cloud/firestore';
+import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
@@ -18,7 +19,12 @@ export type WithOptionalId<T extends { id: unknown }> = Pick<
 > &
   Partial<Pick<T, 'id'>>;
 
-export type IFirestoreVal = string | number | Date | Boolean;
+export type IFirestoreVal =
+  | string
+  | number
+  | Date
+  | Boolean
+  | DocumentReference;
 
 export enum FirestoreOperators {
   equal = '==',
@@ -70,18 +76,19 @@ export interface IQueryBuilder<T extends IEntity> {
   orderByDescending(prop: IWherePropParam<T>): IQueryBuilder<T>;
   limit(limitVal: number): IQueryBuilder<T>;
   find(): Promise<T[]>;
+  findOne(): Promise<T | null>;
 }
 
 export interface IQueryExecutor<T> {
   execute(
     queries: IFireOrmQueryLine[],
     limitVal?: number,
-    orderByObj?: IOrderByParams
+    orderByObj?: IOrderByParams,
+    single?: boolean
   ): Promise<T[]>;
 }
 
-export type ISubCollection<T extends IEntity> = IRepository<T> &
-  IQueryBuilder<T>;
+export type ISubCollection<T extends IEntity> = BaseFirestoreRepository<T>;
 
 export interface IEntity {
   id: string;

@@ -1,6 +1,5 @@
-import uuid from 'uuid';
 import * as admin from 'firebase-admin';
-import { Initialize } from '../src';
+import { initialize } from '../src';
 
 const serviceAccount = {
   projectId: process.env.FIRESTORE_PROJECT_ID,
@@ -19,7 +18,10 @@ admin.initializeApp({
 });
 
 const firestore = admin.firestore();
-Initialize(firestore);
+// To understand this, see 5-document-references.spec.ts
+(global as any).firestoreRef = firestore;
+
+initialize(firestore);
 
 after(async () => {
   console.info('Deleting collections', uniqueCollections);
@@ -28,14 +30,20 @@ after(async () => {
 
   for (const uc of uniqueCollections) {
     const docs = await firestore.collection(uc).listDocuments();
-    docs.forEach(d => batch.delete(d));
+
+    for (const doc of docs) {
+      const albums = await doc.collection('albums').listDocuments();
+
+      albums.forEach(a => batch.delete(a));
+      batch.delete(doc);
+    }
   }
 
   await batch.commit();
 });
 
 export const getUniqueColName = (col: string) => {
-  const unique = `${col}#${uuid.v4()}`;
+  const unique = `${col}#${new Date().getTime()}`;
   uniqueCollections.push(unique);
   console.log(`Now using collection: ${unique}`);
   return unique;

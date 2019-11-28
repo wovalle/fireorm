@@ -1,13 +1,12 @@
-import Collection from './Collection';
 import { expect } from 'chai';
-import { MetadataStorage, Initialize } from '../MetadataStorage';
+import { initialize, getStore, clearMetadataStorage } from '../MetadataStorage';
+import { Collection } from './Collection';
 
 describe('CollectionDecorator', () => {
-  const store = { metadataStorage: new MetadataStorage() };
-
+  const store = getStore();
   beforeEach(() => {
-    store.metadataStorage = new MetadataStorage();
-    Initialize(null, store);
+    clearMetadataStorage();
+    initialize(null);
   });
 
   it('should register collections', () => {

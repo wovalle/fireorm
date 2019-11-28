@@ -1,32 +1,9 @@
-import BaseFirestoreRepository from './BaseFirestoreRepository';
-import { getFixture, Album, Coordinates } from '../test/fixture';
 import { expect } from 'chai';
-import { Collection, SubCollection, ISubCollection, Initialize } from '.';
-import { MetadataStorage } from './MetadataStorage';
 const MockFirebase = require('mock-cloud-firestore');
-
-const store = { metadataStorage: new MetadataStorage() };
-Initialize(null, store);
-
-@Collection('bands')
-class Band {
-  id: string;
-  name: string;
-  formationYear: number;
-  lastShow: Date;
-  genres: Array<string>;
-
-  @SubCollection(Album)
-  albums?: ISubCollection<Album>;
-
-  getLastShowYear() {
-    return this.lastShow.getFullYear();
-  }
-
-  getPopularGenre() {
-    return this.genres[0];
-  }
-}
+import { BaseFirestoreRepository } from './BaseFirestoreRepository';
+import { getFixture, Album } from '../test/fixture';
+import { initialize, MetadataStorageConfig, getMetadataStorage } from './MetadataStorage';
+import { Band } from '../test/BandCollection';
 
 // Just a test type to prevent using any other method than
 // runTransaction in this file
@@ -39,6 +16,8 @@ class BandRepository extends BaseFirestoreRepository<Band> {}
 
 describe('BaseFirestoreTransactionRepository', () => {
   let bandRepository: TestTransactionRepository<Band> = null;
+  let firestore;
+  let defaultMetadataConfig: MetadataStorageConfig;
 
   beforeEach(() => {
     const fixture = Object.assign({}, getFixture());
@@ -46,8 +25,12 @@ describe('BaseFirestoreTransactionRepository', () => {
       isNaiveSnapshotListenerEnabled: false,
     });
 
-    const firestore = firebase.firestore();
-    Initialize(firestore, store);
+    firestore = firebase.firestore();
+    initialize(firestore, defaultMetadataConfig);
+
+    // Save the default config to reset any changes made in tests
+    defaultMetadataConfig = getMetadataStorage().config;
+
     bandRepository = new BandRepository('bands');
   });
 
@@ -111,6 +94,45 @@ describe('BaseFirestoreTransactionRepository', () => {
         expect(band).to.be.instanceOf(Band);
         expect(band.getPopularGenre()).to.equal('progressive-rock');
       });
+    });
+
+    it('must not validate if the validate config property is false', async () => {
+      initialize(firestore, { validateModels: false });
+
+      await bandRepository.runTransaction(async tran => {
+        const entity = new Band();
+        entity.contactEmail = 'Not an email';
+        const band = await tran.create(entity);
+        expect(band.contactEmail).to.equal('Not an email');
+      })
+    });
+
+    it('must fail validation if an invalid class is given', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const entity = new Band();
+  
+        entity.contactEmail = 'Not an email';
+
+        try {
+          await tran.create(entity);
+        } catch (error) {
+          expect(error[0].constraints.isEmail).to.equal('Invalid email!');
+        }
+      })
+    });
+
+    it('must fail validation if an invalid object is given', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const entity: Partial<Band> = {
+          contactEmail: 'Not an email',
+        }
+
+        try {
+          await tran.create(entity as Band);
+        } catch (error) {
+          expect(error[0].constraints.isEmail).to.equal('Invalid email!');
+        }
+      })
     });
 
     it('must create items when id is passed', async () => {
@@ -179,6 +201,48 @@ describe('BaseFirestoreTransactionRepository', () => {
         const updatedBand = await tran.findById('porcupine-tree');
         expect(band.name).to.equal(updatedBand.name);
       });
+    });
+
+    it('must not validate if the validate config property is false', async () => {
+      initialize(firestore, { validateModels: false });
+
+      await bandRepository.runTransaction(async tran => {
+        const band = await tran.findById('porcupine-tree');
+        band.contactEmail = 'Not an email';
+        await tran.update(band);
+        const updatedBand = await tran.findById('porcupine-tree');
+        expect(updatedBand.contactEmail).to.equal('Not an email');
+      })
+    });
+
+    it('must fail validation if an invalid class is given', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const band = await tran.findById('porcupine-tree');
+  
+        band.contactEmail = 'Not an email';
+
+        try {
+          await tran.update(band);
+        } catch (error) {
+          expect(error[0].constraints.isEmail).to.equal('Invalid email!');
+        }
+      })
+    });
+
+    it('must fail validation if an invalid object is given', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const band = await tran.findById('porcupine-tree');
+        const updatedBand: Partial<Band> = {
+          ...band,
+          contactEmail: 'Not an email',
+        }
+
+        try {
+          await tran.update(band);
+        } catch (error) {
+          expect(error[0].constraints.isEmail).to.equal('Invalid email!');
+        }
+      })
     });
 
     it('must throw if item is not found');
@@ -313,6 +377,15 @@ describe('BaseFirestoreTransactionRepository', () => {
       });
     });
 
+    it('should initialize nested subcollections', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const pt = await tran.findById('red-hot-chili-peppers');
+        const album = await pt.albums.findById('stadium-arcadium');
+  
+        expect(album.images).to.be.instanceOf(BaseFirestoreRepository);
+      })
+    });
+
     it('should be able to execute operations in the subcollection', async () => {
       await bandRepository.runTransaction(async tran => {
         const band = await tran.findById('red-hot-chili-peppers');
@@ -354,6 +427,49 @@ describe('BaseFirestoreTransactionRepository', () => {
       });
     });
 
+    it('should initialize nested subcollections on create', async () => {
+      const band = new Band();
+      band.id = '30-seconds-to-mars';
+      band.name = '30 Seconds To Mars';
+      band.formationYear = 1998;
+      band.genres = ['alternative-rock'];
+
+      const firstAlbum = new Album();
+      firstAlbum.id = '30-seconds-to-mars';
+      firstAlbum.name = '30 Seconds to Mars';
+      firstAlbum.releaseDate = new Date('2002-07-22');
+
+      await bandRepository.runTransaction(async tran => {
+        await tran.create(band);
+        const album = await band.albums.create(firstAlbum);
+
+        expect(album.images).to.be.instanceOf(BaseFirestoreRepository);
+      })
+    });
+
+    it('should be able to validate subcollections on create', async () => {
+      const band = new Band();
+      band.id = '30-seconds-to-mars';
+      band.name = '30 Seconds To Mars';
+      band.formationYear = 1998;
+      band.genres = ['alternative-rock'];
+
+      const firstAlbum = new Album();
+      firstAlbum.id = 'invalid-album-name';
+      firstAlbum.name = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+      firstAlbum.releaseDate = new Date('2002-07-22');
+
+      await bandRepository.runTransaction(async tran => {
+        await tran.create(band);
+
+        try {
+          await band.albums.create(firstAlbum);
+        } catch (error) {
+          expect(error[0].constraints.length).to.equal('Name is too long')
+        }
+      });
+    });
+
     it('should be able to update subcollections', async () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
@@ -364,6 +480,21 @@ describe('BaseFirestoreTransactionRepository', () => {
 
         const updatedAlbum = await pt.albums.findById('fear-blank-planet');
         expect(updatedAlbum.comment).to.eql('Anesthethize is top 3 IMHO');
+      });
+    });
+
+    it('should be able to validate subcollections on update', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const pt = await tran.findById('porcupine-tree');
+        const album = await pt.albums.findById('fear-blank-planet');
+        
+        album.name = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+
+        try {
+          await pt.albums.update(album);
+        } catch (error) {
+          expect(error[0].constraints.length).to.equal('Name is too long');
+        }
       });
     });
 

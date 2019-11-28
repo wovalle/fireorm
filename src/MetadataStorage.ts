@@ -1,34 +1,39 @@
 import { Firestore } from '@google-cloud/firestore';
 import { BaseRepository } from './BaseRepository';
-let store: IMetadataStore = null;
+import { InstanstiableIEntity } from './types';
 
 export interface IMetadataStore {
   metadataStorage: MetadataStorage;
 }
 
-const globalStore = global as any;
-
-export interface CollectionMetadata {
-  entity: Function;
-  name: string;
+export function getStore(): IMetadataStore {
+  return global as any;
 }
 
-export interface SubCollectionMetadata {
-  parentEntity: Function;
+export interface CollectionMetadata {
   name: string;
-  entity: Function;
-  propertyKey: string;
+  entity: InstanstiableIEntity;
+  parentEntity?: Function;
+  propertyKey?: string;
 }
 
 export interface RepositoryMetadata {
   target: Function;
-  entity: Function;
+  entity: InstanstiableIEntity;
+}
+
+export interface MetadataStorageConfig {
+  validateModels?: boolean;
 }
 
 export class MetadataStorage {
   readonly collections: Array<CollectionMetadata> = [];
-  readonly subCollections: Array<SubCollectionMetadata> = [];
+  readonly subCollections: Array<CollectionMetadata> = [];
   readonly repositories: Map<unknown, RepositoryMetadata> = new Map();
+
+  public config: MetadataStorageConfig = {
+    validateModels: true,
+  };
 
   public getCollection = (param: string | Function) => {
     if (typeof param === 'string') {
@@ -50,14 +55,14 @@ export class MetadataStorage {
 
   public getSubCollection = (
     param: string | Function
-  ): SubCollectionMetadata => {
+  ): CollectionMetadata => {
     if (typeof param === 'string') {
       return this.subCollections.find(c => c.name === param);
     }
     return this.subCollections.find(c => c.entity === param);
   };
 
-  public setSubCollection = (subCol: SubCollectionMetadata) => {
+  public setSubCollection = (subCol: CollectionMetadata) => {
     this.subCollections.push(subCol);
   };
 
@@ -86,25 +91,48 @@ export class MetadataStorage {
   public firestoreRef: Firestore = null;
 }
 
+/**
+ * Return exisiting metadataStorage, otherwise create if not present
+ */
 export const getMetadataStorage = (): MetadataStorage => {
-  if (!store) {
-    throw new Error(
-      'Application has not been initialized. Call Initialize() method'
-    );
+  const store = getStore();
+
+  if (!store.metadataStorage) {
+    initializeMetadataStorage();
   }
 
   return store.metadataStorage;
 };
 
-export const Initialize = (
-  firestore: Firestore,
-  metadataStore: IMetadataStore = globalStore
-): void => {
-  store = metadataStore;
+function initializeMetadataStorage() {
+  const store = getStore();
 
   if (!store.metadataStorage) {
     store.metadataStorage = new MetadataStorage();
   }
+}
 
-  store.metadataStorage.firestoreRef = firestore;
+/**
+ * Used for testing to reset metadataStore to clean state
+ */
+export function clearMetadataStorage() {
+  const store = getStore();
+  store.metadataStorage = null;
+}
+
+export const initialize = (firestore: Firestore, config?: MetadataStorageConfig): void => {
+  initializeMetadataStorage();
+
+  const { metadataStorage } = getStore();
+
+  metadataStorage.firestoreRef = firestore;
+  metadataStorage.config = {
+    ...metadataStorage.config,
+    ...config
+  };
 };
+
+/**
+ * @deprecated Use initialize. This will be removed in a future version.
+ */
+export const Initialize = initialize;

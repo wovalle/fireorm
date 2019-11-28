@@ -46,6 +46,36 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "skneko",
+      "name": "SaltyKawaiiNeko",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/13376606?v=4",
+      "profile": "http://skneko.moe/",
+      "contributions": [
+        "code",
+        "ideas"
+      ]
+    },
+    {
+      "login": "z-hirschtritt",
+      "name": "z-hirschtritt",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/35265735?v=4",
+      "profile": "https://github.com/z-hirschtritt",
+      "contributions": [
+        "code",
+        "ideas"
+      ]
+    },
+    {
+      "login": "joemckie",
+      "name": "Joe McKie",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/4980618?v=4",
+      "profile": "http://joemck.ie/",
+      "contributions": [
+        "code",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,

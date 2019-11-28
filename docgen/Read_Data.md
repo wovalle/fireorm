@@ -11,7 +11,7 @@ Fireorm [Repositories](CORE_CONCEPTS.md#FireormRepositories) have the method [fi
 Let's imagine we have a Document in our Bands Collection in firestore with an id `red-hot-chilli-peppers`. To retrieve it we only have to use the handy [findById](Classes/BaseFirestoreRepository.md#FindById) method in our repository!
 
 ```typescript
-import { Collection, GetRepository } from 'fireorm';
+import { Collection, getRepository } from 'fireorm';
 
 @Collection()
 class Band {
@@ -21,7 +21,7 @@ class Band {
   genres: Array<string>;
 }
 
-const bandRepository = GetRepository(Band);
+const bandRepository = getRepository(Band);
 
 const band = await bandRepository.findById('red-hot-chilli-peppers');
 ```

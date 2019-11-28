@@ -45,10 +45,12 @@
     "@commitlint/travis-cli": "^8.2.0",
     "@google-cloud/firestore": "^2.4.0",
     "@types/chai": "^4.1.7",
+    "@types/chai-as-promised": "^7.1.2",
     "@types/mocha": "^5.2.7",
     "@types/pluralize": "^0.0.29",
     "@types/uuid": "^3.4.5",
     "chai": "^4.2.0",
+    "class-validator": "^0.10.2",
     "docsify-cli": "^4.3.0",
     "dotenv": "^8.1.0",
     "firebase-admin": "^8.1.0",
@@ -63,8 +65,7 @@
     "tslint": "^5.12.0",
     "typedoc": "^0.15.0",
     "typedoc-plugin-markdown": "^2.2.7",
-    "typescript": "^3.2.2",
-    "uuid": "^3.3.2"
+    "typescript": "^3.2.2"
   },
   "peerDependencies": {
     "reflect-metadata": "^0.1.13"

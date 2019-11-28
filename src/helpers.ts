@@ -1,90 +1,86 @@
 import { getMetadataStorage } from './MetadataStorage';
-import BaseFirestoreRepository from './BaseFirestoreRepository';
+import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { IEntity } from './types';
 
-export function GetRepository<T extends IEntity>(
+export function getRepository<T extends IEntity>(
   entity: { new (): T },
-  docId?: string,
-  subColName?: string
+  documentPath?: string,
 ) {
-  return _getRepository(entity, 'default', docId, subColName);
+  return _getRepository(entity, 'default', documentPath);
 }
 
-export function GetCustomRepository<T extends IEntity>(
+/**
+ * @deprecated Use getRepository. This will be removed in a future version.
+ */
+export const GetRepository = getRepository;
+
+export function getCustomRepository<T extends IEntity>(
   entity: { new (): T },
-  docId?: string,
-  subColName?: string
+  documentPath?: string,
 ) {
-  return _getRepository(entity, 'custom', docId, subColName);
+  return _getRepository(entity, 'custom', documentPath);
 }
 
-export function GetBaseRepository<T extends IEntity>(
+/**
+ * @deprecated Use getCustomRepository. This will be removed in a future version.
+ */
+export const GetCustomRepository = getCustomRepository;
+
+export function getBaseRepository<T extends IEntity>(
   entity: { new (): T },
-  docId?: string,
-  subColName?: string
+  documentPath?: string,
 ) {
-  return _getRepository(entity, 'base', docId, subColName);
+  return _getRepository(entity, 'base', documentPath);
 }
+
+/**
+ * @deprecated Use getBaseRepository. This will be removed in a future version.
+ */
+export const GetBaseRepository = getBaseRepository;
 
 type RepositoryType = 'default' | 'base' | 'custom';
 
 function _getRepository<T extends IEntity>(
   entity: { new (): T },
   repositoryType: RepositoryType,
-  docId?: string,
-  subColName?: string
+  documentPath: string,
 ): BaseFirestoreRepository<T> {
-  const {
-    firestoreRef,
-    getRepository,
-    getSubCollection,
-    getCollection,
-  } = getMetadataStorage();
+  const metadataStorage = getMetadataStorage();
 
-  if (!firestoreRef) {
+  if (!metadataStorage.firestoreRef) {
     throw new Error('Firestore must be initialized first');
   }
 
-  const repository = getRepository(entity);
+  const repository = metadataStorage.getRepository(entity);
 
   if (repositoryType === 'custom' && !repository) {
     throw new Error(`'${entity.name}' does not have a custom repository.`);
   }
 
-  let collectionName = null;
+  const collection = documentPath
+    ? metadataStorage.getSubCollection(entity)
+    : metadataStorage.getCollection(entity);
 
-  // If docId exists, this is a subcollection. Get parent collection name
-  if (docId) {
-    const subCollection = getSubCollection(entity);
+  if (!collection) {
+    throw new Error(`'${entity.name}' is not a valid collection`);
+  }
 
-    if (!subCollection) {
-      throw new Error(`'${entity.name}' is not a valid subcollection.`);
-    }
-
-    const parentCollection = getCollection(subCollection.parentEntity);
+  if (collection.parentEntity) {
+    const parentCollection = metadataStorage.getCollection(collection.parentEntity);
 
     if (!parentCollection) {
       throw new Error(
-        `'${entity.name}' does not have a valid parent collection.`
+        `'${entity.name}' does not have a valid parent collection.`	
       );
     }
-    collectionName = parentCollection.name;
-  } else {
-    const collection = getCollection(entity);
-
-    if (!collection) {
-      throw new Error(`'${entity.name}' is not a valid collection`);
-    }
-
-    collectionName = collection.name;
   }
 
   if (
     repositoryType === 'custom' ||
     (repositoryType === 'default' && repository)
   ) {
-    return new (repository.target as any)(collectionName, docId, subColName);
+    return new (repository.target as any)(collection.name, documentPath);
   } else {
-    return new BaseFirestoreRepository<T>(collectionName, docId, subColName);
+    return new BaseFirestoreRepository<T>(collection.name, documentPath);
   }
 }

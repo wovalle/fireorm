@@ -1,6 +1,10 @@
-import { Band, Album, getInitialData } from '../fixture';
 import {
-  GetRepository,
+  Band as BandEntity,
+  Album as AlbumEntity,
+  getInitialData,
+} from '../fixture';
+import {
+  getRepository,
   Collection,
   SubCollection,
   ISubCollection,
@@ -9,13 +13,15 @@ import { getUniqueColName } from '../setup';
 import { expect } from 'chai';
 
 describe('Integration test: SubCollections', () => {
+  class Album extends AlbumEntity {}
+
   @Collection(getUniqueColName('band-with-subcollections'))
-  class FullBand extends Band {
+  class FullBand extends BandEntity {
     @SubCollection(Album)
     albums: ISubCollection<Album>;
   }
 
-  const fullBandRepository = GetRepository(FullBand);
+  const fullBandRepository = getRepository(FullBand);
 
   before(async () => {
     const seed = getInitialData().map(({ albums, ...band }) => ({

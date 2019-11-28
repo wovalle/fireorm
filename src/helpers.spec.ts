@@ -1,22 +1,17 @@
+import { Firestore } from '@google-cloud/firestore';
 import { expect } from 'chai';
 
-import CustomRepository from './Decorators/CustomRepository';
-import Collection from './Decorators/Collection';
-
-import BaseFirestoreRepository from './BaseFirestoreRepository';
-import { GetRepository, GetBaseRepository } from './helpers';
-import { Initialize, MetadataStorage } from './MetadataStorage';
-import { Firestore } from '@google-cloud/firestore';
+import { Collection, CustomRepository } from './Decorators';
+import { BaseFirestoreRepository } from './BaseFirestoreRepository';
+import { getRepository, getBaseRepository } from './helpers';
+import { initialize } from './MetadataStorage';
 
 describe('Helpers', () => {
-  let store = null;
-
   beforeEach(() => {
-    store = { metadataStorage: new MetadataStorage() };
-    Initialize(new Firestore(), store);
+    initialize(new Firestore());
   });
 
-  it('GetRepository: should get custom repositories', () => {
+  it('getRepository: should get custom repositories', () => {
     @Collection()
     class Entity {
       id: string;
@@ -30,7 +25,7 @@ describe('Helpers', () => {
     }
 
     //TODO: I don't know why store is undefined here, check it out
-    const rep = GetRepository(Entity) as EntityRepo;
+    const rep = getRepository(Entity) as EntityRepo;
     expect(rep).to.be.instanceOf(BaseFirestoreRepository);
     expect(rep.meaningOfLife()).to.eql(42);
   });
@@ -41,7 +36,7 @@ describe('Helpers', () => {
       id: string;
     }
 
-    const rep = GetRepository(Entity);
+    const rep = getRepository(Entity);
     expect(rep).to.be.instanceOf(BaseFirestoreRepository);
   });
 
@@ -50,7 +45,7 @@ describe('Helpers', () => {
       id: string;
     }
 
-    expect(() => GetRepository(Entity)).to.throw(
+    expect(() => getRepository(Entity)).to.throw(
       "'Entity' is not a valid collection"
     );
   });
@@ -68,7 +63,7 @@ describe('Helpers', () => {
       }
     }
 
-    const rep = GetBaseRepository(Entity);
+    const rep = getBaseRepository(Entity);
     expect(rep).to.be.instanceOf(BaseFirestoreRepository);
     expect(rep['meaningOfLife']).to.be.undefined;
   });
@@ -78,7 +73,7 @@ describe('Helpers', () => {
       id: string;
     }
 
-    expect(() => GetRepository(Entity)).to.throw(
+    expect(() => getRepository(Entity)).to.throw(
       "'Entity' is not a valid collection"
     );
   });

@@ -61,10 +61,10 @@ One of my goals when developing this library was create a way to use the Reposit
 
 > In general, repositories are classes or components that encapsulate the logic required to access data sources. They centralize common data access functionality, providing better maintainability and decoupling the infrastructure or technology used to access databases from the domain model layer ([source](https://docs.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/infrastructure-persistence-layer-design)).
 
-Fireorm’s Repositories provide the necessary methods to create, retrieve, update and delete documents from our Firestore collections. To create a repository from a collection we can just call fireorm’s [GetRepository](Globals.md#GetRepository) method.
+Fireorm’s Repositories provide the necessary methods to create, retrieve, update and delete documents from our Firestore collections. To create a repository from a collection we can just call fireorm’s [getRepository](Globals.md#getRepository) method.
 
 ```typescript
-import { Collection, GetRepository } from 'fireorm';
+import { Collection, getRepository } from 'fireorm';
 
 @Collection()
 class Band {
@@ -74,7 +74,7 @@ class Band {
   genres: Array<string>;
 }
 
-const bandRepository = GetRepository(Band);
+const bandRepository = getRepository(Band);
 ```
 
 The variable `bandRepository` contains all the methods to interact with our `Band`. You can [retrieve](READ_DATA.md) [create](MANAGE_DATA.md#create), [update](MANAGE_DATA.md#update), [delete](MANAGE_DATA#delete) and do [complex queries](READ_DATA.md#ComplexQueries) over our Bands collection!

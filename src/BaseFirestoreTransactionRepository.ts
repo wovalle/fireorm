@@ -21,9 +21,9 @@ export class TransactionRepository<T extends IEntity>
   constructor(
     private collection: CollectionReference,
     private transaction: Transaction,
-    entityConstructor: Function
+    colName: string
   ) {
-    super(entityConstructor);
+    super(colName);
   }
 
   execute(queries: IFireOrmQueryLine[]): Promise<T[]> {
@@ -41,12 +41,18 @@ export class TransactionRepository<T extends IEntity>
   }
 
   async create(item: WithOptionalId<T>): Promise<T> {
+    if (this.config.validateModels) {
+      const errors = await this.validate(item as T);
+  
+      if (errors.length) {
+        throw errors;
+      }
+    }
+
     if (item.id) {
       const found = await this.findById(item.id);
       if (found) {
-        return Promise.reject(
-          new Error(`A document with id ${item.id} already exists.`)
-        );
+        throw new Error(`A document with id ${item.id} already exists.`);
       }
     }
 
@@ -58,16 +64,23 @@ export class TransactionRepository<T extends IEntity>
 
     await this.transaction.set(doc, this.toSerializableObject(item as T));
 
-    if (this.collectionType === FirestoreCollectionType.collection) {
-      this.initializeSubCollections(item as T);
-    }
+    this.initializeSubCollections(item as T);
 
     return item as T;
   }
 
   async update(item: T): Promise<T> {
+    if (this.config.validateModels) {
+      const errors = await this.validate(item);
+  
+      if (errors.length) {
+        throw errors;
+      }
+    }
+
     const query = this.collection.doc(item.id);
     await this.transaction.update(query, this.toSerializableObject(item));
+
     return item;
   }
 

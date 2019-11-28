@@ -5,7 +5,6 @@ import { CollectionReference, WhereFilterOp } from '@google-cloud/firestore';
 
 import {
   IRepository,
-  FirestoreCollectionType,
   IFireOrmQueryLine,
   IOrderByParams,
   IEntity,
@@ -16,33 +15,24 @@ import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
 import { TransactionRepository } from './BaseFirestoreTransactionRepository';
 import { FirestoreBatchRepository } from './BatchFirestoreRepository';
 
-export default class BaseFirestoreRepository<T extends IEntity>
+export class BaseFirestoreRepository<T extends IEntity>
   extends AbstractFirestoreRepository<T>
   implements IRepository<T> {
   private readonly firestoreColRef: CollectionReference;
 
-  constructor(colName: string);
-  constructor(colName: string, docId: string, subColName: string);
+  constructor(colName: string, collectionPath?: string) {
+    super(colName, collectionPath);
 
-  constructor(colName: string, docId?: string, subColName?: string) {
-    super(colName, docId, subColName);
     const { firestoreRef } = getMetadataStorage();
 
     if (!firestoreRef) {
       throw new Error('Firestore must be initialized first');
     }
 
-    if (this.docId) {
-      this.firestoreColRef = firestoreRef
-        .collection(this.colName)
-        .doc(this.docId)
-        .collection(this.subColName);
-    } else {
-      this.firestoreColRef = firestoreRef.collection(this.colName);
-    }
+    this.firestoreColRef = firestoreRef.collection(collectionPath || colName);
   }
 
-  findById(id: string): Promise<T> {
+  async findById(id: string): Promise<T> {
     return this.firestoreColRef
       .doc(id)
       .get()
@@ -50,12 +40,18 @@ export default class BaseFirestoreRepository<T extends IEntity>
   }
 
   async create(item: T): Promise<T> {
+    if (this.config.validateModels) {
+      const errors = await this.validate(item);
+
+      if (errors.length) {
+        throw errors;
+      }
+    }
+
     if (item.id) {
       const found = await this.findById(item.id);
       if (found) {
-        return Promise.reject(
-          new Error(`A document with id ${item.id} already exists.`)
-        );
+        throw new Error(`A document with id ${item.id} already exists.`);
       }
     }
 
@@ -69,14 +65,20 @@ export default class BaseFirestoreRepository<T extends IEntity>
 
     await doc.set(this.toSerializableObject(item));
 
-    if (this.collectionType === FirestoreCollectionType.collection) {
-      this.initializeSubCollections(item);
-    }
+    this.initializeSubCollections(item);
 
     return item;
   }
 
   async update(item: T): Promise<T> {
+    if (this.config.validateModels) {
+      const errors = await this.validate(item);
+  
+      if (errors.length) {
+        throw errors;
+      }
+    }
+
     // TODO: handle errors
     await this.firestoreColRef
       .doc(item.id)
@@ -89,13 +91,15 @@ export default class BaseFirestoreRepository<T extends IEntity>
     await this.firestoreColRef.doc(id).delete();
   }
 
-  runTransaction(executor: (tran: TransactionRepository<T>) => Promise<void>) {
-    return this.firestoreColRef.firestore.runTransaction(t => {
+  async runTransaction(
+    executor: (tran: TransactionRepository<T>) => Promise<void>
+  ) {
+    return this.firestoreColRef.firestore.runTransaction(async t => {
       return executor(
         new TransactionRepository<T>(
           this.firestoreColRef,
           t,
-          this.colMetadata.entity
+          this.colName
         )
       );
     });
@@ -108,10 +112,11 @@ export default class BaseFirestoreRepository<T extends IEntity>
     );
   }
 
-  execute(
+  async execute(
     queries: Array<IFireOrmQueryLine>,
     limitVal?: number,
-    orderByObj?: IOrderByParams
+    orderByObj?: IOrderByParams,
+    single?: boolean
   ): Promise<T[]> {
     let query = queries.reduce((acc, cur) => {
       const op = cur.operator as WhereFilterOp;
@@ -122,9 +127,12 @@ export default class BaseFirestoreRepository<T extends IEntity>
       query = query.orderBy(orderByObj.fieldPath, orderByObj.directionStr);
     }
 
-    if (limitVal) {
+    if (single) {
+      query = query.limit(1);
+    } else if (limitVal) {
       query = query.limit(limitVal);
     }
+
     return query.get().then(this.extractTFromColSnap);
   }
 }
