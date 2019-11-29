@@ -58,10 +58,11 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
   }
 
   protected toSerializableObject = (obj: T): Object => {
+    const { ...serializedObj } = obj;
     this.subColMetadata.forEach(scm => {
-      delete obj[scm.propertyKey];
+      delete serializedObj[scm.propertyKey];
     });
-    return { ...obj };
+    return serializedObj;
   };
 
   protected transformFirestoreTypes = (obj: T): T => {
