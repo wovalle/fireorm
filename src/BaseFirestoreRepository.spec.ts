@@ -314,7 +314,7 @@ describe('BaseFirestoreRepository', () => {
       try {
         await bandRepository.update(band);
       } catch (error) {
-        expect(error[0].constraints.isEmail).to.equal('Invalid email!')
+        expect(error[0].constraints.isEmail).to.equal('Invalid email!');
       }
     });
 
@@ -704,6 +704,30 @@ describe('BaseFirestoreRepository', () => {
         expect(releaseDate).instanceOf(Date);
         expect(releaseDate.toISOString()).to.equal('2005-03-25T00:00:00.000Z');
       });
+    });
+  });
+
+  describe('fetching documents created w/o id inside object', () => {
+    let docId: string = null;
+    beforeEach(async () => {
+      const bandWithoutId = new Band();
+      docId = (await firestore.collection(bandRepository.collectionPath).add(bandWithoutId)).id;
+    });
+
+    it('Get by id - entity should contain id', async () => {
+      const band = await bandRepository.findById(docId);
+      expect(band).to.have.property('id');
+      expect(band.id).to.equal(docId);
+    });
+
+    it('Get list - all entities should contain id', async () => {
+      const bands = await bandRepository.find();
+      for (const b of bands) {
+        expect(b.id).not.to.be.undefined;
+      }
+
+      const possibleDocWithoutId = bands.find(band => band.id === docId);
+      expect(possibleDocWithoutId).not.to.be.undefined;
     });
   });
 });
