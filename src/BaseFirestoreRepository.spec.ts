@@ -282,9 +282,14 @@ describe('BaseFirestoreRepository', () => {
   describe('update', () => {
     it('must update and return updated item', async () => {
       const band = await bandRepository.findById('porcupine-tree');
+      const albums = band.albums;
       band.name = 'Steven Wilson';
       const updatedBand = await bandRepository.update(band);
       expect(band.name).to.equal(updatedBand.name);
+      expect(band.albums).to.equal(
+        albums,
+        'should not mutate other fields or relations on updated item'
+      );
     });
 
     it('must not validate if the validate config property is false', async () => {
@@ -309,7 +314,7 @@ describe('BaseFirestoreRepository', () => {
       try {
         await bandRepository.update(band);
       } catch (error) {
-        expect(error[0].constraints.isEmail).to.equal('Invalid email!')
+        expect(error[0].constraints.isEmail).to.equal('Invalid email!');
       }
     });
 
@@ -699,6 +704,30 @@ describe('BaseFirestoreRepository', () => {
         expect(releaseDate).instanceOf(Date);
         expect(releaseDate.toISOString()).to.equal('2005-03-25T00:00:00.000Z');
       });
+    });
+  });
+
+  describe('fetching documents created w/o id inside object', () => {
+    let docId: string = null;
+    beforeEach(async () => {
+      const bandWithoutId = new Band();
+      docId = (await firestore.collection(bandRepository.collectionPath).add(bandWithoutId)).id;
+    });
+
+    it('Get by id - entity should contain id', async () => {
+      const band = await bandRepository.findById(docId);
+      expect(band).to.have.property('id');
+      expect(band.id).to.equal(docId);
+    });
+
+    it('Get list - all entities should contain id', async () => {
+      const bands = await bandRepository.find();
+      for (const b of bands) {
+        expect(b.id).not.to.be.undefined;
+      }
+
+      const possibleDocWithoutId = bands.find(band => band.id === docId);
+      expect(possibleDocWithoutId).not.to.be.undefined;
     });
   });
 });

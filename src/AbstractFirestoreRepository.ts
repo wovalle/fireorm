@@ -58,10 +58,11 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
   }
 
   protected toSerializableObject = (obj: T): Object => {
+    const { ...serializedObj } = obj;
     this.subColMetadata.forEach(scm => {
-      delete obj[scm.propertyKey];
+      delete serializedObj[scm.propertyKey];
     });
-    return { ...obj };
+    return serializedObj;
   };
 
   protected transformFirestoreTypes = (obj: T): T => {
@@ -104,7 +105,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
     // tslint:disable-next-line:no-unnecessary-type-assertion
     const entity = plainToClass(
       this.colMetadata.entity,
-      this.transformFirestoreTypes(doc.data() as T)
+      {id:doc.id, ...this.transformFirestoreTypes(doc.data() as T)}
     ) as T;
 
     this.initializeSubCollections(entity);
