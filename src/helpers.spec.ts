@@ -3,9 +3,13 @@ import { expect } from 'chai';
 
 import { Collection, CustomRepository } from './Decorators';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
-import { getRepository, getBaseRepository, runTransaction } from './helpers';
+import {
+  getRepository,
+  getBaseRepository,
+  runTransaction,
+  createBatch,
+} from './helpers';
 import { initialize } from './MetadataStorage';
-import { TransactionRepository } from './BaseFirestoreTransactionRepository';
 
 describe('Helpers', () => {
   beforeEach(() => {
@@ -25,7 +29,6 @@ describe('Helpers', () => {
       }
     }
 
-    //TODO: I don't know why store is undefined here, check it out
     const rep = getRepository(Entity) as EntityRepo;
     expect(rep).to.be.instanceOf(BaseFirestoreRepository);
     expect(rep.meaningOfLife()).to.eql(42);
@@ -83,5 +86,10 @@ describe('Helpers', () => {
     runTransaction(async transaction => {
       expect(transaction.getRepository).to.be.instanceOf(Function);
     });
+  });
+
+  it('createBatch: ', () => {
+    const batch = createBatch();
+    expect(batch.getRepository).to.be.instanceOf(Function);
   });
 });

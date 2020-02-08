@@ -1,7 +1,8 @@
-import { getMetadataStorage } from './MetadataStorage';
+import { getMetadataStorage, CollectionMetadata } from './MetadataStorage';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { IEntity, Instantiable } from './types';
 import { FirestoreTransaction } from './FirestoreTransaction';
+import { FirestoreBatch } from './FirestoreBatch';
 
 export function getRepository<T extends IEntity>(
   entity: Instantiable<T>,
@@ -101,3 +102,32 @@ export const runTransaction = (
     return executor(new FirestoreTransaction(t));
   });
 };
+
+export const createBatch = () => {
+  const metadataStorage = getMetadataStorage();
+
+  if (!metadataStorage.firestoreRef) {
+    throw new Error('Firestore must be initialized first');
+  }
+
+  return new FirestoreBatch(null);
+};
+
+/**
+ * Returns a serializable object from entity<T>
+ *
+ * @template T
+ * @param {T} Entity object
+ * @param {CollectionMetadata[]} subColMetadata Subcollection
+ * metadata to remove runtime-created fields
+ * @returns {Object} Serialiable object
+ */
+export function serializeEntity<T extends IEntity>(
+  obj: T,
+  subColMetadata: CollectionMetadata[]
+): Object {
+  subColMetadata.forEach(scm => {
+    delete obj[scm.propertyKey];
+  });
+  return { ...obj };
+}

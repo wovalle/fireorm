@@ -19,6 +19,7 @@ import {
 import { BaseRepository } from './BaseRepository';
 import QueryBuilder from './QueryBuilder';
 import { ValidationError } from 'class-validator';
+import { serializeEntity } from '.';
 
 export abstract class AbstractFirestoreRepository<T extends IEntity>
   extends BaseRepository
@@ -58,11 +59,12 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
   }
 
   protected toSerializableObject = (obj: T): Object => {
-    const { ...serializedObj } = obj;
+    // TODO: investigate what's happening
+    // return serializeEntity(obj, this.subColMetadata);
     this.subColMetadata.forEach(scm => {
-      delete serializedObj[scm.propertyKey];
+      delete obj[scm.propertyKey];
     });
-    return serializedObj;
+    return { ...obj };
   };
 
   protected transformFirestoreTypes = (obj: T): T => {
@@ -103,10 +105,10 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
     }
 
     // tslint:disable-next-line:no-unnecessary-type-assertion
-    const entity = plainToClass(
-      this.colMetadata.entity,
-      {id:doc.id, ...this.transformFirestoreTypes(doc.data() as T)}
-    ) as T;
+    const entity = plainToClass(this.colMetadata.entity, {
+      id: doc.id,
+      ...this.transformFirestoreTypes(doc.data() as T),
+    }) as T;
 
     this.initializeSubCollections(entity);
 

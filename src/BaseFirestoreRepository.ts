@@ -92,7 +92,9 @@ export class BaseFirestoreRepository<T extends IEntity>
     await this.firestoreColRef.doc(id).delete();
   }
 
-  // TODO: deprecation notice
+  /**
+   * @deprecated Use runTransaction from root object. This will be removed in a future version.
+   */
   async runTransaction(
     executor: (tran: TransactionRepository<T>) => Promise<void>
   ) {
@@ -100,8 +102,9 @@ export class BaseFirestoreRepository<T extends IEntity>
     const { runTransaction } = await import('./helpers');
 
     return runTransaction(tran => {
-      const repository = tran.getRepository(this.colMetadata
-        .entity as Instantiable<T>);
+      const repository = tran.getRepository(
+        this.colMetadata.entity as Instantiable<T>
+      );
       return executor(repository);
     });
   }
@@ -109,7 +112,7 @@ export class BaseFirestoreRepository<T extends IEntity>
   createBatch() {
     return new FirestoreBatchRepository(
       this.firestoreColRef,
-      this.toSerializableObject
+      this.colMetadata.entity
     );
   }
 

@@ -1,16 +1,32 @@
 import { CollectionReference, WriteBatch } from '@google-cloud/firestore';
 import { IEntity, WithOptionalId } from './types';
+import { serializeEntity, Instantiable } from '.';
+import { getMetadataStorage, CollectionMetadata } from './MetadataStorage';
 
 // TODO: Eventually I'll abstract this class since right
 // now is tied to WriteBatch class from firestore
 export class FirestoreBatchRepository<T extends IEntity> {
   private batch: WriteBatch;
+  private serializer: (item: T) => Object;
+  private colMetadata: CollectionMetadata;
+  private subColMetadata: CollectionMetadata[];
 
   constructor(
     private collection: CollectionReference,
-    private serializer: Function
+    private entity: Instantiable<T>
   ) {
     this.batch = collection.firestore.batch();
+
+    const {
+      getCollection,
+      getSubCollection,
+      getSubCollectionsFromParent,
+    } = getMetadataStorage();
+
+    this.colMetadata = getSubCollection(entity) || getCollection(entity);
+    this.subColMetadata = getSubCollectionsFromParent(this.colMetadata.entity);
+    this.serializer = (item: T) =>
+      serializeEntity<T>(item, this.subColMetadata);
   }
 
   create = (item: WithOptionalId<T>) => {
@@ -18,7 +34,7 @@ export class FirestoreBatchRepository<T extends IEntity> {
     if (!item.id) {
       item.id = doc.id;
     }
-    const serialized = this.serializer(item);
+    const serialized = this.serializer(item as T);
     this.batch.set(doc, serialized);
   };
 

@@ -332,7 +332,7 @@ describe('BaseFirestoreRepository', () => {
       }
     });
 
-    it('must only update changed fields'); // TODO: Discuss
+    it('must only update changed fields');
     it('must throw if item is not found');
   });
 
