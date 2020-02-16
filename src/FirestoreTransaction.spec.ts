@@ -15,12 +15,12 @@ describe('FirestoreTransaction', () => {
   });
 
   describe('getRepository', () => {
-    @Collection()
-    class Entity {
-      id: string;
-    }
-
     it('should return a valid repository<T>', async () => {
+      @Collection()
+      class Entity {
+        id: string;
+      }
+
       const innerTran = {} as Transaction;
       const tran = new FirestoreTransaction(innerTran);
 

@@ -46,15 +46,19 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
     this.colMetadata =
       getSubCollection(nameOrConstructor) || getCollection(nameOrConstructor);
 
-    this.colName = this.colMetadata.name;
-
-    this.config = config;
-    this.collectionPath = collectionPath || this.colName;
-
     if (!this.colMetadata) {
-      throw new Error(`There is no metadata stored for "${this.colName}"`);
+      throw new Error(
+        `There is no metadata stored for "${
+          typeof nameOrConstructor === 'string'
+            ? nameOrConstructor
+            : nameOrConstructor.name
+        }"`
+      );
     }
 
+    this.colName = this.colMetadata.name;
+    this.config = config;
+    this.collectionPath = collectionPath || this.colName;
     this.subColMetadata = getSubCollectionsFromParent(this.colMetadata.entity);
   }
 

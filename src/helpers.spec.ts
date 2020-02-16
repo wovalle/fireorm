@@ -1,5 +1,5 @@
-import { Firestore } from '@google-cloud/firestore';
 import { expect } from 'chai';
+const MockFirebase = require('mock-cloud-firestore');
 
 import { Collection, CustomRepository } from './Decorators';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
@@ -13,7 +13,9 @@ import { initialize } from './MetadataStorage';
 
 describe('Helpers', () => {
   beforeEach(() => {
-    initialize(new Firestore());
+    const firebase = new MockFirebase();
+    const firestore = firebase.firestore();
+    initialize(firestore);
   });
 
   it('getRepository: should get custom repositories', () => {
