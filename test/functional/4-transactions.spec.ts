@@ -32,11 +32,9 @@ describe('Integration test: Transactions', () => {
       website: 'www.tameimpala.com',
     };
 
-    let savedBand: Band = null;
-
-    await bandRepository.runTransaction(async tran => {
+    const savedBand = await bandRepository.runTransaction<Band>(async tran => {
       await tran.create(ti);
-      savedBand = await tran.create(dt);
+      return tran.create(dt);
     });
 
     expect(savedBand.name).to.equal(dt.name);

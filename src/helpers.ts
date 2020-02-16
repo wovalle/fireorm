@@ -89,8 +89,8 @@ function _getRepository<T extends IEntity>(
   }
 }
 
-export const runTransaction = (
-  executor: (tran: FirestoreTransaction) => Promise<void>
+export const runTransaction = <T>(
+  executor: (tran: FirestoreTransaction) => Promise<T>
 ) => {
   const metadataStorage = getMetadataStorage();
 

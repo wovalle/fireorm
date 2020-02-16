@@ -95,13 +95,13 @@ export class BaseFirestoreRepository<T extends IEntity>
   /**
    * @deprecated Use runTransaction from root object. This will be removed in a future version.
    */
-  async runTransaction(
-    executor: (tran: TransactionRepository<T>) => Promise<void>
+  async runTransaction<R>(
+    executor: (tran: TransactionRepository<T>) => Promise<R>
   ) {
     // Importing here to prevent circular dependency
-    const { runTransaction } = require('./helpers');
+    const { runTransaction } = await import('./helpers');
 
-    return runTransaction(tran => {
+    return runTransaction<R>(tran => {
       const repository = tran.getRepository(
         this.colMetadata.entity as Instantiable<T>
       );
