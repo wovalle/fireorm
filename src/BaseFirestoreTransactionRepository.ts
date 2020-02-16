@@ -60,13 +60,6 @@ export class TransactionRepository<T extends IEntity>
       }
     }
 
-    if (item.id) {
-      const found = await this.findById(item.id);
-      if (found) {
-        throw new Error(`A document with id ${item.id} already exists.`);
-      }
-    }
-
     const doc = item.id
       ? this.firestoreColRef.doc(item.id)
       : this.firestoreColRef.doc();

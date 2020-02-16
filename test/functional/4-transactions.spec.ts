@@ -22,9 +22,20 @@ describe('Integration test: Transactions', () => {
       website: 'www.dreamtheater.net',
     };
 
+    // Create another band
+    const ti = new Band();
+    ti.id = 'tame-impala';
+    ti.name = 'Tame Impala';
+    ti.formationYear = 2007;
+    ti.genres = ['psychedelic-pop', 'psychedelic-rock', 'neo-psychedelia'];
+    ti.extra = {
+      website: 'www.tameimpala.com',
+    };
+
     let savedBand: Band = null;
 
     await bandRepository.runTransaction(async tran => {
+      await tran.create(ti);
       savedBand = await tran.create(dt);
     });
 
