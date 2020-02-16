@@ -15,7 +15,6 @@ import { Firestore } from '@google-cloud/firestore';
 describe('BaseFirestoreRepository', () => {
   class BandRepository extends BaseFirestoreRepository<Band> {}
   let bandRepository: BaseFirestoreRepository<Band> = null;
-  let defaultMetadataConfig;
   let firestore: Firestore = null;
 
   beforeEach(() => {
@@ -25,10 +24,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     firestore = firebase.firestore();
-    initialize(firestore, defaultMetadataConfig);
-
-    // Save the default config to reset any changes made in tests
-    defaultMetadataConfig = getMetadataStorage().config;
+    initialize(firestore);
 
     bandRepository = new BandRepository('bands');
   });
@@ -201,7 +197,19 @@ describe('BaseFirestoreRepository', () => {
       expect(band.getPopularGenre()).to.equal('progressive-rock');
     });
 
-    it('must not validate if the validate config property is false', async () => {
+    it('must not validate if the validate config by default', async () => {
+      initialize(firestore);
+
+      bandRepository = new BandRepository('bands');
+
+      const entity = new Band();
+      entity.contactEmail = 'Not an email';
+      const band = await bandRepository.create(entity);
+
+      expect(band.contactEmail).to.equal('Not an email');
+    });
+
+    it('must not validate if the validateModels: false', async () => {
       initialize(firestore, { validateModels: false });
 
       bandRepository = new BandRepository('bands');
@@ -214,6 +222,8 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must fail validation if an invalid class is given', async () => {
+      initialize(firestore, { validateModels: true });
+
       const entity = new Band();
 
       entity.contactEmail = 'Not an email';
@@ -226,6 +236,8 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must fail validation if an invalid object is given', async () => {
+      initialize(firestore, { validateModels: true });
+
       const entity: Partial<Band> = {
         contactEmail: 'Not an email',
         id: '1234',
@@ -307,6 +319,8 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must fail validation if an invalid class is given', async () => {
+      initialize(firestore, { validateModels: true });
+
       const band = await bandRepository.findById('porcupine-tree');
 
       band.contactEmail = 'Not an email';
@@ -319,14 +333,13 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must fail validation if an invalid object is given', async () => {
+      initialize(firestore, { validateModels: true });
+
       const band = await bandRepository.findById('porcupine-tree');
-      const updatedBand: Partial<Band> = {
-        ...band,
-        contactEmail: 'Not an email',
-      };
+      band.contactEmail = 'Not an Email';
 
       try {
-        await bandRepository.create(updatedBand as Band);
+        await bandRepository.update(band);
       } catch (error) {
         expect(error[0].constraints.isEmail).to.equal('Invalid email!');
       }
@@ -635,6 +648,8 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('should be able to validate subcollections on create', async () => {
+      initialize(firestore, { validateModels: true });
+
       const band = new Band();
       band.id = '30-seconds-to-mars';
       band.name = '30 Seconds To Mars';
@@ -668,6 +683,8 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('should be able to validate subcollections on update', async () => {
+      initialize(firestore, { validateModels: true });
+
       const pt = await bandRepository.findById('porcupine-tree');
       const album = await pt.albums.findById('fear-blank-planet');
 

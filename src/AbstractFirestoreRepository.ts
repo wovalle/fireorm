@@ -1,5 +1,7 @@
 import { plainToClass } from 'class-transformer';
 import { DocumentSnapshot, QuerySnapshot } from '@google-cloud/firestore';
+import { ValidationError } from 'class-validator';
+
 import {
   IEntity,
   IQueryBuilder,
@@ -19,8 +21,7 @@ import {
 
 import { BaseRepository } from './BaseRepository';
 import QueryBuilder from './QueryBuilder';
-import { ValidationError } from 'class-validator';
-import { serializeEntity } from '.';
+import { serializeEntity } from './utils';
 
 export abstract class AbstractFirestoreRepository<T extends IEntity>
   extends BaseRepository

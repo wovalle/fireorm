@@ -99,7 +99,7 @@ export class BaseFirestoreRepository<T extends IEntity>
     executor: (tran: TransactionRepository<T>) => Promise<void>
   ) {
     // Importing here to prevent circular dependency
-    const { runTransaction } = await import('./helpers');
+    const { runTransaction } = require('./helpers');
 
     return runTransaction(tran => {
       const repository = tran.getRepository(

@@ -32,7 +32,7 @@ export class MetadataStorage {
   readonly repositories: Map<unknown, RepositoryMetadata> = new Map();
 
   public config: MetadataStorageConfig = {
-    validateModels: true,
+    validateModels: false,
   };
 
   public getCollection = (param: string | Function) => {
@@ -120,17 +120,14 @@ export function clearMetadataStorage() {
 
 export const initialize = (
   firestore: Firestore,
-  config?: MetadataStorageConfig
+  config: MetadataStorageConfig = { validateModels: false }
 ): void => {
   initializeMetadataStorage();
 
   const { metadataStorage } = getStore();
 
   metadataStorage.firestoreRef = firestore;
-  metadataStorage.config = {
-    ...metadataStorage.config,
-    ...config,
-  };
+  metadataStorage.config = config;
 };
 
 /**
