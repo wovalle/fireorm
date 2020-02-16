@@ -5,9 +5,10 @@ import {
   IQueryBuilder,
   IWherePropParam,
   IFirestoreVal,
-  IQueryExecutor,
   IFireOrmQueryLine,
   IOrderByParams,
+  IRepository,
+  PartialBy,
 } from './types';
 
 import {
@@ -23,7 +24,7 @@ import { serializeEntity } from '.';
 
 export abstract class AbstractFirestoreRepository<T extends IEntity>
   extends BaseRepository
-  implements IQueryBuilder<T>, IQueryExecutor<T> {
+  implements IRepository<T> {
   protected readonly subColMetadata: CollectionMetadata[];
   protected readonly colMetadata: CollectionMetadata;
   protected readonly colName: string;
@@ -62,14 +63,8 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
     this.subColMetadata = getSubCollectionsFromParent(this.colMetadata.entity);
   }
 
-  protected toSerializableObject = (obj: T): Object => {
-    // TODO: investigate what's happening
-    // return serializeEntity(obj, this.subColMetadata);
-    this.subColMetadata.forEach(scm => {
-      delete obj[scm.propertyKey];
-    });
-    return { ...obj };
-  };
+  protected toSerializableObject = (obj: T): Object =>
+    serializeEntity(obj, this.subColMetadata);
 
   protected transformFirestoreTypes = (obj: T): T => {
     Object.keys(obj).forEach(key => {
@@ -352,4 +347,49 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
     orderByObj?: IOrderByParams,
     single?: boolean
   ): Promise<T[]>;
+
+  /**
+   * Retreive a document with the specified id.
+   * Must be implemented by base repositores
+   *
+   * @abstract
+   * @param {string} id
+   * @returns {Promise<T>}
+   * @memberof AbstractFirestoreRepository
+   */
+  abstract findById(id: string): Promise<T>;
+
+  /**
+   * Creates a document.
+   * If no id is passed, is automatically generated.
+   * Must be implemented by base repositores
+   *
+   * @abstract
+   * @param {string} id
+   * @returns {Promise<T>}
+   * @memberof AbstractFirestoreRepository
+   */
+  abstract create(item: PartialBy<T, 'id'>): Promise<T>;
+
+  /**
+   * Updates a document.
+   * Must be implemented by base repositores
+   *
+   * @abstract
+   * @param {string} id
+   * @returns {Promise<T>}
+   * @memberof AbstractFirestoreRepository
+   */
+  abstract update(item: T): Promise<T>;
+
+  /**
+   * Deletes a document.
+   * Must be implemented by base repositores
+   *
+   * @abstract
+   * @param {string} id
+   * @returns {Promise<T>}
+   * @memberof AbstractFirestoreRepository
+   */
+  abstract delete(id: string): Promise<void>;
 }
