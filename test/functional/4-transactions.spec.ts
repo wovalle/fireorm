@@ -82,7 +82,7 @@ describe('Integration test: Transactions', () => {
     expect(deletedBand).to.equal(null);
   });
 
-  it('should do CUD operations inside batchs', async () => {
+  it('should do CRUD operations inside batchs', async () => {
     // Array of bands to batch-insert
     const bands = [
       {

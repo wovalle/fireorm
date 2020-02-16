@@ -84,8 +84,8 @@ describe('Helpers', () => {
     );
   });
 
-  it('runTransaction: ', () => {
-    runTransaction(async transaction => {
+  it('runTransaction: ', async () => {
+    await runTransaction(async transaction => {
       expect(transaction.getRepository).to.be.instanceOf(Function);
     });
   });

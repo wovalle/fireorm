@@ -7,7 +7,6 @@
   "gaSite": "Fireorm Type Documentation",
   "excludeExternals": true,
   "excludeNotExported": true,
-  "categorizeByGroups": false,
   "hideBreadcrumbs": true,
   "plugins": ["typedoc-plugin-markdown"],
   "theme": "docgen/typedoc-docsify",
