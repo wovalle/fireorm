@@ -727,9 +727,10 @@ describe('BaseFirestoreRepository', () => {
 
   describe('fetching documents created w/o id inside object', () => {
     let docId: string = null;
+
     beforeEach(async () => {
       const bandWithoutId = new Band();
-      docId = (await firestore.collection(bandRepository.collectionPath).add(bandWithoutId)).id;
+      docId = (await firestore.collection('bands').add(bandWithoutId)).id;
     });
 
     it('Get by id - entity should contain id', async () => {

@@ -14,8 +14,9 @@ export function serializeEntity<T extends IEntity>(
   obj: T,
   subColMetadata: CollectionMetadata[]
 ): Object {
+  const serializableObj = { ...obj };
   subColMetadata.forEach(scm => {
-    delete obj[scm.propertyKey];
+    delete serializableObj[scm.propertyKey];
   });
-  return { ...obj };
+  return serializableObj;
 }
