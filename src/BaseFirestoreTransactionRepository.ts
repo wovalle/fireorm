@@ -2,6 +2,7 @@ import {
   CollectionReference,
   Transaction,
   WhereFilterOp,
+  DocumentReference,
 } from '@google-cloud/firestore';
 
 import {
@@ -98,5 +99,9 @@ export class TransactionRepository<T extends IEntity>
 
   orderByDescending(): IQueryBuilder<T> {
     throw new Error('`orderByDescending` is not available for transactions');
+  }
+
+  getReference(id: string): DocumentReference {
+    return this.collection.doc(id);
   }
 }

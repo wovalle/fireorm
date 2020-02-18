@@ -1,7 +1,7 @@
 // tslint:disable-next-line:no-import-side-effect
 import 'reflect-metadata';
 
-import { CollectionReference, WhereFilterOp } from '@google-cloud/firestore';
+import {CollectionReference, DocumentReference, WhereFilterOp} from '@google-cloud/firestore';
 
 import {
   IRepository,
@@ -110,6 +110,10 @@ export class BaseFirestoreRepository<T extends IEntity>
       this.firestoreColRef,
       this.toSerializableObject
     );
+  }
+
+  getReference(id: string): DocumentReference {
+    return this.firestoreColRef.doc(id);
   }
 
   async execute(

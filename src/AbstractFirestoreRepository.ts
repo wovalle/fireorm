@@ -1,5 +1,5 @@
 import { plainToClass } from 'class-transformer';
-import { DocumentSnapshot, QuerySnapshot } from '@google-cloud/firestore';
+import { DocumentSnapshot, QuerySnapshot, DocumentReference } from '@google-cloud/firestore';
 import {
   FirestoreCollectionType,
   IEntity,
@@ -344,6 +344,12 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
       throw error;
     }
   }
+
+  /**
+   * Return a {@link DocumentReference} of a document
+   * @param {string} id of a document
+   */
+  abstract getReference(id: string): DocumentReference;
 
   /**
    * Takes all the queries stored by QueryBuilder and executes them.

@@ -11,6 +11,7 @@ export interface IRepository<T extends { id: string }> {
   create(item: PartialBy<T, 'id'>): Promise<T>;
   update(item: T): Promise<T>;
   delete(id: string): Promise<void>;
+  getReference(id: string): DocumentReference;
 }
 
 export type WithOptionalId<T extends { id: unknown }> = Pick<
