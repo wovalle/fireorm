@@ -25,9 +25,12 @@ export default class QueryBuilder<T extends IEntity>
     return getPath(param as Function).join('.');
   };
 
-  whereEqualTo(param: IWherePropParam<T>, val: IFirestoreVal): QueryBuilder<T> {
+  whereEqualTo(
+      prop: IWherePropParam<T>,
+      val: IFirestoreVal
+  ): QueryBuilder<T> {
     this.queries.push({
-      prop: this.extractWhereParam(param),
+      prop: this.extractWhereParam(prop),
       val,
       operator: FirestoreOperators.equal,
     });
