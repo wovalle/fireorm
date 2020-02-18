@@ -115,6 +115,7 @@ export class BaseFirestoreRepository<T extends IEntity>
   async execute(
     queries: Array<IFireOrmQueryLine>,
     limitVal?: number,
+    offsetVal?: number,
     orderByObj?: IOrderByParams,
     single?: boolean
   ): Promise<T[]> {
@@ -131,6 +132,10 @@ export class BaseFirestoreRepository<T extends IEntity>
       query = query.limit(1);
     } else if (limitVal) {
       query = query.limit(limitVal);
+    }
+
+    if(offsetVal){
+      query.offset(offsetVal)
     }
 
     return query.get().then(this.extractTFromColSnap);

@@ -15,6 +15,7 @@ export default class QueryBuilder<T extends IEntity>
   implements IQueryBuilder<T> {
   protected queries: Array<IFireOrmQueryLine> = [];
   protected limitVal: number;
+  protected offsetVal: number;
   protected orderByObj: IOrderByParams;
 
   constructor(protected executor: IQueryExecutor<T>) {}
@@ -100,6 +101,18 @@ export default class QueryBuilder<T extends IEntity>
     return this;
   }
 
+  offset(
+      offsetVal: number
+  ): QueryBuilder<T> {
+    if (this.offsetVal) {
+      throw new Error(
+          'A offset function cannot be called more than once in the same query expression'
+      );
+    }
+    this.offsetVal = offsetVal;
+    return this;
+  }
+
   orderByAscending(prop: IWherePropParam<T>): QueryBuilder<T> {
     if (this.orderByObj) {
       throw new Error(
@@ -131,11 +144,11 @@ export default class QueryBuilder<T extends IEntity>
   }
 
   find(): Promise<T[]> {
-    return this.executor.execute(this.queries, this.limitVal, this.orderByObj);
+    return this.executor.execute(this.queries, this.limitVal, this.offsetVal, this.orderByObj);
   }
 
   async findOne(): Promise<T | null> {
-    const queryResult = await this.executor.execute(this.queries, this.limitVal, this.orderByObj, true);
+    const queryResult = await this.executor.execute(this.queries, this.limitVal, this.offsetVal, this.orderByObj, true);
     
     return queryResult.length ? queryResult[0] : null;
   }

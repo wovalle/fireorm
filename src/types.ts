@@ -75,6 +75,7 @@ export interface IQueryBuilder<T extends IEntity> {
   orderByAscending(prop: IWherePropParam<T>): IQueryBuilder<T>;
   orderByDescending(prop: IWherePropParam<T>): IQueryBuilder<T>;
   limit(limitVal: number): IQueryBuilder<T>;
+  offset(offsetVal: number): IQueryBuilder<T>;
   find(): Promise<T[]>;
   findOne(): Promise<T | null>;
 }
@@ -83,6 +84,7 @@ export interface IQueryExecutor<T> {
   execute(
     queries: IFireOrmQueryLine[],
     limitVal?: number,
+    offsetVal?: number,
     orderByObj?: IOrderByParams,
     single?: boolean
   ): Promise<T[]>;
