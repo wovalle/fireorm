@@ -10,6 +10,8 @@ import {
   createBatch,
 } from './helpers';
 import { initialize } from './MetadataStorage';
+import { FirestoreTransaction } from './FirestoreTransaction';
+import { FirestoreBatch } from './FirestoreBatch';
 
 describe('Helpers', () => {
   beforeEach(() => {
@@ -84,14 +86,13 @@ describe('Helpers', () => {
     );
   });
 
-  it('runTransaction: ', async () => {
+  it('runTransaction: should be able to get a transaction repository', async () => {
     await runTransaction(async transaction => {
-      expect(transaction.getRepository).to.be.instanceOf(Function);
+      expect(transaction).to.be.instanceOf(FirestoreTransaction);
     });
   });
 
-  it('createBatch: ', () => {
-    const batch = createBatch();
-    expect(batch.getRepository).to.be.instanceOf(Function);
+  it('createBatch: should be able to get a batch repository', () => {
+    expect(createBatch()).to.be.instanceOf(FirestoreBatch);
   });
 });

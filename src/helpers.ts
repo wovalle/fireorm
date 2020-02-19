@@ -110,5 +110,5 @@ export const createBatch = () => {
     throw new Error('Firestore must be initialized first');
   }
 
-  return new FirestoreBatch(null);
+  return new FirestoreBatch(metadataStorage.firestoreRef);
 };

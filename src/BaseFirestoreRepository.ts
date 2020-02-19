@@ -14,7 +14,7 @@ import {
 import { getMetadataStorage } from './MetadataStorage';
 import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
 import { TransactionRepository } from './BaseFirestoreTransactionRepository';
-import { FirestoreBatchRepository } from './BatchFirestoreRepository';
+import { FirestoreBatch } from './FirestoreBatch';
 
 export class BaseFirestoreRepository<T extends IEntity>
   extends AbstractFirestoreRepository<T>
@@ -110,9 +110,12 @@ export class BaseFirestoreRepository<T extends IEntity>
   }
 
   createBatch() {
-    return new FirestoreBatchRepository(
-      this.firestoreColRef,
-      this.colMetadata.entity
+    const { firestoreRef } = getMetadataStorage();
+
+    const batch = new FirestoreBatch(firestoreRef);
+
+    return batch.getStandaloneRepository(
+      this.colMetadata.entity as Instantiable<T>
     );
   }
 

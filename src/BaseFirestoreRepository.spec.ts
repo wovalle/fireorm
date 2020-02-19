@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 const MockFirebase = require('mock-cloud-firestore');
 
-import { initialize, getMetadataStorage } from './MetadataStorage';
+import { initialize } from './MetadataStorage';
 import {
   getFixture,
   Album,
@@ -71,97 +71,99 @@ describe('BaseFirestoreRepository', () => {
     it('must throw if the limit is less than 0');
   });
 
-  describe('orderByAscending', () => {
-    it('must order repository objects', async () => {
-      const bands = await bandRepository
-        .orderByAscending('formationYear')
-        .find();
-      expect(bands[0].id).to.equal('pink-floyd');
-    });
+  describe('Ordering', () => {
+    describe('orderByAscending', () => {
+      it('must order repository objects', async () => {
+        const bands = await bandRepository
+          .orderByAscending('formationYear')
+          .find();
+        expect(bands[0].id).to.equal('pink-floyd');
+      });
 
-    it('must order the objects in a subcollection', async () => {
-      const pt = await bandRepository.findById('porcupine-tree');
-      const albumsSubColl = pt.albums;
-      const discographyNewestFirst = await albumsSubColl
-        .orderByAscending('releaseDate')
-        .find();
-      expect(discographyNewestFirst[0].id).to.equal('lightbulb-sun');
-    });
-
-    it('must be chainable with where* filters', async () => {
-      const pt = await bandRepository.findById('porcupine-tree');
-      const albumsSubColl = pt.albums;
-      const discographyNewestFirst = await albumsSubColl
-        .whereGreaterOrEqualThan('releaseDate', new Date('2001-01-01'))
-        .orderByAscending('releaseDate')
-        .find();
-      expect(discographyNewestFirst[0].id).to.equal('in-absentia');
-    });
-
-    it('must be chainable with limit', async () => {
-      const bands = await bandRepository
-        .orderByAscending('formationYear')
-        .limit(2)
-        .find();
-      const lastBand = bands[bands.length - 1];
-      expect(lastBand.id).to.equal('red-hot-chili-peppers');
-    });
-
-    it('must throw an Error if an orderBy* function is called more than once in the same expression', async () => {
-      const pt = await bandRepository.findById('porcupine-tree');
-      const albumsSubColl = pt.albums;
-      expect(() => {
-        albumsSubColl
+      it('must order the objects in a subcollection', async () => {
+        const pt = await bandRepository.findById('porcupine-tree');
+        const albumsSubColl = pt.albums;
+        const discographyNewestFirst = await albumsSubColl
           .orderByAscending('releaseDate')
-          .orderByDescending('releaseDate');
-      }).to.throw;
-    });
-  });
+          .find();
+        expect(discographyNewestFirst[0].id).to.equal('lightbulb-sun');
+      });
 
-  describe('orderByDescending', () => {
-    it('must order repository objects', async () => {
-      const bands = await bandRepository
-        .orderByDescending('formationYear')
-        .find();
-      expect(bands[0].id).to.equal('porcupine-tree');
-    });
-
-    it('must order the objects in a subcollection', async () => {
-      const pt = await bandRepository.findById('porcupine-tree');
-      const albumsSubColl = pt.albums;
-      const discographyNewestFirst = await albumsSubColl
-        .orderByDescending('releaseDate')
-        .find();
-      expect(discographyNewestFirst[0].id).to.equal('fear-blank-planet');
-    });
-
-    it('must be chainable with where* filters', async () => {
-      const pt = await bandRepository.findById('porcupine-tree');
-      const albumsSubColl = pt.albums;
-      const discographyNewestFirst = await albumsSubColl
-        .whereGreaterOrEqualThan('releaseDate', new Date('2001-01-01'))
-        .orderByDescending('releaseDate')
-        .find();
-      expect(discographyNewestFirst[0].id).to.equal('fear-blank-planet');
-    });
-
-    it('must be chainable with limit', async () => {
-      const bands = await bandRepository
-        .orderByDescending('formationYear')
-        .limit(2)
-        .find();
-      const lastBand = bands[bands.length - 1];
-      expect(lastBand.id).to.equal('red-hot-chili-peppers');
-    });
-
-    it('must throw an Error if an orderBy* function is called more than once in the same expression', async () => {
-      const pt = await bandRepository.findById('porcupine-tree');
-      const albumsSubColl = pt.albums;
-      expect(() => {
-        albumsSubColl
+      it('must be chainable with where* filters', async () => {
+        const pt = await bandRepository.findById('porcupine-tree');
+        const albumsSubColl = pt.albums;
+        const discographyNewestFirst = await albumsSubColl
+          .whereGreaterOrEqualThan('releaseDate', new Date('2001-01-01'))
           .orderByAscending('releaseDate')
-          .orderByDescending('releaseDate');
-      }).to.throw;
+          .find();
+        expect(discographyNewestFirst[0].id).to.equal('in-absentia');
+      });
+
+      it('must be chainable with limit', async () => {
+        const bands = await bandRepository
+          .orderByAscending('formationYear')
+          .limit(2)
+          .find();
+        const lastBand = bands[bands.length - 1];
+        expect(lastBand.id).to.equal('red-hot-chili-peppers');
+      });
+
+      it('must throw an Error if an orderBy* function is called more than once in the same expression', async () => {
+        const pt = await bandRepository.findById('porcupine-tree');
+        const albumsSubColl = pt.albums;
+        expect(() => {
+          albumsSubColl
+            .orderByAscending('releaseDate')
+            .orderByDescending('releaseDate');
+        }).to.throw;
+      });
+    });
+
+    describe('orderByDescending', () => {
+      it('must order repository objects', async () => {
+        const bands = await bandRepository
+          .orderByDescending('formationYear')
+          .find();
+        expect(bands[0].id).to.equal('porcupine-tree');
+      });
+
+      it('must order the objects in a subcollection', async () => {
+        const pt = await bandRepository.findById('porcupine-tree');
+        const albumsSubColl = pt.albums;
+        const discographyNewestFirst = await albumsSubColl
+          .orderByDescending('releaseDate')
+          .find();
+        expect(discographyNewestFirst[0].id).to.equal('fear-blank-planet');
+      });
+
+      it('must be chainable with where* filters', async () => {
+        const pt = await bandRepository.findById('porcupine-tree');
+        const albumsSubColl = pt.albums;
+        const discographyNewestFirst = await albumsSubColl
+          .whereGreaterOrEqualThan('releaseDate', new Date('2001-01-01'))
+          .orderByDescending('releaseDate')
+          .find();
+        expect(discographyNewestFirst[0].id).to.equal('fear-blank-planet');
+      });
+
+      it('must be chainable with limit', async () => {
+        const bands = await bandRepository
+          .orderByDescending('formationYear')
+          .limit(2)
+          .find();
+        const lastBand = bands[bands.length - 1];
+        expect(lastBand.id).to.equal('red-hot-chili-peppers');
+      });
+
+      it('must throw an Error if an orderBy* function is called more than once in the same expression', async () => {
+        const pt = await bandRepository.findById('porcupine-tree');
+        const albumsSubColl = pt.albums;
+        expect(() => {
+          albumsSubColl
+            .orderByAscending('releaseDate')
+            .orderByDescending('releaseDate');
+        }).to.throw;
+      });
     });
   });
 
@@ -534,7 +536,7 @@ describe('BaseFirestoreRepository', () => {
   });
 
   describe('batch', () => {
-    it('should be able to create batched transactions', async () => {
+    it('should be able to create batched transactions from repository', async () => {
       const batch = bandRepository.createBatch();
 
       const entity1 = new Band();
@@ -567,12 +569,6 @@ describe('BaseFirestoreRepository', () => {
         'Entity2',
         'Entity3',
       ]);
-    });
-
-    it('should return FirestoreBatchRepository', () => {
-      expect(bandRepository.createBatch().constructor.name).to.eql(
-        'FirestoreBatchRepository'
-      );
     });
   });
 
