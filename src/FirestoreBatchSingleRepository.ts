@@ -9,10 +9,10 @@ import { BaseFirestoreBatchRepository } from './BaseFirestoreBatchRepository';
  *
  * @export
  * @class FirestoreBatchRepository
- * @extends {BaseFirestoreBatchRepository<T>}
+ * @extends {FirestoreBatchSingleRepository<T>}
  * @template T
  */
-export class FirestoreBatchRepository<
+export class FirestoreBatchSingleRepository<
   T extends IEntity
 > extends BaseFirestoreBatchRepository<T> {
   commit() {

@@ -1,6 +1,6 @@
 import { IEntity, Instantiable } from './types';
 import { BaseFirestoreBatchRepository } from './BaseFirestoreBatchRepository';
-import { FirestoreBatchRepository } from './FirestoreBatchRepository';
+import { FirestoreBatchSingleRepository } from './FirestoreBatchSingleRepository';
 import { WriteBatch, Firestore } from '@google-cloud/firestore';
 
 // TODO: handle status where batch was already committed.
@@ -35,8 +35,8 @@ export class FirestoreBatch {
    * @returns
    * @memberof FirestoreBatch
    */
-  getStandaloneRepository<T extends IEntity>(entity: Instantiable<T>) {
-    return new FirestoreBatchRepository(this.batch, entity);
+  getSingleRepository<T extends IEntity>(entity: Instantiable<T>) {
+    return new FirestoreBatchSingleRepository(this.batch, entity);
   }
 
   /**

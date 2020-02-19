@@ -114,7 +114,7 @@ export class BaseFirestoreRepository<T extends IEntity>
 
     const batch = new FirestoreBatch(firestoreRef);
 
-    return batch.getStandaloneRepository(
+    return batch.getSingleRepository(
       this.colMetadata.entity as Instantiable<T>
     );
   }

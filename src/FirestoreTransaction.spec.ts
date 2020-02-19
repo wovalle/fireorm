@@ -15,7 +15,7 @@ describe('FirestoreTransaction', () => {
   });
 
   describe('getRepository', () => {
-    it('should return a valid repository<T>', async () => {
+    it('should return a valid TransactionRepository<T>', async () => {
       @Collection()
       class Entity {
         id: string;
@@ -25,7 +25,7 @@ describe('FirestoreTransaction', () => {
       const tran = new FirestoreTransaction(innerTran);
 
       const bandRepository = tran.getRepository(Entity);
-      expect(bandRepository).to.be.instanceOf(BaseRepository);
+      expect(bandRepository.constructor.name).to.eql('TransactionRepository');
     });
   });
 });
