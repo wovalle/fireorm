@@ -3,9 +3,8 @@ const MockFirebase = require('mock-cloud-firestore');
 import { Transaction } from '@google-cloud/firestore';
 
 import { FirestoreTransaction } from './FirestoreTransaction';
-import { BaseRepository } from './BaseRepository';
-import { initialize } from '.';
-import { Collection } from './Decorators';
+import { initialize } from '..';
+import { Collection } from '../Decorators';
 
 describe('FirestoreTransaction', () => {
   beforeEach(() => {

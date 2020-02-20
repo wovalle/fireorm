@@ -1,4 +1,4 @@
-import { IEntity, Instantiable } from './types';
+import { IEntity, Instantiable } from '../types';
 import { BaseFirestoreBatchRepository } from './BaseFirestoreBatchRepository';
 import { FirestoreBatchSingleRepository } from './FirestoreBatchSingleRepository';
 import { WriteBatch, Firestore } from '@google-cloud/firestore';

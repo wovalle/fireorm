@@ -11,10 +11,10 @@ import {
   IQueryBuilder,
   IRepository,
   Instantiable,
-} from './types';
+} from '../types';
 
-import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
-import { getMetadataStorage } from './MetadataStorage';
+import { AbstractFirestoreRepository } from '../AbstractFirestoreRepository';
+import { getMetadataStorage } from '../MetadataStorage';
 
 export class TransactionRepository<T extends IEntity>
   extends AbstractFirestoreRepository<T>

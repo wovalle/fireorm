@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 const MockFirebase = require('mock-cloud-firestore');
 import { BaseFirestoreBatchRepository } from './BaseFirestoreBatchRepository';
-import { getFixture } from '../test/fixture';
-import { initialize } from './MetadataStorage';
-import { Band } from '../test/BandCollection';
+import { getFixture } from '../../test/fixture';
+import { initialize } from '../MetadataStorage';
+import { Band } from '../../test/BandCollection';
 import { Firestore, WriteBatch } from '@google-cloud/firestore';
 import sinon from 'sinon';
 

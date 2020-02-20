@@ -1,7 +1,7 @@
 import { WriteBatch, CollectionReference } from '@google-cloud/firestore';
-import { IEntity, WithOptionalId, Instantiable } from './types';
-import { getMetadataStorage, CollectionMetadata } from './MetadataStorage';
-import { serializeEntity } from './utils';
+import { IEntity, WithOptionalId, Instantiable } from '../types';
+import { getMetadataStorage, CollectionMetadata } from '../MetadataStorage';
+import { serializeEntity } from '../utils';
 
 export class BaseFirestoreBatchRepository<T extends IEntity> {
   protected serializer: (item: T) => Object;

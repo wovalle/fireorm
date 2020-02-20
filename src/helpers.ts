@@ -1,8 +1,8 @@
 import { getMetadataStorage, CollectionMetadata } from './MetadataStorage';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { IEntity, Instantiable } from './types';
-import { FirestoreTransaction } from './FirestoreTransaction';
-import { FirestoreBatch } from './FirestoreBatch';
+import { FirestoreTransaction } from './Transaction/FirestoreTransaction';
+import { FirestoreBatch } from './Batch/FirestoreBatch';
 
 export function getRepository<T extends IEntity>(
   entity: Instantiable<T>,

@@ -2,8 +2,8 @@ import { expect } from 'chai';
 const MockFirebase = require('mock-cloud-firestore');
 import { Firestore } from '@google-cloud/firestore';
 
-import { initialize } from '.';
-import { Collection } from './Decorators';
+import { initialize } from '..';
+import { Collection } from '../Decorators';
 import { FirestoreBatch } from './FirestoreBatch';
 
 describe('FirestoreBatch', () => {

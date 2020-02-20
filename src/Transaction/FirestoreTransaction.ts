@@ -1,7 +1,7 @@
 import { Transaction } from '@google-cloud/firestore';
 import { TransactionRepository } from './BaseFirestoreTransactionRepository';
-import { getMetadataStorage } from './MetadataStorage';
-import { IEntity, Instantiable } from './types';
+import { getMetadataStorage } from '../MetadataStorage';
+import { IEntity, Instantiable } from '../types';
 
 const metadataStorage = getMetadataStorage();
 

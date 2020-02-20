@@ -10,8 +10,8 @@ import {
   createBatch,
 } from './helpers';
 import { initialize } from './MetadataStorage';
-import { FirestoreTransaction } from './FirestoreTransaction';
-import { FirestoreBatch } from './FirestoreBatch';
+import { FirestoreTransaction } from './Transaction/FirestoreTransaction';
+import { FirestoreBatch } from './Batch/FirestoreBatch';
 
 describe('Helpers', () => {
   beforeEach(() => {

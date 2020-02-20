@@ -1,13 +1,13 @@
 import { expect } from 'chai';
 const MockFirebase = require('mock-cloud-firestore');
-import { BaseFirestoreRepository } from './BaseFirestoreRepository';
-import { getFixture, Album } from '../test/fixture';
+import { BaseFirestoreRepository } from '../BaseFirestoreRepository';
+import { getFixture, Album } from '../../test/fixture';
 import {
   initialize,
   MetadataStorageConfig,
   getMetadataStorage,
-} from './MetadataStorage';
-import { Band } from '../test/BandCollection';
+} from '../MetadataStorage';
+import { Band } from '../../test/BandCollection';
 
 // Just a test type to prevent using any other method than
 // runTransaction in this file

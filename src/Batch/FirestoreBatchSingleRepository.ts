@@ -1,4 +1,4 @@
-import { IEntity } from './types';
+import { IEntity } from '../types';
 import { BaseFirestoreBatchRepository } from './BaseFirestoreBatchRepository';
 
 /**

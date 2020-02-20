@@ -13,8 +13,8 @@ import {
 
 import { getMetadataStorage } from './MetadataStorage';
 import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
-import { TransactionRepository } from './BaseFirestoreTransactionRepository';
-import { FirestoreBatch } from './FirestoreBatch';
+import { TransactionRepository } from './Transaction/BaseFirestoreTransactionRepository';
+import { FirestoreBatch } from './Batch/FirestoreBatch';
 
 export class BaseFirestoreRepository<T extends IEntity>
   extends AbstractFirestoreRepository<T>
