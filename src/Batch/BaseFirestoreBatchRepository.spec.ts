@@ -6,10 +6,12 @@ import { initialize } from '../MetadataStorage';
 import { Band } from '../../test/BandCollection';
 import { Firestore, WriteBatch } from '@google-cloud/firestore';
 import sinon from 'sinon';
+import { FirestoreBatchUnit } from './FirestoreBatchUnit';
 
 describe('BaseFirestoreBatchRepository', () => {
   let bandRepository: BaseFirestoreBatchRepository<Band> = null;
   let firestore: Firestore;
+  let batch: FirestoreBatchUnit;
   let batchStub: sinon.SinonStubbedInstance<WriteBatch>;
 
   beforeEach(() => {
@@ -23,7 +25,7 @@ describe('BaseFirestoreBatchRepository', () => {
     firestore = Object.assign(firebase.firestore(), { batch: () => batchStub });
     initialize(firestore);
 
-    const batch = firestore.batch();
+    batch = new FirestoreBatchUnit(firestore);
     bandRepository = new BaseFirestoreBatchRepository(batch, Band);
   });
 
@@ -36,6 +38,7 @@ describe('BaseFirestoreBatchRepository', () => {
       entity.genres = ['alternative-rock', 'alternative-metal', 'hard-rock'];
 
       bandRepository.create(entity);
+      await batch.commit();
 
       expect(batchStub.set.firstCall.lastArg).to.eql({
         id: 'perfect-circle',
@@ -52,6 +55,7 @@ describe('BaseFirestoreBatchRepository', () => {
       entity.genres = ['progressive-rock'];
 
       bandRepository.create(entity);
+      await batch.commit();
 
       const data = batchStub.set.firstCall.lastArg;
 
@@ -73,9 +77,11 @@ describe('BaseFirestoreBatchRepository', () => {
       entity.genres = ['alternative-rock', 'alternative-metal', 'hard-rock'];
 
       bandRepository.create(entity);
+      await batch.commit();
 
       entity.name = 'Un Círculo Perfecto';
       bandRepository.update(entity);
+      await batch.commit();
 
       expect(batchStub.update.firstCall.lastArg).to.eql({
         id: 'perfect-circle',
@@ -95,6 +101,7 @@ describe('BaseFirestoreBatchRepository', () => {
       entity.genres = ['alternative-rock', 'alternative-metal', 'hard-rock'];
 
       bandRepository.delete(entity);
+      await batch.commit();
 
       expect(batchStub.delete.firstCall.lastArg).to.eql({
         id: 'perfect-circle',
@@ -105,9 +112,50 @@ describe('BaseFirestoreBatchRepository', () => {
     });
   });
 
-  // TODO: Maybe refactor validations to be a Decorator
-  // tslint:disable-next-line:no-empty
-  describe('should run validations', () => {});
+  describe('should run validations',  () => {
+    it('should run validations', async () => {
+      initialize(firestore, { validateModels: true });
+
+      const batch = new FirestoreBatchUnit(firestore);
+      const bandRepository = new BaseFirestoreBatchRepository(batch, Band);
+
+      const entity = new Band();
+      entity.id = 'perfect-circle';
+      entity.name = 'A Perfect Circle';
+      entity.formationYear = 1999;
+      entity.genres = ['alternative-rock', 'alternative-metal', 'hard-rock'];
+      entity.contactEmail = 'Not an email';
+
+      bandRepository.create(entity);
+
+      try {
+        await batch.commit();
+      } catch (error) {
+        expect(error[0].constraints.isEmail).to.equal('Invalid email!');
+      }
+    });
+
+    it('should not run validations on delete', async () => {
+      initialize(firestore, { validateModels: true });
+
+      const batch = new FirestoreBatchUnit(firestore);
+      const bandRepository = new BaseFirestoreBatchRepository(batch, Band);
+
+      const entity = new Band();
+      entity.id = 'perfect-circle';
+      entity.name = 'A Perfect Circle';
+      entity.formationYear = 1999;
+      entity.genres = ['alternative-rock', 'alternative-metal', 'hard-rock'];
+      entity.contactEmail = 'email@apc.com';
+
+      bandRepository.create(entity);
+      await batch.commit();
+
+      entity.contactEmail = 'email';
+      bandRepository.delete(entity);
+      expect(batch.commit).to.not.to.throw();
+    });
+  });
 
   //TODO: for this to work I'll probably need to do the collectionPath refactor
   // Copy from BaseFirestoreTransactionRepository.spec

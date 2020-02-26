@@ -1,17 +1,22 @@
-import { WriteBatch, CollectionReference } from '@google-cloud/firestore';
+import { CollectionReference } from '@google-cloud/firestore';
 import { IEntity, WithOptionalId, Instantiable } from '../types';
-import { getMetadataStorage, CollectionMetadata } from '../MetadataStorage';
-import { serializeEntity } from '../utils';
+import {
+  getMetadataStorage,
+  CollectionMetadata,
+  MetadataStorageConfig,
+} from '../MetadataStorage';
+import { ValidationError } from 'class-validator';
+import { FirestoreBatchUnit } from './FirestoreBatchUnit';
 
 export class BaseFirestoreBatchRepository<T extends IEntity> {
-  protected serializer: (item: T) => Object;
   protected colMetadata: CollectionMetadata;
   protected subColMetadata: CollectionMetadata[];
   protected collectionPath: string;
   protected colRef: CollectionReference;
+  protected config: MetadataStorageConfig;
 
   constructor(
-    protected batch: WriteBatch,
+    protected batch: FirestoreBatchUnit,
     protected entity: Instantiable<T>,
     collectionPath?: string
   ) {
@@ -20,6 +25,7 @@ export class BaseFirestoreBatchRepository<T extends IEntity> {
       getSubCollection,
       getSubCollectionsFromParent,
       firestoreRef,
+      config,
     } = getMetadataStorage();
 
     this.colMetadata = getSubCollection(entity) || getCollection(entity);
@@ -27,9 +33,7 @@ export class BaseFirestoreBatchRepository<T extends IEntity> {
 
     this.collectionPath = collectionPath || this.colMetadata.name;
     this.colRef = firestoreRef.collection(this.collectionPath);
-
-    this.serializer = (item: T) =>
-      serializeEntity<T>(item, this.subColMetadata);
+    this.config = config;
   }
 
   create = (item: WithOptionalId<T>) => {
@@ -37,15 +41,36 @@ export class BaseFirestoreBatchRepository<T extends IEntity> {
     if (!item.id) {
       item.id = doc.id;
     }
-    const serialized = this.serializer(item as T);
-    this.batch.set(doc, serialized);
+
+    this.batch.add(
+      'create',
+      item as T,
+      doc,
+      this.colMetadata.entity,
+      this.subColMetadata,
+      this.config.validateModels
+    );
   };
 
   update = (item: T) => {
-    this.batch.update(this.colRef.doc(item.id), this.serializer(item));
+    this.batch.add(
+      'update',
+      item,
+      this.colRef.doc(item.id),
+      this.colMetadata.entity,
+      this.subColMetadata,
+      this.config.validateModels
+    );
   };
 
   delete = (item: T) => {
-    this.batch.delete(this.colRef.doc(item.id), this.serializer(item));
+    this.batch.add(
+      'delete',
+      item,
+      this.colRef.doc(item.id),
+      this.colMetadata.entity,
+      this.subColMetadata,
+      this.config.validateModels
+    );
   };
 }

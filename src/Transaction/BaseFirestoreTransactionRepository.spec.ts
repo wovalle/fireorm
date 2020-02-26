@@ -2,11 +2,7 @@ import { expect } from 'chai';
 const MockFirebase = require('mock-cloud-firestore');
 import { BaseFirestoreRepository } from '../BaseFirestoreRepository';
 import { getFixture, Album } from '../../test/fixture';
-import {
-  initialize,
-  MetadataStorageConfig,
-  getMetadataStorage,
-} from '../MetadataStorage';
+import { initialize } from '../MetadataStorage';
 import { Band } from '../../test/BandCollection';
 
 // Just a test type to prevent using any other method than
@@ -21,19 +17,13 @@ class BandRepository extends BaseFirestoreRepository<Band> {}
 describe('BaseFirestoreTransactionRepository', () => {
   let bandRepository: TestTransactionRepository<Band> = null;
   let firestore;
-  let defaultMetadataConfig: MetadataStorageConfig;
 
   beforeEach(() => {
     const fixture = Object.assign({}, getFixture());
-    const firebase = new MockFirebase(fixture, {
-      isNaiveSnapshotListenerEnabled: false,
-    });
+    const firebase = new MockFirebase(fixture);
 
     firestore = firebase.firestore();
-    initialize(firestore, defaultMetadataConfig);
-
-    // Save the default config to reset any changes made in tests
-    defaultMetadataConfig = getMetadataStorage().config;
+    initialize(firestore);
 
     bandRepository = new BandRepository('bands');
   });

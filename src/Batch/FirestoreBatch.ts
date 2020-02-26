@@ -1,14 +1,16 @@
-import { IEntity, Instantiable } from '../types';
+import { IEntity, Instantiable, InstanstiableIEntity } from '../types';
 import { BaseFirestoreBatchRepository } from './BaseFirestoreBatchRepository';
 import { FirestoreBatchSingleRepository } from './FirestoreBatchSingleRepository';
-import { WriteBatch, Firestore } from '@google-cloud/firestore';
+import { Firestore } from '@google-cloud/firestore';
+import { FirestoreBatchUnit } from './FirestoreBatchUnit';
+
 
 // TODO: handle status where batch was already committed.
 export class FirestoreBatch {
-  private batch: WriteBatch;
+  private batch: FirestoreBatchUnit;
 
   constructor(protected firestoreRef: Firestore) {
-    this.batch = firestoreRef.batch();
+    this.batch = new FirestoreBatchUnit(firestoreRef);
   }
 
   /**
