@@ -116,8 +116,8 @@ describe('BaseFirestoreBatchRepository', () => {
     it('should run validations', async () => {
       initialize(firestore, { validateModels: true });
 
-      const batch = new FirestoreBatchUnit(firestore);
-      const bandRepository = new BaseFirestoreBatchRepository(batch, Band);
+      const validationBatch = new FirestoreBatchUnit(firestore);
+      const validationBandRepository = new BaseFirestoreBatchRepository(validationBatch, Band);
 
       const entity = new Band();
       entity.id = 'perfect-circle';
@@ -126,7 +126,7 @@ describe('BaseFirestoreBatchRepository', () => {
       entity.genres = ['alternative-rock', 'alternative-metal', 'hard-rock'];
       entity.contactEmail = 'Not an email';
 
-      bandRepository.create(entity);
+      validationBandRepository.create(entity);
 
       try {
         await batch.commit();
@@ -138,8 +138,8 @@ describe('BaseFirestoreBatchRepository', () => {
     it('should not run validations on delete', async () => {
       initialize(firestore, { validateModels: true });
 
-      const batch = new FirestoreBatchUnit(firestore);
-      const bandRepository = new BaseFirestoreBatchRepository(batch, Band);
+      const validationBatch = new FirestoreBatchUnit(firestore);
+      const validationBandRepository = new BaseFirestoreBatchRepository(validationBatch, Band);
 
       const entity = new Band();
       entity.id = 'perfect-circle';
@@ -148,11 +148,11 @@ describe('BaseFirestoreBatchRepository', () => {
       entity.genres = ['alternative-rock', 'alternative-metal', 'hard-rock'];
       entity.contactEmail = 'email@apc.com';
 
-      bandRepository.create(entity);
+      validationBandRepository.create(entity);
       await batch.commit();
 
       entity.contactEmail = 'email';
-      bandRepository.delete(entity);
+      validationBandRepository.delete(entity);
       expect(batch.commit).to.not.to.throw();
     });
   });
