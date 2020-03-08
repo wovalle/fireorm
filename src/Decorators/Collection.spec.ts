@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { initialize, getStore, clearMetadataStorage } from '../MetadataStorage';
 import { Collection } from './Collection';
 
-describe('CollectionDecorator', () => {
+describe.skip('CollectionDecorator', () => {
   const store = getStore();
   beforeEach(() => {
     clearMetadataStorage();

@@ -1,10 +1,12 @@
-import { getMetadataStorage } from './MetadataStorage';
+import { getMetadataStorage, CollectionMetadata } from './MetadataStorage';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
-import { IEntity } from './types';
+import { IEntity, Instantiable } from './types';
+import { FirestoreTransaction } from './Transaction/FirestoreTransaction';
+import { FirestoreBatch } from './Batch/FirestoreBatch';
 
 export function getRepository<T extends IEntity>(
-  entity: { new (): T },
-  documentPath?: string,
+  entity: Instantiable<T>,
+  documentPath?: string
 ) {
   return _getRepository(entity, 'default', documentPath);
 }
@@ -15,8 +17,8 @@ export function getRepository<T extends IEntity>(
 export const GetRepository = getRepository;
 
 export function getCustomRepository<T extends IEntity>(
-  entity: { new (): T },
-  documentPath?: string,
+  entity: Instantiable<T>,
+  documentPath?: string
 ) {
   return _getRepository(entity, 'custom', documentPath);
 }
@@ -27,8 +29,8 @@ export function getCustomRepository<T extends IEntity>(
 export const GetCustomRepository = getCustomRepository;
 
 export function getBaseRepository<T extends IEntity>(
-  entity: { new (): T },
-  documentPath?: string,
+  entity: Instantiable<T>,
+  documentPath?: string
 ) {
   return _getRepository(entity, 'base', documentPath);
 }
@@ -41,9 +43,9 @@ export const GetBaseRepository = getBaseRepository;
 type RepositoryType = 'default' | 'base' | 'custom';
 
 function _getRepository<T extends IEntity>(
-  entity: { new (): T },
+  entity: Instantiable<T>,
   repositoryType: RepositoryType,
-  documentPath: string,
+  documentPath: string
 ): BaseFirestoreRepository<T> {
   const metadataStorage = getMetadataStorage();
 
@@ -66,11 +68,13 @@ function _getRepository<T extends IEntity>(
   }
 
   if (collection.parentEntity) {
-    const parentCollection = metadataStorage.getCollection(collection.parentEntity);
+    const parentCollection = metadataStorage.getCollection(
+      collection.parentEntity
+    );
 
     if (!parentCollection) {
       throw new Error(
-        `'${entity.name}' does not have a valid parent collection.`	
+        `'${entity.name}' does not have a valid parent collection.`
       );
     }
   }
@@ -84,3 +88,27 @@ function _getRepository<T extends IEntity>(
     return new BaseFirestoreRepository<T>(collection.name, documentPath);
   }
 }
+
+export const runTransaction = <T>(
+  executor: (tran: FirestoreTransaction) => Promise<T>
+) => {
+  const metadataStorage = getMetadataStorage();
+
+  if (!metadataStorage.firestoreRef) {
+    throw new Error('Firestore must be initialized first');
+  }
+
+  return metadataStorage.firestoreRef.runTransaction(async t => {
+    return executor(new FirestoreTransaction(t));
+  });
+};
+
+export const createBatch = () => {
+  const metadataStorage = getMetadataStorage();
+
+  if (!metadataStorage.firestoreRef) {
+    throw new Error('Firestore must be initialized first');
+  }
+
+  return new FirestoreBatch(metadataStorage.firestoreRef);
+};

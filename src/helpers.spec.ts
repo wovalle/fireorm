@@ -1,14 +1,23 @@
-import { Firestore } from '@google-cloud/firestore';
 import { expect } from 'chai';
+const MockFirebase = require('mock-cloud-firestore');
 
 import { Collection, CustomRepository } from './Decorators';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
-import { getRepository, getBaseRepository } from './helpers';
+import {
+  getRepository,
+  getBaseRepository,
+  runTransaction,
+  createBatch,
+} from './helpers';
 import { initialize } from './MetadataStorage';
+import { FirestoreTransaction } from './Transaction/FirestoreTransaction';
+import { FirestoreBatch } from './Batch/FirestoreBatch';
 
 describe('Helpers', () => {
   beforeEach(() => {
-    initialize(new Firestore());
+    const firebase = new MockFirebase();
+    const firestore = firebase.firestore();
+    initialize(firestore);
   });
 
   it('getRepository: should get custom repositories', () => {
@@ -24,7 +33,6 @@ describe('Helpers', () => {
       }
     }
 
-    //TODO: I don't know why store is undefined here, check it out
     const rep = getRepository(Entity) as EntityRepo;
     expect(rep).to.be.instanceOf(BaseFirestoreRepository);
     expect(rep.meaningOfLife()).to.eql(42);
@@ -76,5 +84,15 @@ describe('Helpers', () => {
     expect(() => getRepository(Entity)).to.throw(
       "'Entity' is not a valid collection"
     );
+  });
+
+  it('runTransaction: should be able to get a transaction repository', async () => {
+    await runTransaction(async transaction => {
+      expect(transaction).to.be.instanceOf(FirestoreTransaction);
+    });
+  });
+
+  it('createBatch: should be able to get a batch repository', () => {
+    expect(createBatch()).to.be.instanceOf(FirestoreBatch);
   });
 });

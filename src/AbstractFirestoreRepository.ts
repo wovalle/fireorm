@@ -1,14 +1,16 @@
 import { plainToClass } from 'class-transformer';
 import { DocumentSnapshot, QuerySnapshot } from '@google-cloud/firestore';
+import { ValidationError } from 'class-validator';
+
 import {
-  FirestoreCollectionType,
   IEntity,
   IQueryBuilder,
   IWherePropParam,
   IFirestoreVal,
-  IQueryExecutor,
   IFireOrmQueryLine,
   IOrderByParams,
+  IRepository,
+  PartialBy,
 } from './types';
 
 import {
@@ -19,51 +21,51 @@ import {
 
 import { BaseRepository } from './BaseRepository';
 import QueryBuilder from './QueryBuilder';
-import { ValidationError } from 'class-validator';
+import { serializeEntity } from './utils';
 
 export abstract class AbstractFirestoreRepository<T extends IEntity>
   extends BaseRepository
-  implements IQueryBuilder<T>, IQueryExecutor<T> {
+  implements IRepository<T> {
   protected readonly subColMetadata: CollectionMetadata[];
   protected readonly colMetadata: CollectionMetadata;
-  protected readonly collectionType: FirestoreCollectionType;
   protected readonly colName: string;
   protected readonly config: MetadataStorageConfig;
+  protected readonly collectionPath: string;
 
-  // TODO: Make this private when transactions have been fixed
-  public readonly collectionPath: string;
-
-  constructor(
-    nameOrConstructor: string | Function,
-    collectionPath?: string,
-  ) {
+  constructor(nameOrConstructor: string | Function, collectionPath?: string) {
     super();
 
-    this.colName =
-      typeof nameOrConstructor === 'function'
-        ? nameOrConstructor.name
-        : nameOrConstructor;
-    
-    const { getCollection, getSubCollection, getSubCollectionsFromParent, config } = getMetadataStorage();
+    const {
+      getCollection,
+      getSubCollection,
+      getSubCollectionsFromParent,
+      config,
+    } = getMetadataStorage();
 
-    this.colMetadata = getSubCollection(this.colName) || getCollection(this.colName);
-    this.config = config;
-    this.collectionPath = collectionPath || this.colName;
+    //TODO: add tests to ensure that we can initialize this with name or constructor
+    //Also, I'm pretty sure getCollection types can be updated to be Instantiable<T>
+
+    this.colMetadata =
+      getSubCollection(nameOrConstructor) || getCollection(nameOrConstructor);
 
     if (!this.colMetadata) {
-      throw new Error(`There is no metadata stored for "${this.colName}"`);
+      throw new Error(
+        `There is no metadata stored for "${
+          typeof nameOrConstructor === 'string'
+            ? nameOrConstructor
+            : nameOrConstructor.name
+        }"`
+      );
     }
 
+    this.colName = this.colMetadata.name;
+    this.config = config;
+    this.collectionPath = collectionPath || this.colName;
     this.subColMetadata = getSubCollectionsFromParent(this.colMetadata.entity);
   }
 
-  protected toSerializableObject = (obj: T): Object => {
-    const { ...serializedObj } = obj;
-    this.subColMetadata.forEach(scm => {
-      delete serializedObj[scm.propertyKey];
-    });
-    return serializedObj;
-  };
+  protected toSerializableObject = (obj: T): Object =>
+    serializeEntity(obj, this.subColMetadata);
 
   protected transformFirestoreTypes = (obj: T): T => {
     Object.keys(obj).forEach(key => {
@@ -101,12 +103,12 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
     if (!doc.exists) {
       return null;
     }
-    
+
     // tslint:disable-next-line:no-unnecessary-type-assertion
-    const entity = plainToClass(
-      this.colMetadata.entity,
-      {id:doc.id, ...this.transformFirestoreTypes(doc.data() as T)}
-    ) as T;
+    const entity = plainToClass(this.colMetadata.entity, {
+      id: doc.id,
+      ...this.transformFirestoreTypes(doc.data() as T),
+    }) as T;
 
     this.initializeSubCollections(entity);
 
@@ -296,7 +298,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
 
   /**
    * Uses class-validator to validate an entity using decorators set in the collection class
-   * 
+   *
    * @param item class or object representing an entity
    * @returns {Promise<ValidationError[]>} An array of class-validator errors
    */
@@ -304,15 +306,15 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
     try {
       const classValidator = await import('class-validator');
       const { getSubCollection, getCollection } = getMetadataStorage();
-      const { entity: Entity } = getSubCollection(this.colName) || getCollection(this.colName);
-  
+      const { entity: Entity } =
+        getSubCollection(this.colName) || getCollection(this.colName);
+
       /**
        * Instantiate plain objects into an entity class
        */
-      const entity = item instanceof Entity
-          ? item
-          : Object.assign(new Entity(), item);
-  
+      const entity =
+        item instanceof Entity ? item : Object.assign(new Entity(), item);
+
       return classValidator.validate(entity);
     } catch (error) {
       if (error.code === 'MODULE_NOT_FOUND') {
@@ -320,7 +322,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
           'It looks like class-validator is not installed. Please run `npm i -S class-validator` to fix this error, or initialize FireORM with `validateModels: false` to disable validation.'
         );
       }
-      
+
       throw error;
     }
   }
@@ -346,4 +348,49 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
     orderByObj?: IOrderByParams,
     single?: boolean
   ): Promise<T[]>;
+
+  /**
+   * Retreive a document with the specified id.
+   * Must be implemented by base repositores
+   *
+   * @abstract
+   * @param {string} id
+   * @returns {Promise<T>}
+   * @memberof AbstractFirestoreRepository
+   */
+  abstract findById(id: string): Promise<T>;
+
+  /**
+   * Creates a document.
+   * If no id is passed, is automatically generated.
+   * Must be implemented by base repositores
+   *
+   * @abstract
+   * @param {string} id
+   * @returns {Promise<T>}
+   * @memberof AbstractFirestoreRepository
+   */
+  abstract create(item: PartialBy<T, 'id'>): Promise<T>;
+
+  /**
+   * Updates a document.
+   * Must be implemented by base repositores
+   *
+   * @abstract
+   * @param {string} id
+   * @returns {Promise<T>}
+   * @memberof AbstractFirestoreRepository
+   */
+  abstract update(item: T): Promise<T>;
+
+  /**
+   * Deletes a document.
+   * Must be implemented by base repositores
+   *
+   * @abstract
+   * @param {string} id
+   * @returns {Promise<T>}
+   * @memberof AbstractFirestoreRepository
+   */
+  abstract delete(id: string): Promise<void>;
 }

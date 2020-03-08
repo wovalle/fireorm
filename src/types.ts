@@ -1,17 +1,6 @@
 import { OrderByDirection, DocumentReference } from '@google-cloud/firestore';
-import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
-
-export interface IRepository<T extends { id: string }> {
-  limit(limitVal: number): IQueryBuilder<T>;
-  orderByAscending(prop: keyof T & string): IQueryBuilder<T>;
-  orderByDescending(prop: keyof T & string): IQueryBuilder<T>;
-  findById(id: string): Promise<T>;
-  create(item: PartialBy<T, 'id'>): Promise<T>;
-  update(item: T): Promise<T>;
-  delete(id: string): Promise<void>;
-}
 
 export type WithOptionalId<T extends { id: unknown }> = Pick<
   T,
@@ -35,10 +24,6 @@ export enum FirestoreOperators {
   arrayContains = 'array-contains',
 }
 
-export enum FirestoreCollectionType {
-  collection = 'collection',
-  subcollection = 'subcollection',
-}
 export interface IFireOrmQueryLine {
   prop: string;
   val: IFirestoreVal;
@@ -53,7 +38,8 @@ export interface IOrderByParams {
 export type IQueryBuilderResult = IFireOrmQueryLine[];
 
 export type IWherePropParam<T> = keyof T | ((t: T) => unknown);
-export interface IQueryBuilder<T extends IEntity> {
+
+export interface IQueryable<T extends IEntity> {
   whereEqualTo(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T>;
   whereGreaterThan(
     prop: IWherePropParam<T>,
@@ -72,12 +58,22 @@ export interface IQueryBuilder<T extends IEntity> {
     prop: IWherePropParam<T>,
     val: IFirestoreVal
   ): IQueryBuilder<T>;
-  orderByAscending(prop: IWherePropParam<T>): IQueryBuilder<T>;
-  orderByDescending(prop: IWherePropParam<T>): IQueryBuilder<T>;
-  limit(limitVal: number): IQueryBuilder<T>;
   find(): Promise<T[]>;
   findOne(): Promise<T | null>;
 }
+
+export interface IOrderable<T extends IEntity> {
+  orderByAscending(prop: IWherePropParam<T>): IQueryBuilder<T>;
+  orderByDescending(prop: IWherePropParam<T>): IQueryBuilder<T>;
+}
+
+export interface ILimitable<T extends IEntity> {
+  limit(limitVal: number): IQueryBuilder<T>;
+}
+
+export type IQueryBuilder<T extends IEntity> = IQueryable<T> &
+  IOrderable<T> &
+  ILimitable<T>;
 
 export interface IQueryExecutor<T> {
   execute(
@@ -88,10 +84,22 @@ export interface IQueryExecutor<T> {
   ): Promise<T[]>;
 }
 
-export type ISubCollection<T extends IEntity> = BaseFirestoreRepository<T>;
+export interface IBaseRepository<T extends IEntity> {
+  findById(id: string): Promise<T>;
+  create(item: PartialBy<T, 'id'>): Promise<T>;
+  update(item: T): Promise<T>;
+  delete(id: string): Promise<void>;
+}
+
+export type IRepository<T extends IEntity> = IBaseRepository<T> &
+  IQueryBuilder<T> &
+  IQueryExecutor<T>;
+
+export type ISubCollection<T extends IEntity> = IRepository<T>;
 
 export interface IEntity {
   id: string;
 }
 
-export type InstanstiableIEntity = { new (): IEntity };
+export type Instantiable<T> = { new (): T };
+export type InstanstiableIEntity = Instantiable<IEntity>;

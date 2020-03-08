@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 const MockFirebase = require('mock-cloud-firestore');
-import { BaseFirestoreRepository } from './BaseFirestoreRepository';
-import { getFixture, Album } from '../test/fixture';
-import { initialize, MetadataStorageConfig, getMetadataStorage } from './MetadataStorage';
-import { Band } from '../test/BandCollection';
+import { BaseFirestoreRepository } from '../BaseFirestoreRepository';
+import { getFixture, Album } from '../../test/fixture';
+import { initialize } from '../MetadataStorage';
+import { Band } from '../../test/BandCollection';
 
 // Just a test type to prevent using any other method than
 // runTransaction in this file
@@ -17,19 +17,13 @@ class BandRepository extends BaseFirestoreRepository<Band> {}
 describe('BaseFirestoreTransactionRepository', () => {
   let bandRepository: TestTransactionRepository<Band> = null;
   let firestore;
-  let defaultMetadataConfig: MetadataStorageConfig;
 
   beforeEach(() => {
     const fixture = Object.assign({}, getFixture());
-    const firebase = new MockFirebase(fixture, {
-      isNaiveSnapshotListenerEnabled: false,
-    });
+    const firebase = new MockFirebase(fixture);
 
     firestore = firebase.firestore();
-    initialize(firestore, defaultMetadataConfig);
-
-    // Save the default config to reset any changes made in tests
-    defaultMetadataConfig = getMetadataStorage().config;
+    initialize(firestore);
 
     bandRepository = new BandRepository('bands');
   });
@@ -104,13 +98,13 @@ describe('BaseFirestoreTransactionRepository', () => {
         entity.contactEmail = 'Not an email';
         const band = await tran.create(entity);
         expect(band.contactEmail).to.equal('Not an email');
-      })
+      });
     });
 
     it('must fail validation if an invalid class is given', async () => {
       await bandRepository.runTransaction(async tran => {
         const entity = new Band();
-  
+
         entity.contactEmail = 'Not an email';
 
         try {
@@ -118,21 +112,21 @@ describe('BaseFirestoreTransactionRepository', () => {
         } catch (error) {
           expect(error[0].constraints.isEmail).to.equal('Invalid email!');
         }
-      })
+      });
     });
 
     it('must fail validation if an invalid object is given', async () => {
       await bandRepository.runTransaction(async tran => {
         const entity: Partial<Band> = {
           contactEmail: 'Not an email',
-        }
+        };
 
         try {
           await tran.create(entity as Band);
         } catch (error) {
           expect(error[0].constraints.isEmail).to.equal('Invalid email!');
         }
-      })
+      });
     });
 
     it('must create items when id is passed', async () => {
@@ -212,13 +206,13 @@ describe('BaseFirestoreTransactionRepository', () => {
         await tran.update(band);
         const updatedBand = await tran.findById('porcupine-tree');
         expect(updatedBand.contactEmail).to.equal('Not an email');
-      })
+      });
     });
 
     it('must fail validation if an invalid class is given', async () => {
       await bandRepository.runTransaction(async tran => {
         const band = await tran.findById('porcupine-tree');
-  
+
         band.contactEmail = 'Not an email';
 
         try {
@@ -226,7 +220,7 @@ describe('BaseFirestoreTransactionRepository', () => {
         } catch (error) {
           expect(error[0].constraints.isEmail).to.equal('Invalid email!');
         }
-      })
+      });
     });
 
     it('must fail validation if an invalid object is given', async () => {
@@ -235,14 +229,14 @@ describe('BaseFirestoreTransactionRepository', () => {
         const updatedBand: Partial<Band> = {
           ...band,
           contactEmail: 'Not an email',
-        }
+        };
 
         try {
           await tran.update(band);
         } catch (error) {
           expect(error[0].constraints.isEmail).to.equal('Invalid email!');
         }
-      })
+      });
     });
 
     it('must throw if item is not found');
@@ -381,9 +375,9 @@ describe('BaseFirestoreTransactionRepository', () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('red-hot-chili-peppers');
         const album = await pt.albums.findById('stadium-arcadium');
-  
+
         expect(album.images).to.be.instanceOf(BaseFirestoreRepository);
-      })
+      });
     });
 
     it('should be able to execute operations in the subcollection', async () => {
@@ -444,7 +438,7 @@ describe('BaseFirestoreTransactionRepository', () => {
         const album = await band.albums.create(firstAlbum);
 
         expect(album.images).to.be.instanceOf(BaseFirestoreRepository);
-      })
+      });
     });
 
     it('should be able to validate subcollections on create', async () => {
@@ -456,7 +450,8 @@ describe('BaseFirestoreTransactionRepository', () => {
 
       const firstAlbum = new Album();
       firstAlbum.id = 'invalid-album-name';
-      firstAlbum.name = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+      firstAlbum.name =
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
       firstAlbum.releaseDate = new Date('2002-07-22');
 
       await bandRepository.runTransaction(async tran => {
@@ -465,7 +460,7 @@ describe('BaseFirestoreTransactionRepository', () => {
         try {
           await band.albums.create(firstAlbum);
         } catch (error) {
-          expect(error[0].constraints.length).to.equal('Name is too long')
+          expect(error[0].constraints.length).to.equal('Name is too long');
         }
       });
     });
@@ -487,7 +482,7 @@ describe('BaseFirestoreTransactionRepository', () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
         const album = await pt.albums.findById('fear-blank-planet');
-        
+
         album.name = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
 
         try {
