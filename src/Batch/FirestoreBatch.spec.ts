@@ -48,6 +48,7 @@ describe('FirestoreBatch', () => {
   });
 
   describe('commit', () => {
+    it('should throw error if no ops');
     it('should return call inner commit');
   });
 });

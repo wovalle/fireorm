@@ -32,6 +32,7 @@ describe('Integration test: Transactions', () => {
       website: 'www.tameimpala.com',
     };
 
+    // Transactions can return data
     const savedBand = await bandRepository.runTransaction<Band>(async tran => {
       await tran.create(ti);
       return tran.create(dt);

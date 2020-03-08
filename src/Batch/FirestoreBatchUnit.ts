@@ -42,6 +42,10 @@ export class FirestoreBatchUnit {
       throw new Error('This Batch is being committed');
     }
 
+    if (this.operations.length === 0) {
+      throw new Error('Cannot commit a batch with zero operations');
+    }
+
     this.status = 'committing';
     const batch = this.firestoreRef.batch();
 
@@ -72,7 +76,7 @@ export class FirestoreBatchUnit {
     const result = await batch.commit();
     this.operations = [];
     this.status = 'pending';
-    
+
     return result;
   };
 

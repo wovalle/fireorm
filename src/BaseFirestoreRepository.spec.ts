@@ -536,7 +536,7 @@ describe('BaseFirestoreRepository', () => {
   });
 
   describe('batch', () => {
-    it('should be able to create batchs from repository', async () => {
+    it('should be able to create batches from repository', async () => {
       const batch = bandRepository.createBatch();
 
       const entity1 = new Band();

@@ -3,7 +3,7 @@ import { Band as BandEntity } from '../fixture';
 import { expect } from 'chai';
 import { getUniqueColName } from '../setup';
 
-describe('Integration test: Batchs', () => {
+describe('Integration test: Batches', () => {
   @Collection(getUniqueColName('band-in-batch'))
   class Band extends BandEntity {
     extra?: { website: string };
@@ -11,7 +11,7 @@ describe('Integration test: Batchs', () => {
 
   const bandRepository = getRepository(Band);
 
-  it('should do CRUD operations inside batchs in repositories', async () => {
+  it('should do CRUD operations inside batches in repositories', async () => {
     // Array of bands to batch-insert
     const bands = [
       {
@@ -91,7 +91,7 @@ describe('Integration test: Batchs', () => {
     expect(deletedBands.length).to.eql(0);
   });
 
-  it('should do CRUD operations inside batchs', async () => {
+  it('should do CRUD operations inside batches', async () => {
     // Array of bands to batch-insert
     const bands: Band[] = [
       {
@@ -119,7 +119,6 @@ describe('Integration test: Batchs', () => {
     const bandBatchRepository = batch.getRepository(Band);
     bands.forEach(b => bandBatchRepository.create(b));
 
-    // TODO: the commit should be in the batch
     await batch.commit();
 
     // Assert that bands were actually created

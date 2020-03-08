@@ -112,12 +112,15 @@ describe('BaseFirestoreBatchRepository', () => {
     });
   });
 
-  describe('should run validations',  () => {
+  describe('should run validations', () => {
     it('should run validations', async () => {
       initialize(firestore, { validateModels: true });
 
       const validationBatch = new FirestoreBatchUnit(firestore);
-      const validationBandRepository = new BaseFirestoreBatchRepository(validationBatch, Band);
+      const validationBandRepository = new BaseFirestoreBatchRepository(
+        validationBatch,
+        Band
+      );
 
       const entity = new Band();
       entity.id = 'perfect-circle';
@@ -129,7 +132,7 @@ describe('BaseFirestoreBatchRepository', () => {
       validationBandRepository.create(entity);
 
       try {
-        await batch.commit();
+        await validationBatch.commit();
       } catch (error) {
         expect(error[0].constraints.isEmail).to.equal('Invalid email!');
       }
@@ -139,7 +142,10 @@ describe('BaseFirestoreBatchRepository', () => {
       initialize(firestore, { validateModels: true });
 
       const validationBatch = new FirestoreBatchUnit(firestore);
-      const validationBandRepository = new BaseFirestoreBatchRepository(validationBatch, Band);
+      const validationBandRepository = new BaseFirestoreBatchRepository(
+        validationBatch,
+        Band
+      );
 
       const entity = new Band();
       entity.id = 'perfect-circle';
@@ -149,11 +155,11 @@ describe('BaseFirestoreBatchRepository', () => {
       entity.contactEmail = 'email@apc.com';
 
       validationBandRepository.create(entity);
-      await batch.commit();
+      await validationBatch.commit();
 
       entity.contactEmail = 'email';
       validationBandRepository.delete(entity);
-      expect(batch.commit).to.not.to.throw();
+      expect(validationBatch.commit).to.not.to.throw();
     });
   });
 
