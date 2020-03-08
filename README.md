@@ -141,7 +141,7 @@ npm publish
 - To deploy the documentation
 
 ```bash
-yarn deploy:documentation # or npm deploy:documentation
+yarn deploy:doc # or npm deploy:doc
 ```
 
 </details>
@@ -151,7 +151,7 @@ yarn deploy:documentation # or npm deploy:documentation
 - Fireorm uses [typedoc](https://typedoc.org/) to automatically build the API documentation, to generate it:
 
 ```bash
-yarn build:documentation # or npm build:documentation
+yarn build:doc # or npm build:doc
 ```
 
 Documentation is automatically deployed on each commit to master and is hosted in [Github Pages](https://pages.github.com/) in this [link](https://wovalle.github.io/fireorm).
