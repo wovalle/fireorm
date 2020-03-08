@@ -12,15 +12,15 @@ jobs:
     - stage: test
       script:
         - yarn lint
-        # - commitlint-travis
+        - commitlint-travis
         - yarn test
         - yarn test:integration
 
     - stage: deploy
       script:
         - yarn build
-        - yarn build:documentation
+        - yarn build:doc
         - yarn semantic-release
-        - yarn deploy:documentation
+        - yarn deploy:doc
 
 cache: yarn

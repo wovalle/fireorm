@@ -23,9 +23,9 @@
     "build": "tsc",
     "build:typedoc": "typedoc --options docgen/typedoc.json",
     "build:docsify": "yarn ts-node docgen/build.ts",
-    "build:documentation": "yarn rimraf docs && yarn build:typedoc && yarn build:docsify && cp CNAME docs/CNAME",
-    "serve:documentation": "yarn docsify serve docgen",
-    "deploy:documentation": "gh-pages-deploy",
+    "build:doc": "yarn rimraf docs && yarn build:typedoc && yarn build:docsify && cp CNAME docs/CNAME",
+    "serve:doc": "yarn docsify serve docgen",
+    "deploy:doc": "gh-pages-deploy",
     "build:watch": "tsc -w --incremental",
     "lint": "tslint --project tsconfig.json",
     "lint:md": "remark README.md -o README.md",
@@ -52,7 +52,7 @@
     "@types/uuid": "^3.4.5",
     "chai": "^4.2.0",
     "class-validator": "^0.11.0",
-    "docsify-cli": "^4.3.0",
+    "docsify-cli": "4.3.0",
     "dotenv": "^8.1.0",
     "firebase-admin": "^8.1.0",
     "gh-pages-deploy": "^0.5.1",
@@ -101,7 +101,7 @@
   "gh-pages-deploy": {
     "staticpath": "docs",
     "prep": [
-      "build:documentation"
+      "build:doc"
     ],
     "commit": "chore(docs): Updating documentation",
     "noprompt": true
