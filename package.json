@@ -3,7 +3,7 @@
   "description": "ORM for Firestore",
   "version": "0.0.0-development",
   "author": "Willy Ovalle <willyovalle16@gmail.com>",
-  "homepage": "https://wovalle.github.io/fireorm/",
+  "homepage": "https://fireorm.js.org",
   "license": "ISC",
   "main": "lib/src/index.js",
   "types": "lib/src/index.d.ts",

@@ -9,5 +9,6 @@
   - [Manage Data](Manage_Data.md)
   - [SubCollections](Subcollections.md)
   - [Transactions](Transactions.md)
+  - [Batches](Batches.md)
   - [Custom Repositories](Custom_Repositories.md)
   - [Validation](Validation.md)
