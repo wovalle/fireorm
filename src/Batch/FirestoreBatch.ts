@@ -4,7 +4,6 @@ import { FirestoreBatchSingleRepository } from './FirestoreBatchSingleRepository
 import { Firestore } from '@google-cloud/firestore';
 import { FirestoreBatchUnit } from './FirestoreBatchUnit';
 
-
 // TODO: handle status where batch was already committed.
 export class FirestoreBatch {
   private batch: FirestoreBatchUnit;
@@ -27,7 +26,6 @@ export class FirestoreBatch {
   }
 
   /**
-   * @deprecated
    *
    * Returns a batch repository of a single entity. Required to maintain
    * current features and will be deleted in the next major version.
