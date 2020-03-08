@@ -13,7 +13,7 @@ import Band from './models/Band';
 @CustomRepository(Band)
 class CustomBandRepository extends BaseFirestoreRepository<Band> {
   async getProgressiveRockBands(): Promise<Band[]> {
-    return this.whereArrayCointain('genres', 'progressive-rock').find();
+    return this.whereArrayContains('genres', 'progressive-rock').find();
   }
 }
 
