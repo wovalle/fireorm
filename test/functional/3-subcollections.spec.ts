@@ -10,7 +10,6 @@ import {
   ISubCollection,
 } from '../../src';
 import { getUniqueColName } from '../setup';
-import { expect } from 'chai';
 
 describe('Integration test: SubCollections', () => {
   class Album extends AlbumEntity {}
@@ -87,26 +86,26 @@ describe('Integration test: SubCollections', () => {
       .whereLessThan('releaseDate', new Date('1980-01-01'))
       .find();
 
-    expect(albumsBefore1980.length).to.eql(2);
-    expect(albumsBefore1980[0].id).to.eql('fly-by-night');
-    expect(albumsBefore1980[1].id).to.eql('2112');
+    expect(albumsBefore1980.length).toEqual(2);
+    expect(albumsBefore1980[0].id).toEqual('fly-by-night');
+    expect(albumsBefore1980[1].id).toEqual('2112');
 
     // Updating album
     const movingPictures = await rush.albums.findById('moving-pictures');
     movingPictures.releaseDate = new Date('1981-02-12');
     await rush.albums.update(movingPictures);
     const updated = await rush.albums.findById('moving-pictures');
-    expect(updated.releaseDate).to.eql(movingPictures.releaseDate);
+    expect(updated.releaseDate).toEqual(movingPictures.releaseDate);
 
     // Deleting an album
     await rush.albums.delete('moving-pictures');
     const updatedAlbums = await rush.albums.find();
-    expect(updatedAlbums.length).to.eql(2);
+    expect(updatedAlbums.length).toEqual(2);
 
     // Updating parent collection
     rush.genres = rush.genres.slice(0, 2);
     await fullBandRepository.update(rush);
     const updatedRush = await fullBandRepository.findById('rush');
-    expect(updatedRush.genres).to.eql(rush.genres);
+    expect(updatedRush.genres).toEqual(rush.genres);
   });
 });

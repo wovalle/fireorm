@@ -1,6 +1,5 @@
 import { getRepository, Collection, Type } from '../../src';
 import { Band as BandEntity, FirestoreDocumentReference } from '../fixture';
-import { expect } from 'chai';
 import { getUniqueColName } from '../setup';
 import { Firestore } from '@google-cloud/firestore';
 
@@ -52,14 +51,14 @@ describe('Integration test: Using Document References', () => {
       .whereEqualTo(b => b.name, 'Steven Wilson')
       .findOne();
 
-    expect(swFromDb.formationYear).to.eql(1987);
+    expect(swFromDb.formationYear).toEqual(1987);
 
     // Is able to filter documents by references
     const band = await bandRepository
       .whereEqualTo(b => b.relatedBand, ptRef)
       .find();
 
-    expect(band.length).to.eql(1);
-    expect(band[0].name).to.eql('Steven Wilson');
+    expect(band.length).toEqual(1);
+    expect(band[0].name).toEqual('Steven Wilson');
   });
 });

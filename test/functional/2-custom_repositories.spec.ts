@@ -5,7 +5,6 @@ import {
   getRepository,
   Collection,
 } from '../../src';
-import { expect } from 'chai';
 import { getUniqueColName } from '../setup';
 
 describe('Integration test: Custom Repository', () => {
@@ -53,10 +52,10 @@ describe('Integration test: Custom Repository', () => {
       .map(b => b.name)
       .sort((a, b) => a.localeCompare(b));
 
-    expect(progressiveRockBands.length).to.equal(3);
-    expect(first).to.equal('Opeth');
-    expect(second).to.equal('Pink Floyd');
-    expect(third).to.equal('Porcupine Tree');
+    expect(progressiveRockBands.length).toEqual(3);
+    expect(first).toEqual('Opeth');
+    expect(second).toEqual('Pink Floyd');
+    expect(third).toEqual('Porcupine Tree');
 
     // Filter progressive-rock bands formed in 1989
     const millenialProgressiveRockBands = await rockBandRepository
@@ -64,7 +63,7 @@ describe('Integration test: Custom Repository', () => {
       .whereEqualTo('formationYear', 1989)
       .find();
 
-    expect(millenialProgressiveRockBands.length).to.equal(1);
-    expect(progressiveRockBands[0].name).to.equal('Opeth');
+    expect(millenialProgressiveRockBands.length).toEqual(1);
+    expect(progressiveRockBands[0].name).toEqual('Opeth');
   });
 });

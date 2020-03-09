@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 const MockFirebase = require('mock-cloud-firestore');
 
 import { Collection, CustomRepository } from './Decorators';
@@ -34,8 +33,8 @@ describe('Helpers', () => {
     }
 
     const rep = getRepository(Entity) as EntityRepo;
-    expect(rep).to.be.instanceOf(BaseFirestoreRepository);
-    expect(rep.meaningOfLife()).to.eql(42);
+    expect(rep).toBeInstanceOf(BaseFirestoreRepository);
+    expect(rep.meaningOfLife()).toEqual(42);
   });
 
   it('should get base repositories if custom are not registered', () => {
@@ -45,7 +44,7 @@ describe('Helpers', () => {
     }
 
     const rep = getRepository(Entity);
-    expect(rep).to.be.instanceOf(BaseFirestoreRepository);
+    expect(rep).toBeInstanceOf(BaseFirestoreRepository);
   });
 
   it('should throw if trying to get an unexistent collection', () => {
@@ -53,7 +52,7 @@ describe('Helpers', () => {
       id: string;
     }
 
-    expect(() => getRepository(Entity)).to.throw(
+    expect(() => getRepository(Entity)).toThrow(
       "'Entity' is not a valid collection"
     );
   });
@@ -72,8 +71,8 @@ describe('Helpers', () => {
     }
 
     const rep = getBaseRepository(Entity);
-    expect(rep).to.be.instanceOf(BaseFirestoreRepository);
-    expect(rep['meaningOfLife']).to.be.undefined;
+    expect(rep).toBeInstanceOf(BaseFirestoreRepository);
+    expect(rep['meaningOfLife']).toBeUndefined;
   });
 
   it('should throw if trying to get an unexistent collection', () => {
@@ -81,18 +80,18 @@ describe('Helpers', () => {
       id: string;
     }
 
-    expect(() => getRepository(Entity)).to.throw(
+    expect(() => getRepository(Entity)).toThrow(
       "'Entity' is not a valid collection"
     );
   });
 
   it('runTransaction: should be able to get a transaction repository', async () => {
     await runTransaction(async transaction => {
-      expect(transaction).to.be.instanceOf(FirestoreTransaction);
+      expect(transaction).toBeInstanceOf(FirestoreTransaction);
     });
   });
 
   it('createBatch: should be able to get a batch repository', () => {
-    expect(createBatch()).to.be.instanceOf(FirestoreBatch);
+    expect(createBatch()).toBeInstanceOf(FirestoreBatch);
   });
 });

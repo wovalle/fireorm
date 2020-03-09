@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 const MockFirebase = require('mock-cloud-firestore');
 
 import { initialize } from './MetadataStorage';
@@ -32,7 +31,7 @@ describe('BaseFirestoreRepository', () => {
   describe('limit', () => {
     it('must limit the documents in a collection', async () => {
       const twoBands = await bandRepository.limit(2).find();
-      expect(twoBands.length).to.equal(2);
+      expect(twoBands.length).toEqual(2);
     });
 
     it('must limit the results of a query', async () => {
@@ -40,7 +39,7 @@ describe('BaseFirestoreRepository', () => {
         .whereGreaterOrEqualThan('formationYear', 1980)
         .limit(1)
         .find();
-      expect(eightiesBands.length).to.equal(1);
+      expect(eightiesBands.length).toEqual(1);
     });
 
     it('must not throw any exceptions if a query with no results is limited', async () => {
@@ -48,14 +47,14 @@ describe('BaseFirestoreRepository', () => {
         .whereLessOrEqualThan('formationYear', 1930)
         .limit(4)
         .find();
-      expect(oldBands.length).to.equal(0);
+      expect(oldBands.length).toEqual(0);
     });
 
     it('must limit subcollections', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
       const albumsSubColl = pt.albums;
       const albumsLimited = await albumsSubColl.limit(2).find();
-      expect(albumsLimited.length).to.equal(2);
+      expect(albumsLimited.length).toEqual(2);
     });
 
     it('must throw an exception if limit call more than once', async () => {
@@ -64,11 +63,11 @@ describe('BaseFirestoreRepository', () => {
           .limit(2)
           .limit(2)
           .find()
-      ).to.throw();
+      ).toThrow();
     });
 
-    it('must return if limit is 0');
-    it('must throw if the limit is less than 0');
+    it.todo('must return if limit is 0');
+    it.todo('must throw if the limit is less than 0');
   });
 
   describe('Ordering', () => {
@@ -77,7 +76,7 @@ describe('BaseFirestoreRepository', () => {
         const bands = await bandRepository
           .orderByAscending('formationYear')
           .find();
-        expect(bands[0].id).to.equal('pink-floyd');
+        expect(bands[0].id).toEqual('pink-floyd');
       });
 
       it('must order the objects in a subcollection', async () => {
@@ -86,7 +85,7 @@ describe('BaseFirestoreRepository', () => {
         const discographyNewestFirst = await albumsSubColl
           .orderByAscending('releaseDate')
           .find();
-        expect(discographyNewestFirst[0].id).to.equal('lightbulb-sun');
+        expect(discographyNewestFirst[0].id).toEqual('lightbulb-sun');
       });
 
       it('must be chainable with where* filters', async () => {
@@ -96,7 +95,7 @@ describe('BaseFirestoreRepository', () => {
           .whereGreaterOrEqualThan('releaseDate', new Date('2001-01-01'))
           .orderByAscending('releaseDate')
           .find();
-        expect(discographyNewestFirst[0].id).to.equal('in-absentia');
+        expect(discographyNewestFirst[0].id).toEqual('in-absentia');
       });
 
       it('must be chainable with limit', async () => {
@@ -105,7 +104,7 @@ describe('BaseFirestoreRepository', () => {
           .limit(2)
           .find();
         const lastBand = bands[bands.length - 1];
-        expect(lastBand.id).to.equal('red-hot-chili-peppers');
+        expect(lastBand.id).toEqual('red-hot-chili-peppers');
       });
 
       it('must throw an Error if an orderBy* function is called more than once in the same expression', async () => {
@@ -115,7 +114,7 @@ describe('BaseFirestoreRepository', () => {
           albumsSubColl
             .orderByAscending('releaseDate')
             .orderByDescending('releaseDate');
-        }).to.throw;
+        }).toThrow;
       });
     });
 
@@ -124,7 +123,7 @@ describe('BaseFirestoreRepository', () => {
         const bands = await bandRepository
           .orderByDescending('formationYear')
           .find();
-        expect(bands[0].id).to.equal('porcupine-tree');
+        expect(bands[0].id).toEqual('porcupine-tree');
       });
 
       it('must order the objects in a subcollection', async () => {
@@ -133,7 +132,7 @@ describe('BaseFirestoreRepository', () => {
         const discographyNewestFirst = await albumsSubColl
           .orderByDescending('releaseDate')
           .find();
-        expect(discographyNewestFirst[0].id).to.equal('fear-blank-planet');
+        expect(discographyNewestFirst[0].id).toEqual('fear-blank-planet');
       });
 
       it('must be chainable with where* filters', async () => {
@@ -143,7 +142,7 @@ describe('BaseFirestoreRepository', () => {
           .whereGreaterOrEqualThan('releaseDate', new Date('2001-01-01'))
           .orderByDescending('releaseDate')
           .find();
-        expect(discographyNewestFirst[0].id).to.equal('fear-blank-planet');
+        expect(discographyNewestFirst[0].id).toEqual('fear-blank-planet');
       });
 
       it('must be chainable with limit', async () => {
@@ -152,7 +151,7 @@ describe('BaseFirestoreRepository', () => {
           .limit(2)
           .find();
         const lastBand = bands[bands.length - 1];
-        expect(lastBand.id).to.equal('red-hot-chili-peppers');
+        expect(lastBand.id).toEqual('red-hot-chili-peppers');
       });
 
       it('must throw an Error if an orderBy* function is called more than once in the same expression', async () => {
@@ -162,7 +161,7 @@ describe('BaseFirestoreRepository', () => {
           albumsSubColl
             .orderByAscending('releaseDate')
             .orderByDescending('releaseDate');
-        }).to.throw;
+        }).toThrow;
       });
     });
   });
@@ -170,19 +169,19 @@ describe('BaseFirestoreRepository', () => {
   describe('findById', () => {
     it('must find by id', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
-      expect(pt).instanceOf(Band);
-      expect(pt.id).to.equal('porcupine-tree');
-      expect(pt.name).to.equal('Porcupine Tree');
+      expect(pt).toBeInstanceOf(Band);
+      expect(pt.id).toEqual('porcupine-tree');
+      expect(pt.name).toEqual('Porcupine Tree');
     });
 
     it('must have proper getters', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
-      expect(pt.getLastShowYear()).to.eql(2010);
+      expect(pt.getLastShowYear()).toEqual(2010);
     });
 
     it('return null if not found', async () => {
       const sw = await bandRepository.findById('steven-wilson');
-      expect(sw).to.be.null;
+      expect(sw).toBeNull();
     });
   });
 
@@ -195,8 +194,8 @@ describe('BaseFirestoreRepository', () => {
       entity.genres = ['progressive-rock', 'hard-rock', 'heavy-metal'];
 
       const band = await bandRepository.create(entity);
-      expect(band).to.be.instanceOf(Band);
-      expect(band.getPopularGenre()).to.equal('progressive-rock');
+      expect(band).toBeInstanceOf(Band);
+      expect(band.getPopularGenre()).toEqual('progressive-rock');
     });
 
     it('must not validate if the validate config by default', async () => {
@@ -208,7 +207,7 @@ describe('BaseFirestoreRepository', () => {
       entity.contactEmail = 'Not an email';
       const band = await bandRepository.create(entity);
 
-      expect(band.contactEmail).to.equal('Not an email');
+      expect(band.contactEmail).toEqual('Not an email');
     });
 
     it('must not validate if the validateModels: false', async () => {
@@ -220,7 +219,7 @@ describe('BaseFirestoreRepository', () => {
       entity.contactEmail = 'Not an email';
       const band = await bandRepository.create(entity);
 
-      expect(band.contactEmail).to.equal('Not an email');
+      expect(band.contactEmail).toEqual('Not an email');
     });
 
     it('must fail validation if an invalid class is given', async () => {
@@ -233,7 +232,7 @@ describe('BaseFirestoreRepository', () => {
       try {
         await bandRepository.create(entity);
       } catch (error) {
-        expect(error[0].constraints.isEmail).to.equal('Invalid email!');
+        expect(error[0].constraints.isEmail).toEqual('Invalid email!');
       }
     });
 
@@ -248,7 +247,7 @@ describe('BaseFirestoreRepository', () => {
       try {
         await bandRepository.create(entity as Band);
       } catch (error) {
-        expect(error[0].constraints.isEmail).to.equal('Invalid email!');
+        expect(error[0].constraints.isEmail).toEqual('Invalid email!');
       }
     });
 
@@ -260,10 +259,10 @@ describe('BaseFirestoreRepository', () => {
       entity.genres = ['alternative-rock', 'alternative-metal', 'hard-rock'];
 
       const band = await bandRepository.create(entity);
-      expect(band.id).to.equal(entity.id);
-      expect(band.name).to.equal(entity.name);
-      expect(band.formationYear).to.equal(entity.formationYear);
-      expect(band.genres).to.equal(entity.genres);
+      expect(band.id).toEqual(entity.id);
+      expect(band.name).toEqual(entity.name);
+      expect(band.formationYear).toEqual(entity.formationYear);
+      expect(band.genres).toEqual(entity.genres);
     });
 
     it('must create items and assign a custom id if no id is passed', async () => {
@@ -273,11 +272,11 @@ describe('BaseFirestoreRepository', () => {
       entity.genres = ['progressive-rock'];
 
       const band = await bandRepository.create(entity);
-      expect(typeof band.id).to.equal('string');
-      expect(band.id).not.to.be.undefined;
-      expect(band.name).to.equal(entity.name);
-      expect(band.formationYear).to.equal(entity.formationYear);
-      expect(band.genres).to.equal(entity.genres);
+      expect(typeof band.id).toEqual('string');
+      expect(band.id).not.toBeUndefined();
+      expect(band.name).toEqual(entity.name);
+      expect(band.formationYear).toEqual(entity.formationYear);
+      expect(band.genres).toEqual(entity.genres);
     });
 
     it('must save autogenerated id field in document if no id is passed', async () => {
@@ -289,7 +288,7 @@ describe('BaseFirestoreRepository', () => {
       const band = await bandRepository.create(entity);
       const foundBand = await bandRepository.findById(band.id);
 
-      expect(band.id).to.equal(foundBand.id);
+      expect(band.id).toEqual(foundBand.id);
     });
   });
 
@@ -299,11 +298,10 @@ describe('BaseFirestoreRepository', () => {
       const albums = band.albums;
       band.name = 'Steven Wilson';
       const updatedBand = await bandRepository.update(band);
-      expect(band.name).to.equal(updatedBand.name);
-      expect(band.albums).to.equal(
-        albums,
-        'should not mutate other fields or relations on updated item'
-      );
+      expect(band.name).toEqual(updatedBand.name);
+
+      // should not mutate other fields or relations on updated item
+      expect(band.albums).toEqual(albums);
     });
 
     it('must not validate if the validate config property is false', async () => {
@@ -317,7 +315,7 @@ describe('BaseFirestoreRepository', () => {
       await bandRepository.update(band);
       const updatedBand = await bandRepository.findById('porcupine-tree');
 
-      expect(updatedBand.contactEmail).to.equal('Not an email');
+      expect(updatedBand.contactEmail).toEqual('Not an email');
     });
 
     it('must fail validation if an invalid class is given', async () => {
@@ -330,7 +328,7 @@ describe('BaseFirestoreRepository', () => {
       try {
         await bandRepository.update(band);
       } catch (error) {
-        expect(error[0].constraints.isEmail).to.equal('Invalid email!');
+        expect(error[0].constraints.isEmail).toEqual('Invalid email!');
       }
     });
 
@@ -343,24 +341,24 @@ describe('BaseFirestoreRepository', () => {
       try {
         await bandRepository.update(band);
       } catch (error) {
-        expect(error[0].constraints.isEmail).to.equal('Invalid email!');
+        expect(error[0].constraints.isEmail).toEqual('Invalid email!');
       }
     });
 
-    it('must only update changed fields');
-    it('must throw if item is not found');
+    it.todo('must only update changed fields');
+    it.todo('must throw if item is not found');
   });
 
   describe('delete', () => {
     it('must delete item', async () => {
       await bandRepository.delete('porcupine-tree');
       const roy = await bandRepository.findById('porcupine-tree');
-      expect(roy).to.be.null;
+      expect(roy).toBeNull();
     });
 
     it('must throw if item is not found', async () => {
       //tslint:disable-next-line:rule1 no-void-expression
-      expect(await bandRepository.delete('lol')).to.throw;
+      expect(await bandRepository.delete('lol')).toThrow;
     });
   });
 
@@ -369,8 +367,8 @@ describe('BaseFirestoreRepository', () => {
       const list = await bandRepository
         .whereEqualTo(b => b.name, 'Porcupine Tree')
         .find();
-      expect(list.length).to.equal(1);
-      expect(list[0].name).to.equal('Porcupine Tree');
+      expect(list.length).toEqual(1);
+      expect(list[0].name).toEqual('Porcupine Tree');
     });
 
     it('must return T[]', async () => {
@@ -379,7 +377,7 @@ describe('BaseFirestoreRepository', () => {
         .find();
 
       progressiveRockBands.forEach(b => {
-        expect(b.getPopularGenre()).to.eql(b.genres[0]);
+        expect(b.getPopularGenre()).toEqual(b.genres[0]);
       });
     });
 
@@ -387,29 +385,29 @@ describe('BaseFirestoreRepository', () => {
       const list = await bandRepository
         .whereGreaterOrEqualThan('formationYear', 1983)
         .find();
-      expect(list.length).to.equal(2);
+      expect(list.length).toEqual(2);
     });
 
     it('must filter with whereEqualTo', async () => {
       const list = await bandRepository
         .whereEqualTo('name', 'Porcupine Tree')
         .find();
-      expect(list.length).to.equal(1);
-      expect(list[0].name).to.equal('Porcupine Tree');
+      expect(list.length).toEqual(1);
+      expect(list[0].name).toEqual('Porcupine Tree');
     });
 
     it('must filter with whereGreaterThan', async () => {
       const list = await bandRepository
         .whereGreaterThan('formationYear', 1983)
         .find();
-      expect(list.length).to.equal(1);
+      expect(list.length).toEqual(1);
     });
 
     it('must filter with whereGreaterOrEqualThan', async () => {
       const list = await bandRepository
         .whereGreaterOrEqualThan('formationYear', 1983)
         .find();
-      expect(list.length).to.equal(2);
+      expect(list.length).toEqual(2);
     });
 
     it('must filter with whereLessThan', async () => {
@@ -417,21 +415,21 @@ describe('BaseFirestoreRepository', () => {
         .whereLessThan('formationYear', 1983)
         .find();
 
-      expect(list.length).to.equal(1);
+      expect(list.length).toEqual(1);
     });
 
     it('must filter with whereLessOrEqualThan', async () => {
       const list = await bandRepository
         .whereLessOrEqualThan('formationYear', 1983)
         .find();
-      expect(list.length).to.equal(2);
+      expect(list.length).toEqual(2);
     });
 
     it('must filter with whereArrayContains', async () => {
       const list = await bandRepository
         .whereArrayContains('genres', 'progressive-rock')
         .find();
-      expect(list.length).to.equal(2);
+      expect(list.length).toEqual(2);
     });
 
     it('must filter with two or more operators', async () => {
@@ -439,8 +437,8 @@ describe('BaseFirestoreRepository', () => {
         .whereLessOrEqualThan('formationYear', 1983)
         .whereArrayContains('genres', 'funk-rock')
         .find();
-      expect(list.length).to.equal(1);
-      expect(list[0].id).to.equal('red-hot-chili-peppers');
+      expect(list.length).toEqual(1);
+      expect(list[0].id).toEqual('red-hot-chili-peppers');
     });
 
     it('must support document references in where methods', async () => {
@@ -454,8 +452,8 @@ describe('BaseFirestoreRepository', () => {
         .whereEqualTo(b => b.relatedBand, docRef)
         .find();
 
-      expect(byReference.length).to.equal(1);
-      expect(byReference[0].name).to.equal('Porcupine Tree');
+      expect(byReference.length).toEqual(1);
+      expect(byReference[0].name).toEqual('Porcupine Tree');
     });
   });
 
@@ -465,21 +463,21 @@ describe('BaseFirestoreRepository', () => {
         .whereLessOrEqualThan('formationYear', 1983)
         .whereArrayContains('genres', 'funk-rock')
         .findOne();
-      expect(result).to.be.instanceOf(Band);
-      expect(result.id).to.equal('red-hot-chili-peppers');
+      expect(result).toBeInstanceOf(Band);
+      expect(result.id).toEqual('red-hot-chili-peppers');
     });
 
     it('must return null if not found', async () => {
       const result = await bandRepository
         .whereLessThan('formationYear', 0)
         .findOne();
-      expect(result).to.be.null;
+      expect(result).toBeNull();
     });
 
     it('should work within transactions', async () => {
       await bandRepository.runTransaction(async tran => {
         const result = await tran.whereLessThan('formationYear', 0).findOne();
-        expect(result).to.be.null;
+        expect(result).toBeNull();
       });
     });
   });
@@ -487,15 +485,15 @@ describe('BaseFirestoreRepository', () => {
   describe('miscellaneous', () => {
     it('should correctly parse dates', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
-      expect(pt.lastShow).to.be.instanceOf(Date);
-      expect(pt.lastShow.toISOString()).to.equal('2010-10-14T00:00:00.000Z');
+      expect(pt.lastShow).toBeInstanceOf(Date);
+      expect(pt.lastShow.toISOString()).toEqual('2010-10-14T00:00:00.000Z');
     });
 
     it('should correctly parse geopoints', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
-      expect(pt.lastShowCoordinates).to.be.instanceOf(Coordinates);
-      expect(pt.lastShowCoordinates.latitude).to.equal(51.5009088);
-      expect(pt.lastShowCoordinates.longitude).to.equal(-0.1795547);
+      expect(pt.lastShowCoordinates).toBeInstanceOf(Coordinates);
+      expect(pt.lastShowCoordinates.latitude).toEqual(51.5009088);
+      expect(pt.lastShowCoordinates.longitude).toEqual(-0.1795547);
     });
 
     it('should correctly parse references', async () => {
@@ -507,12 +505,10 @@ describe('BaseFirestoreRepository', () => {
 
       const foundBand = await bandRepository.findById('porcupine-tree');
 
-      expect(foundBand.relatedBand).to.be.instanceOf(
-        FirestoreDocumentReference
-      );
-      expect(foundBand.relatedBand.id).to.equal('opeth');
+      expect(foundBand.relatedBand).toBeInstanceOf(FirestoreDocumentReference);
+      expect(foundBand.relatedBand.id).toEqual('opeth');
       // firestore mock doesn't set this property, it should be bands/opeth
-      expect(foundBand.relatedBand.path).to.equal(undefined);
+      expect(foundBand.relatedBand.path).toEqual(undefined);
     });
   });
 
@@ -525,12 +521,12 @@ describe('BaseFirestoreRepository', () => {
       });
 
       const updated = await bandRepository.findById('porcupine-tree');
-      expect(updated.name).to.eql('Árbol de Puercoespín');
+      expect(updated.name).toEqual('Árbol de Puercoespín');
     });
 
     it('should return TransactionRepository', async () => {
       await bandRepository.runTransaction(async tran => {
-        expect(tran.constructor.name).to.equal('TransactionRepository');
+        expect(tran.constructor.name).toEqual('TransactionRepository');
       });
     });
   });
@@ -564,7 +560,7 @@ describe('BaseFirestoreRepository', () => {
         .whereEqualTo('formationYear', 2099)
         .find();
 
-      expect(batchedBands.map(b => b.name)).to.eql([
+      expect(batchedBands.map(b => b.name)).toEqual([
         'Entity1',
         'Entity2',
         'Entity3',
@@ -575,21 +571,21 @@ describe('BaseFirestoreRepository', () => {
   describe('must handle subcollections', () => {
     it('should initialize subcollections', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
-      expect(pt.name).to.equal('Porcupine Tree');
-      expect(pt.albums).to.be.instanceOf(BaseFirestoreRepository);
+      expect(pt.name).toEqual('Porcupine Tree');
+      expect(pt.albums).toBeInstanceOf(BaseFirestoreRepository);
     });
 
     it('should initialize nested subcollections', async () => {
       const pt = await bandRepository.findById('red-hot-chili-peppers');
       const album = await pt.albums.findById('stadium-arcadium');
 
-      expect(album.images).to.be.instanceOf(BaseFirestoreRepository);
+      expect(album.images).toBeInstanceOf(BaseFirestoreRepository);
     });
 
     it('should be able to execute operations in the subcollection', async () => {
       const band = await bandRepository.findById('red-hot-chili-peppers');
       const bestAlbum = await band.albums.findById('stadium-arcadium');
-      expect(bestAlbum.id).to.equal('stadium-arcadium');
+      expect(bestAlbum.id).toEqual('stadium-arcadium');
     });
 
     it('should be able to create subcollections', async () => {
@@ -621,7 +617,7 @@ describe('BaseFirestoreRepository', () => {
       await band.albums.create(thirdAlbum);
 
       const albums = await band.albums.find();
-      expect(albums.length).to.eql(3);
+      expect(albums.length).toEqual(3);
     });
 
     it('should initialize nested subcollections on create', async () => {
@@ -640,7 +636,7 @@ describe('BaseFirestoreRepository', () => {
 
       const album = await band.albums.create(firstAlbum);
 
-      expect(album.images).to.be.instanceOf(BaseFirestoreRepository);
+      expect(album.images).toBeInstanceOf(BaseFirestoreRepository);
     });
 
     it('should be able to validate subcollections on create', async () => {
@@ -663,7 +659,7 @@ describe('BaseFirestoreRepository', () => {
       try {
         await band.albums.create(firstAlbum);
       } catch (error) {
-        expect(error[0].constraints.length).to.equal('Name is too long');
+        expect(error[0].constraints.length).toEqual('Name is too long');
       }
     });
 
@@ -675,7 +671,7 @@ describe('BaseFirestoreRepository', () => {
       await pt.albums.update(album);
 
       const updatedAlbum = await pt.albums.findById('fear-blank-planet');
-      expect(updatedAlbum.comment).to.eql('Anesthethize is top 3 IMHO');
+      expect(updatedAlbum.comment).toEqual('Anesthethize is top 3 IMHO');
     });
 
     it('should be able to validate subcollections on update', async () => {
@@ -689,7 +685,7 @@ describe('BaseFirestoreRepository', () => {
       try {
         await pt.albums.update(album);
       } catch (error) {
-        expect(error[0].constraints.length).to.equal('Name is too long');
+        expect(error[0].constraints.length).toEqual('Name is too long');
       }
     });
 
@@ -699,8 +695,8 @@ describe('BaseFirestoreRepository', () => {
       const updatedPt = await bandRepository.update(pt);
       const foundUpdatedPt = await bandRepository.update(pt);
 
-      expect(updatedPt.name).to.eql(pt.name);
-      expect(foundUpdatedPt.name).to.eql(pt.name);
+      expect(updatedPt.name).toEqual(pt.name);
+      expect(foundUpdatedPt.name).toEqual(pt.name);
     });
 
     it('should be able to delete subcollections', async () => {
@@ -708,15 +704,15 @@ describe('BaseFirestoreRepository', () => {
       await pt.albums.delete('fear-blank-planet');
 
       const updatedBandAlbums = await pt.albums.find();
-      expect(updatedBandAlbums.length).to.eql(3);
+      expect(updatedBandAlbums.length).toEqual(3);
     });
 
     describe('miscellaneous', () => {
       it('should correctly parse dates', async () => {
         const pt = await bandRepository.findById('porcupine-tree');
         const { releaseDate } = await pt.albums.findById('deadwing');
-        expect(releaseDate).instanceOf(Date);
-        expect(releaseDate.toISOString()).to.equal('2005-03-25T00:00:00.000Z');
+        expect(releaseDate).toBeInstanceOf(Date);
+        expect(releaseDate.toISOString()).toEqual('2005-03-25T00:00:00.000Z');
       });
     });
   });
@@ -731,18 +727,18 @@ describe('BaseFirestoreRepository', () => {
 
     it('Get by id - entity should contain id', async () => {
       const band = await bandRepository.findById(docId);
-      expect(band).to.have.property('id');
-      expect(band.id).to.equal(docId);
+      expect(band).toHaveProperty('id');
+      expect(band.id).toEqual(docId);
     });
 
     it('Get list - all entities should contain id', async () => {
       const bands = await bandRepository.find();
       for (const b of bands) {
-        expect(b.id).not.to.be.undefined;
+        expect(b.id).not.toBeUndefined();
       }
 
       const possibleDocWithoutId = bands.find(band => band.id === docId);
-      expect(possibleDocWithoutId).not.to.be.undefined;
+      expect(possibleDocWithoutId).not.toBeUndefined();
     });
   });
 });

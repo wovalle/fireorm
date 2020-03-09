@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 const MockFirebase = require('mock-cloud-firestore');
 import { BaseFirestoreBatchRepository } from './BaseFirestoreBatchRepository';
 import { getFixture } from '../../test/fixture';
@@ -40,7 +39,7 @@ describe('BaseFirestoreBatchRepository', () => {
       bandRepository.create(entity);
       await batch.commit();
 
-      expect(batchStub.set.firstCall.lastArg).to.eql({
+      expect(batchStub.set.firstCall.lastArg).toEqual({
         id: 'perfect-circle',
         name: 'A Perfect Circle',
         formationYear: 1999,
@@ -59,13 +58,13 @@ describe('BaseFirestoreBatchRepository', () => {
 
       const data = batchStub.set.firstCall.lastArg;
 
-      expect(typeof data.id).to.eql('string');
-      expect(data.name).to.eql('The Pinapple Thief');
-      expect(data.formationYear).to.eql(1999);
-      expect(data.genres).to.eql(['progressive-rock']);
+      expect(typeof data.id).toEqual('string');
+      expect(data.name).toEqual('The Pinapple Thief');
+      expect(data.formationYear).toEqual(1999);
+      expect(data.genres).toEqual(['progressive-rock']);
     });
 
-    it('must be able to create document from anonymous object without id');
+    it.todo('must be able to create document from anonymous object without id');
   });
 
   describe('update', () => {
@@ -83,7 +82,7 @@ describe('BaseFirestoreBatchRepository', () => {
       bandRepository.update(entity);
       await batch.commit();
 
-      expect(batchStub.update.firstCall.lastArg).to.eql({
+      expect(batchStub.update.firstCall.lastArg).toEqual({
         id: 'perfect-circle',
         name: 'Un Círculo Perfecto',
         formationYear: 1999,
@@ -103,7 +102,7 @@ describe('BaseFirestoreBatchRepository', () => {
       bandRepository.delete(entity);
       await batch.commit();
 
-      expect(batchStub.delete.firstCall.lastArg).to.eql({
+      expect(batchStub.delete.firstCall.lastArg).toEqual({
         id: 'perfect-circle',
         name: 'A Perfect Circle',
         formationYear: 1999,
@@ -134,7 +133,7 @@ describe('BaseFirestoreBatchRepository', () => {
       try {
         await validationBatch.commit();
       } catch (error) {
-        expect(error[0].constraints.isEmail).to.equal('Invalid email!');
+        expect(error[0].constraints.isEmail).toEqual('Invalid email!');
       }
     });
 
@@ -159,7 +158,7 @@ describe('BaseFirestoreBatchRepository', () => {
 
       entity.contactEmail = 'email';
       validationBandRepository.delete(entity);
-      expect(validationBatch.commit).to.not.to.throw();
+      expect(validationBatch.commit).not.toThrow();
     });
   });
 

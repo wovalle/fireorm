@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 const MockFirebase = require('mock-cloud-firestore');
 import { Transaction } from '@google-cloud/firestore';
 
@@ -24,7 +23,7 @@ describe('FirestoreTransaction', () => {
       const tran = new FirestoreTransaction(innerTran);
 
       const bandRepository = tran.getRepository(Entity);
-      expect(bandRepository.constructor.name).to.eql('TransactionRepository');
+      expect(bandRepository.constructor.name).toEqual('TransactionRepository');
     });
   });
 });

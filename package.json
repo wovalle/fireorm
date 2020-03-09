@@ -30,9 +30,11 @@
     "lint": "tslint --project tsconfig.json",
     "lint:md": "remark README.md -o README.md",
     "release": "semantic-release",
-    "test": "mocha --require ts-node/register --extension ts --recursive src",
+    "test": "jest src",
     "test:integration": "mocha --require ts-node/register -r dotenv/config --extension ts --recursive -t 10000 --file test/setup.ts test",
-    "test:watch": "mocha --require ts-node/register --extension ts --recursive -w src"
+    "test:watch": "jest --watch src",
+    "t": "yarn test",
+    "tw": "yarn test:watch"
   },
   "dependencies": {
     "class-transformer": "^0.2.0",
@@ -44,25 +46,22 @@
     "@commitlint/config-conventional": "^8.2.0",
     "@commitlint/travis-cli": "^8.2.0",
     "@google-cloud/firestore": "^3.5.0",
-    "@types/chai": "^4.1.7",
-    "@types/chai-as-promised": "^7.1.2",
-    "@types/mocha": "^7.0.1",
+    "@types/jest": "^25.1.4",
     "@types/pluralize": "^0.0.29",
     "@types/sinon": "^7.5.1",
-    "@types/uuid": "^3.4.5",
-    "chai": "^4.2.0",
     "class-validator": "^0.11.0",
     "docsify-cli": "4.3.0",
     "dotenv": "^8.1.0",
     "firebase-admin": "^8.1.0",
     "gh-pages-deploy": "^0.5.1",
     "husky": "^4.2.3",
-    "mocha": "^7.0.1",
+    "jest": "^25.1.0",
     "mock-cloud-firestore": "^0.11.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",
     "semantic-release": "^17.0.3",
     "sinon": "^9.0.0",
+    "ts-jest": "^25.2.1",
     "ts-node": "^8.3.0",
     "tslint": "^6.0.0",
     "typedoc": "^0.16.10",
@@ -103,7 +102,7 @@
     "prep": [
       "build:doc"
     ],
-    "commit": "chore(docs): Updating documentation",
+    "commit": "chore(docs): updating documentation",
     "noprompt": true
   }
 }

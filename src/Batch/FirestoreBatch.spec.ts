@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 const MockFirebase = require('mock-cloud-firestore');
 import { Firestore } from '@google-cloud/firestore';
 
@@ -25,7 +24,7 @@ describe('FirestoreBatch', () => {
       const tran = new FirestoreBatch(firestore);
 
       const bandRepository = tran.getRepository(Entity);
-      expect(bandRepository.constructor.name).to.be.eql(
+      expect(bandRepository.constructor.name).toEqual(
         'BaseFirestoreBatchRepository'
       );
     });
@@ -41,14 +40,14 @@ describe('FirestoreBatch', () => {
       const tran = new FirestoreBatch(firestore);
 
       const bandRepository = tran.getSingleRepository(Entity);
-      expect(bandRepository.constructor.name).to.be.eql(
+      expect(bandRepository.constructor.name).toEqual(
         'FirestoreBatchSingleRepository'
       );
     });
   });
 
   describe('commit', () => {
-    it('should throw error if no ops');
-    it('should return call inner commit');
+    it.todo('should throw error if no ops');
+    it.todo('should return call inner commit');
   });
 });

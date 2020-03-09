@@ -1,6 +1,5 @@
 import { getRepository, Collection } from '../../src';
 import { Band as BandEntity } from '../fixture';
-import { expect } from 'chai';
 import { getUniqueColName } from '../setup';
 
 describe('Integration test: Simple Repository', () => {
@@ -23,10 +22,10 @@ describe('Integration test: Simple Repository', () => {
     };
 
     const savedBand = await bandRepository.create(dt);
-    expect(savedBand.name).to.equal(dt.name);
-    expect(savedBand.id).to.equal(dt.id);
-    expect(savedBand.formationYear).to.equal(dt.formationYear);
-    expect(savedBand.genres).to.equal(dt.genres);
+    expect(savedBand.name).toEqual(dt.name);
+    expect(savedBand.id).toEqual(dt.id);
+    expect(savedBand.formationYear).toEqual(dt.formationYear);
+    expect(savedBand.genres).toEqual(dt.genres);
 
     // Create a band without an id
     const devinT = new Band();
@@ -35,32 +34,32 @@ describe('Integration test: Simple Repository', () => {
     devinT.genres = ['progressive-metal', 'extreme-metal'];
 
     const savedBandWithoutId = await bandRepository.create(devinT);
-    expect(savedBandWithoutId.name).to.equal(devinT.name);
-    expect(savedBandWithoutId.id).to.equal(devinT.id);
+    expect(savedBandWithoutId.name).toEqual(devinT.name);
+    expect(savedBandWithoutId.id).toEqual(devinT.id);
 
     // Read a band
     const foundBand = await bandRepository.findById(dt.id);
-    expect(foundBand.id).to.equal(dt.id);
-    expect(foundBand.name).to.equal(dt.name);
+    expect(foundBand.id).toEqual(dt.id);
+    expect(foundBand.name).toEqual(dt.name);
 
     // Update a band
     dt.name = 'Dream Theater';
     const updatedDt = await bandRepository.update(dt);
     const updatedDtInDb = await bandRepository.findById(dt.id);
-    expect(updatedDt.name).to.equal(dt.name);
-    expect(updatedDtInDb.name).to.equal(dt.name);
+    expect(updatedDt.name).toEqual(dt.name);
+    expect(updatedDtInDb.name).toEqual(dt.name);
 
     // Filter a band by subfield
     const byWebsite = await bandRepository
       .whereEqualTo(a => a.extra.website, 'www.dreamtheater.net')
       .find();
-    expect(byWebsite[0].id).to.equal('dream-theater');
+    expect(byWebsite[0].id).toEqual('dream-theater');
 
     // Find one band matching some criteria
     const byWebsiteOne = await bandRepository
       .whereEqualTo(a => a.name, 'Dream Theater')
       .findOne();
-    expect(byWebsiteOne.id).to.equal('dream-theater');
+    expect(byWebsiteOne.id).toEqual('dream-theater');
 
     // Should be able to run transactions
     await bandRepository.runTransaction(async tran => {
@@ -70,11 +69,11 @@ describe('Integration test: Simple Repository', () => {
     });
 
     const updated = await bandRepository.findById('dream-theater');
-    expect(updated.name).to.eql('Teatro del sueño');
+    expect(updated.name).toEqual('Teatro del sueño');
 
     // Delete a band
     await bandRepository.delete(dt.id);
     const deletedBand = await bandRepository.findById(dt.id);
-    expect(deletedBand).to.equal(null);
+    expect(deletedBand).toEqual(null);
   });
 });
