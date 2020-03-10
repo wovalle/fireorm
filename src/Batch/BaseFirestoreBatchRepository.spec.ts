@@ -3,15 +3,14 @@ import { BaseFirestoreBatchRepository } from './BaseFirestoreBatchRepository';
 import { getFixture } from '../../test/fixture';
 import { initialize } from '../MetadataStorage';
 import { Band } from '../../test/BandCollection';
-import { Firestore, WriteBatch } from '@google-cloud/firestore';
-import sinon from 'sinon';
+import { Firestore, WriteBatch, WriteResult } from '@google-cloud/firestore';
 import { FirestoreBatchUnit } from './FirestoreBatchUnit';
 
 describe('BaseFirestoreBatchRepository', () => {
   let bandRepository: BaseFirestoreBatchRepository<Band> = null;
   let firestore: Firestore;
   let batch: FirestoreBatchUnit;
-  let batchStub: sinon.SinonStubbedInstance<WriteBatch>;
+  let batchStub: jest.Mocked<WriteBatch>;
 
   beforeEach(() => {
     const fixture = Object.assign({}, getFixture());
@@ -19,7 +18,13 @@ describe('BaseFirestoreBatchRepository', () => {
       isNaiveSnapshotListenerEnabled: false,
     });
 
-    batchStub = sinon.createStubInstance(WriteBatch);
+    batchStub = {
+      create: jest.fn(),
+      update: jest.fn(),
+      set: jest.fn(),
+      delete: jest.fn(),
+      commit: jest.fn(),
+    };
 
     firestore = Object.assign(firebase.firestore(), { batch: () => batchStub });
     initialize(firestore);
@@ -39,7 +44,7 @@ describe('BaseFirestoreBatchRepository', () => {
       bandRepository.create(entity);
       await batch.commit();
 
-      expect(batchStub.set.firstCall.lastArg).toEqual({
+      expect(batchStub.set.mock.calls[0][1]).toEqual({
         id: 'perfect-circle',
         name: 'A Perfect Circle',
         formationYear: 1999,
@@ -56,7 +61,7 @@ describe('BaseFirestoreBatchRepository', () => {
       bandRepository.create(entity);
       await batch.commit();
 
-      const data = batchStub.set.firstCall.lastArg;
+      const data = batchStub.set.mock.calls[0][1] as Band;
 
       expect(typeof data.id).toEqual('string');
       expect(data.name).toEqual('The Pinapple Thief');
@@ -82,7 +87,7 @@ describe('BaseFirestoreBatchRepository', () => {
       bandRepository.update(entity);
       await batch.commit();
 
-      expect(batchStub.update.firstCall.lastArg).toEqual({
+      expect(batchStub.update.mock.calls[0][1]).toEqual({
         id: 'perfect-circle',
         name: 'Un Círculo Perfecto',
         formationYear: 1999,
@@ -102,7 +107,7 @@ describe('BaseFirestoreBatchRepository', () => {
       bandRepository.delete(entity);
       await batch.commit();
 
-      expect(batchStub.delete.firstCall.lastArg).toEqual({
+      expect(batchStub.delete.mock.calls[0][1]).toEqual({
         id: 'perfect-circle',
         name: 'A Perfect Circle',
         formationYear: 1999,
