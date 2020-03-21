@@ -5,7 +5,6 @@ import {
   CollectionMetadata,
   MetadataStorageConfig,
 } from '../MetadataStorage';
-import { ValidationError } from 'class-validator';
 import { FirestoreBatchUnit } from './FirestoreBatchUnit';
 
 export class BaseFirestoreBatchRepository<T extends IEntity> {

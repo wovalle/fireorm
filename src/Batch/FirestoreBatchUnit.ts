@@ -2,7 +2,7 @@ import { IEntity, Instantiable } from '../types';
 import { Firestore, DocumentReference } from '@google-cloud/firestore';
 import { CollectionMetadata } from '../MetadataStorage';
 import { serializeEntity } from '../utils';
-import { ValidationError } from 'class-validator';
+import { ValidationError } from '../Errors/ValidationError';
 
 type BatchOperation<T extends IEntity> = {
   type: 'create' | 'update' | 'delete';
