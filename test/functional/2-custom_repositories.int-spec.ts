@@ -24,7 +24,7 @@ describe('Integration test: Custom Repository', () => {
   // custom repository
   const rockBandRepository = getRepository(Band) as CustomRockBandRepository;
 
-  before(async () => {
+  beforeAll(async () => {
     const seed = getInitialData().map(b => rockBandRepository.create(b));
     await Promise.all(seed);
   });

@@ -22,7 +22,7 @@ describe('Integration test: SubCollections', () => {
 
   const fullBandRepository = getRepository(FullBand);
 
-  before(async () => {
+  beforeAll(async () => {
     const seed = getInitialData().map(({ albums, ...band }) => ({
       band,
       albums,

@@ -1,7 +1,7 @@
 import { initialize, getStore, clearMetadataStorage } from '../MetadataStorage';
 import { Collection } from './Collection';
 
-describe.skip('CollectionDecorator', () => {
+describe('CollectionDecorator', () => {
   const store = getStore();
   beforeEach(() => {
     clearMetadataStorage();

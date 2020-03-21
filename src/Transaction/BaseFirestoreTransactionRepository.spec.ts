@@ -250,10 +250,10 @@ describe('BaseFirestoreTransactionRepository', () => {
       });
     });
 
+    // mock-cloud-firestore won't throw here
     it.skip('must throw if item is not found', async () => {
       await bandRepository.runTransaction(async tran => {
-        const a = await tran.delete('lol');
-        expect(a).toBeTruthy();
+        expect(() => tran.delete('lolita')).toThrow();
       });
     });
   });

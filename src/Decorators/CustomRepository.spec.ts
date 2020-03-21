@@ -2,7 +2,7 @@ import { CustomRepository } from './CustomRepository';
 import { initialize, getStore, clearMetadataStorage } from '../MetadataStorage';
 import { BaseFirestoreRepository } from '../BaseFirestoreRepository';
 
-describe.skip('CustomRepositoryDecorator', () => {
+describe('CustomRepositoryDecorator', () => {
   const store = getStore();
 
   beforeEach(() => {

@@ -1,7 +1,7 @@
 import { SubCollection } from './SubCollection';
 import { initialize, clearMetadataStorage, getStore } from '../MetadataStorage';
 
-describe.skip('SubCollectionDecorator', () => {
+describe('SubCollectionDecorator', () => {
   const store = getStore();
 
   beforeEach(() => {
