@@ -1,6 +1,6 @@
 import { plainToClass } from 'class-transformer';
 import { DocumentSnapshot, QuerySnapshot } from '@google-cloud/firestore';
-import { ValidationError } from 'class-validator';
+import { ValidationError } from './Errors/ValidationError';
 
 import {
   IEntity,
