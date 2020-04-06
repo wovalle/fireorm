@@ -85,7 +85,7 @@ export interface IQueryExecutor<T> {
 }
 
 export interface IBaseRepository<T extends IEntity> {
-  findById(id: string): Promise<T>;
+  findById(id: string): Promise<T | null>;
   create(item: PartialBy<T, 'id'>): Promise<T>;
   update(item: T): Promise<T>;
   delete(id: string): Promise<void>;
