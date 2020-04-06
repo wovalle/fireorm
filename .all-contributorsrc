@@ -76,11 +76,21 @@
         "code",
         "ideas"
       ]
+    },
+    {
+      "login": "smddzcy",
+      "name": "Samed Düzçay",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/13895224?v=4",
+      "profile": "https://www.smddzcy.com/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
   "projectName": "fireorm",
   "projectOwner": "wovalle",
   "repoType": "github",
-  "repoHost": "https://github.com"
+  "repoHost": "https://github.com",
+  "skipCi": true
 }
