@@ -35,9 +35,6 @@ admin.initializeApp({
 });
 
 const firestore = admin.firestore();
-firestore.settings({
-  timestampsInSnapshots: true,
-});
 fireorm.initialize(firestore);
 ```
 
@@ -66,7 +63,7 @@ class Todo {
   done: Boolean;
 }
 
-const todoRepository = getRepository(Todo, firestore);
+const todoRepository = getRepository(Todo);
 
 const todo = new Todo();
 todo.text = "Check fireorm's Github Repository";
