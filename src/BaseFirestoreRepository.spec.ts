@@ -58,12 +58,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must throw an exception if limit call more than once', async () => {
-      expect(() =>
-        bandRepository
-          .limit(2)
-          .limit(2)
-          .find()
-      ).toThrow();
+      expect(() => bandRepository.limit(2).limit(2).find()).toThrow();
     });
 
     it.todo('must return if limit is 0');
@@ -114,7 +109,7 @@ describe('BaseFirestoreRepository', () => {
           albumsSubColl
             .orderByAscending('releaseDate')
             .orderByDescending('releaseDate');
-        }).toThrow;
+        }).toThrow();
       });
     });
 
@@ -161,7 +156,7 @@ describe('BaseFirestoreRepository', () => {
           albumsSubColl
             .orderByAscending('releaseDate')
             .orderByDescending('releaseDate');
-        }).toThrow;
+        }).toThrow();
       });
     });
   });
@@ -366,7 +361,7 @@ describe('BaseFirestoreRepository', () => {
   describe('.where*', () => {
     it('whereEqualTo must accept function as first parameter', async () => {
       const list = await bandRepository
-        .whereEqualTo(b => b.name, 'Porcupine Tree')
+        .whereEqualTo((b) => b.name, 'Porcupine Tree')
         .find();
       expect(list.length).toEqual(1);
       expect(list[0].name).toEqual('Porcupine Tree');
@@ -377,7 +372,7 @@ describe('BaseFirestoreRepository', () => {
         .whereArrayContains('genres', 'progressive-rock')
         .find();
 
-      progressiveRockBands.forEach(b => {
+      progressiveRockBands.forEach((b) => {
         expect(b.getPopularGenre()).toEqual(b.genres[0]);
       });
     });
@@ -450,7 +445,7 @@ describe('BaseFirestoreRepository', () => {
       await bandRepository.update(band);
 
       const byReference = await bandRepository
-        .whereEqualTo(b => b.relatedBand, docRef)
+        .whereEqualTo((b) => b.relatedBand, docRef)
         .find();
 
       expect(byReference.length).toEqual(1);
@@ -476,7 +471,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('should work within transactions', async () => {
-      await bandRepository.runTransaction(async tran => {
+      await bandRepository.runTransaction(async (tran) => {
         const result = await tran.whereLessThan('formationYear', 0).findOne();
         expect(result).toBeNull();
       });
@@ -515,7 +510,7 @@ describe('BaseFirestoreRepository', () => {
 
   describe('transactions', () => {
     it('should be able to open transactions', async () => {
-      await bandRepository.runTransaction(async tran => {
+      await bandRepository.runTransaction(async (tran) => {
         const band = await tran.findById('porcupine-tree');
         band.name = 'Árbol de Puercoespín';
         await tran.update(band);
@@ -526,7 +521,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('should return TransactionRepository', async () => {
-      await bandRepository.runTransaction(async tran => {
+      await bandRepository.runTransaction(async (tran) => {
         expect(tran.constructor.name).toEqual('TransactionRepository');
       });
     });
@@ -561,7 +556,7 @@ describe('BaseFirestoreRepository', () => {
         .whereEqualTo('formationYear', 2099)
         .find();
 
-      expect(batchedBands.map(b => b.name)).toEqual([
+      expect(batchedBands.map((b) => b.name)).toEqual([
         'Entity1',
         'Entity2',
         'Entity3',
@@ -738,7 +733,7 @@ describe('BaseFirestoreRepository', () => {
         expect(b.id).not.toBeUndefined();
       }
 
-      const possibleDocWithoutId = bands.find(band => band.id === docId);
+      const possibleDocWithoutId = bands.find((band) => band.id === docId);
       expect(possibleDocWithoutId).not.toBeUndefined();
     });
   });

@@ -17,21 +17,13 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch specific test integration w/ mocha",
-      "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
+      "name": "Launch current integration test w/ jest",
+      "program": "${workspaceRoot}/node_modules/.bin/jest",
       "args": [
-        "--require",
-        "ts-node/register",
-        "--require",
-        "dotenv/config",
-        "--ui",
-        "bdd",
-        "--timeout",
-        "0",
-        "--colors",
-        "--file",
-        "test/setup",
-        "test/functional/4-transactions.spec.ts"
+        "--runInBand",
+        "-c",
+        "test/jest.config.js",
+        "test/functional/2-custom_repositories.int-spec.ts"
       ],
       "cwd": "${workspaceRoot}",
       "internalConsoleOptions": "openOnSessionStart"

@@ -8,6 +8,7 @@ import {
   Collection,
   SubCollection,
   ISubCollection,
+  BaseFirestoreRepository,
 } from '../../src';
 import { getUniqueColName } from '../setup';
 
@@ -20,9 +21,10 @@ describe('Integration test: SubCollections', () => {
     albums: ISubCollection<Album>;
   }
 
-  const fullBandRepository = getRepository(FullBand);
+  let fullBandRepository: BaseFirestoreRepository<FullBand> = null;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
+    fullBandRepository = getRepository(FullBand);
     const seed = getInitialData().map(({ albums, ...band }) => ({
       band,
       albums,
@@ -39,7 +41,7 @@ describe('Integration test: SubCollections', () => {
 
       await fullBandRepository.create(band);
 
-      const albums = s.albums.map(a => {
+      const albums = s.albums.map((a) => {
         const album = new Album();
         album.id = a.id;
         album.releaseDate = a.releaseDate;
@@ -48,7 +50,7 @@ describe('Integration test: SubCollections', () => {
         return album;
       });
 
-      await Promise.all(albums.map(a => band.albums.create(a)));
+      await Promise.all(albums.map((a) => band.albums.create(a)));
     }
   });
 

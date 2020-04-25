@@ -1,6 +1,8 @@
 import * as admin from 'firebase-admin';
 import { initialize } from '../src';
 
+console.log('Running Integration Test Setup');
+
 const serviceAccount = {
   projectId: process.env.FIRESTORE_PROJECT_ID,
   databaseUrl: process.env.FIREBASE_DATABASE_URL,
@@ -11,7 +13,6 @@ const serviceAccount = {
   clientEmail: process.env.FIRESTORE_CLIENT_EMAIL,
 };
 
-const uniqueCollections: Array<string> = [];
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: serviceAccount.databaseUrl,
@@ -21,11 +22,15 @@ const firestore = admin.firestore();
 // To understand this, see 5-document-references.spec.ts
 (global as any).firestoreRef = firestore;
 
-initialize(firestore);
+const uniqueCollections = [];
+jest.setTimeout(10000); // 10 seconds
+
+beforeEach(() => {
+  initialize(firestore);
+});
 
 afterAll(async () => {
   console.info('Deleting collections', uniqueCollections);
-
   const batch = firestore.batch();
 
   for (const uc of uniqueCollections) {
@@ -33,12 +38,10 @@ afterAll(async () => {
 
     for (const doc of docs) {
       const albums = await doc.collection('albums').listDocuments();
-
-      albums.forEach(a => batch.delete(a));
+      albums.forEach((a) => batch.delete(a));
       batch.delete(doc);
     }
   }
-
   await batch.commit();
 });
 

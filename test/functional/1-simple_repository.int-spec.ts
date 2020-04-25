@@ -8,9 +8,8 @@ describe('Integration test: Simple Repository', () => {
     extra?: { website: string };
   }
 
-  const bandRepository = getRepository(Band);
-
-  it('should do crud operations', async () => {
+  test('should do crud operations', async () => {
+    const bandRepository = getRepository(Band);
     // Create a band
     const dt = new Band();
     dt.id = 'dream-theater';
@@ -51,18 +50,18 @@ describe('Integration test: Simple Repository', () => {
 
     // Filter a band by subfield
     const byWebsite = await bandRepository
-      .whereEqualTo(a => a.extra.website, 'www.dreamtheater.net')
+      .whereEqualTo((a) => a.extra.website, 'www.dreamtheater.net')
       .find();
     expect(byWebsite[0].id).toEqual('dream-theater');
 
     // Find one band matching some criteria
     const byWebsiteOne = await bandRepository
-      .whereEqualTo(a => a.name, 'Dream Theater')
+      .whereEqualTo((a) => a.name, 'Dream Theater')
       .findOne();
     expect(byWebsiteOne.id).toEqual('dream-theater');
 
     // Should be able to run transactions
-    await bandRepository.runTransaction(async tran => {
+    await bandRepository.runTransaction(async (tran) => {
       const band = await tran.findById('dream-theater');
       band.name = 'Teatro del sueño';
       await tran.update(band);

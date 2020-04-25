@@ -1,4 +1,9 @@
-import { getRepository, Collection, Type } from '../../src';
+import {
+  getRepository,
+  Collection,
+  Type,
+  BaseFirestoreRepository,
+} from '../../src';
 import { Band as BandEntity, FirestoreDocumentReference } from '../fixture';
 import { getUniqueColName } from '../setup';
 import { Firestore } from '@google-cloud/firestore';
@@ -11,16 +16,21 @@ describe('Integration test: Using Document References', () => {
     relatedBand?: FirestoreDocumentReference;
   }
 
-  const bandRepository = getRepository(Band);
+  let firestore: Firestore = null;
+  let bandRepository: BaseFirestoreRepository<Band> = null;
 
-  /*
-   * Yes, this is a hack.
-   * Since the firestore initialization is being done in
-   * setup.ts, I'm just storing the firestore instance
-   * so I can use the sdk to store references.
-   * After fireorm/issues/58 this will be removed
-   */
-  const firestore = (global as any).firestoreRef as Firestore;
+  beforeEach(() => {
+    bandRepository = getRepository(Band);
+
+    /*
+     * Yes, this is a hack.
+     * Since the firestore initialization is being done in
+     * setup.ts, I'm just storing the firestore instance
+     * so I can use the sdk to store references.
+     * After fireorm/issues/58 this will be removed
+     */
+    firestore = (global as any).firestoreRef as Firestore;
+  });
 
   it('should work with document references', async () => {
     const pt = new Band();
@@ -48,14 +58,14 @@ describe('Integration test: Using Document References', () => {
 
     // Is able to retrieve documents with references
     const swFromDb = await bandRepository
-      .whereEqualTo(b => b.name, 'Steven Wilson')
+      .whereEqualTo((b) => b.name, 'Steven Wilson')
       .findOne();
 
     expect(swFromDb.formationYear).toEqual(1987);
 
     // Is able to filter documents by references
     const band = await bandRepository
-      .whereEqualTo(b => b.relatedBand, ptRef)
+      .whereEqualTo((b) => b.relatedBand, ptRef)
       .find();
 
     expect(band.length).toEqual(1);

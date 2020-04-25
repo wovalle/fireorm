@@ -22,10 +22,13 @@ describe('Integration test: Custom Repository', () => {
   // (if it has the @CustomRepository decorator). Since typescript
   // cannot guess dynamic types, we'll have to cast it to the
   // custom repository
-  const rockBandRepository = getRepository(Band) as CustomRockBandRepository;
+  let rockBandRepository: CustomRockBandRepository = null;
 
-  beforeAll(async () => {
-    const seed = getInitialData().map(b => rockBandRepository.create(b));
+  beforeEach(async () => {
+    // see comment above
+    rockBandRepository = getRepository(Band) as CustomRockBandRepository;
+
+    const seed = getInitialData().map((b) => rockBandRepository.create(b));
     await Promise.all(seed);
   });
 
@@ -49,7 +52,7 @@ describe('Integration test: Custom Repository', () => {
       .find();
 
     const [first, second, third] = progressiveRockBands
-      .map(b => b.name)
+      .map((b) => b.name)
       .sort((a, b) => a.localeCompare(b));
 
     expect(progressiveRockBands.length).toEqual(3);

@@ -47,7 +47,21 @@ describe('FirestoreBatch', () => {
   });
 
   describe('commit', () => {
-    it.todo('should throw error if no ops');
-    it.todo('should return call inner commit');
+    it('should throw error if no ops', () => {
+      @Collection()
+      class Entity {
+        id: string;
+      }
+
+      const tran = new FirestoreBatch(firestore);
+
+      expect(tran.commit()).rejects.toThrow(
+        'Cannot commit a batch with zero operations'
+      );
+    });
+
+    it.todo(
+      'when calling FirestoreBatch.commit it should call FirestoreBatchUnit.commit'
+    );
   });
 });

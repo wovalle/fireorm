@@ -1,9 +1,13 @@
-import { getRepository, Collection } from '../../src';
+import { getRepository, Collection, initialize } from '../../src';
 import { Band as BandEntity } from '../fixture';
 import { getUniqueColName } from '../setup';
 import { IsEmail } from 'class-validator';
+import { Firestore } from '@google-cloud/firestore';
 
 describe('Integration test: Validations', () => {
+  const firestore = (global as any).firestoreRef as Firestore;
+  initialize(firestore, { validateModels: true });
+
   @Collection(getUniqueColName('validations'))
   class Band extends BandEntity {
     @IsEmail()
@@ -37,10 +41,16 @@ describe('Integration test: Validations', () => {
     sw.name = 'Steven Wilson';
     sw.contactEmail = 'stevenwilson.com';
 
-    expect(async () => await bandRepository.create(sw)).toThrow();
+    expect(bandRepository.create(sw)).rejects.toBeTruthy();
 
     // Should throw when trying to update a band with an invalid email
     dt.contactEmail = 'dreamtheater.com';
-    expect(async () => await bandRepository.update(dt)).toThrow();
+
+    try {
+      await bandRepository.update(dt);
+      expect(false).toBeTruthy();
+    } catch (err) {
+      expect(err).toBeTruthy();
+    }
   });
 });

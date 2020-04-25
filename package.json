@@ -31,7 +31,7 @@
     "lint:md": "remark README.md -o README.md",
     "release": "semantic-release",
     "test": "jest src",
-    "test:integration": "mocha --require ts-node/register -r dotenv/config --extension ts --recursive -t 10000 --file test/setup.ts test",
+    "test:integration": "jest -c test/jest.config.js",
     "test:watch": "jest --watch src",
     "t": "yarn test",
     "tw": "yarn test:watch"
