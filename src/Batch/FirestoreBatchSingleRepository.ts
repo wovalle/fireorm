@@ -11,9 +11,9 @@ import { BaseFirestoreBatchRepository } from './BaseFirestoreBatchRepository';
  * @extends {FirestoreBatchSingleRepository<T>}
  * @template T
  */
-export class FirestoreBatchSingleRepository<
-  T extends IEntity
-> extends BaseFirestoreBatchRepository<T> {
+export class FirestoreBatchSingleRepository<T extends IEntity> extends BaseFirestoreBatchRepository<
+  T
+> {
   commit() {
     return this.batch.commit();
   }

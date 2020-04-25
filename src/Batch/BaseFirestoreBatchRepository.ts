@@ -1,10 +1,6 @@
 import { CollectionReference } from '@google-cloud/firestore';
 import { IEntity, WithOptionalId, Instantiable } from '../types';
-import {
-  getMetadataStorage,
-  CollectionMetadata,
-  MetadataStorageConfig,
-} from '../MetadataStorage';
+import { getMetadataStorage, CollectionMetadata, MetadataStorageConfig } from '../MetadataStorage';
 import { FirestoreBatchUnit } from './FirestoreBatchUnit';
 
 export class BaseFirestoreBatchRepository<T extends IEntity> {

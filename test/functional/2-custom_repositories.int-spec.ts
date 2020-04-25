@@ -1,10 +1,5 @@
 import { getInitialData, Band as BandEntity } from '../fixture';
-import {
-  CustomRepository,
-  BaseFirestoreRepository,
-  getRepository,
-  Collection,
-} from '../../src';
+import { CustomRepository, BaseFirestoreRepository, getRepository, Collection } from '../../src';
 import { getUniqueColName } from '../setup';
 
 describe('Integration test: Custom Repository', () => {
@@ -28,7 +23,7 @@ describe('Integration test: Custom Repository', () => {
     // see comment above
     rockBandRepository = getRepository(Band) as CustomRockBandRepository;
 
-    const seed = getInitialData().map((b) => rockBandRepository.create(b));
+    const seed = getInitialData().map(b => rockBandRepository.create(b));
     await Promise.all(seed);
   });
 
@@ -37,22 +32,16 @@ describe('Integration test: Custom Repository', () => {
     band.id = 'opeth';
     band.name = 'Opeth';
     band.formationYear = 1989;
-    band.genres = [
-      'progressive-death-metal',
-      'progressive-metal',
-      'progressive-rock',
-    ];
+    band.genres = ['progressive-death-metal', 'progressive-metal', 'progressive-rock'];
 
     await rockBandRepository.create(band);
 
     // Filter bands with genre progressive-rock, check that since we didn't
     // called .find in the repository method, we have to do it here
-    const progressiveRockBands = await rockBandRepository
-      .filterByGenre('progressive-rock')
-      .find();
+    const progressiveRockBands = await rockBandRepository.filterByGenre('progressive-rock').find();
 
     const [first, second, third] = progressiveRockBands
-      .map((b) => b.name)
+      .map(b => b.name)
       .sort((a, b) => a.localeCompare(b));
 
     expect(progressiveRockBands.length).toEqual(3);

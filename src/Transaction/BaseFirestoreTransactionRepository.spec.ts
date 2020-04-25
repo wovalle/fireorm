@@ -1,8 +1,10 @@
-const MockFirebase = require('mock-cloud-firestore');
 import { BaseFirestoreRepository } from '../BaseFirestoreRepository';
 import { getFixture, Album } from '../../test/fixture';
 import { initialize } from '../MetadataStorage';
 import { Band } from '../../test/BandCollection';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const MockFirebase = require('mock-cloud-firestore');
 
 // Just a test type to prevent using any other method than
 // runTransaction in this file
@@ -261,9 +263,7 @@ describe('BaseFirestoreTransactionRepository', () => {
   describe('.where*', () => {
     it('whereEqualTo must accept function as first parameter', async () => {
       await bandRepository.runTransaction(async tran => {
-        const list = await tran
-          .whereEqualTo(b => b.name, 'Porcupine Tree')
-          .find();
+        const list = await tran.whereEqualTo(b => b.name, 'Porcupine Tree').find();
         expect(list.length).toEqual(1);
         expect(list[0].name).toEqual('Porcupine Tree');
       });
@@ -283,9 +283,7 @@ describe('BaseFirestoreTransactionRepository', () => {
 
     it('must return same list if where filter does not apply', async () => {
       await bandRepository.runTransaction(async tran => {
-        const list = await tran
-          .whereGreaterOrEqualThan('formationYear', 1983)
-          .find();
+        const list = await tran.whereGreaterOrEqualThan('formationYear', 1983).find();
         expect(list.length).toEqual(2);
       });
     });
@@ -307,9 +305,7 @@ describe('BaseFirestoreTransactionRepository', () => {
 
     it('must filter with whereGreaterOrEqualThan', async () => {
       await bandRepository.runTransaction(async tran => {
-        const list = await tran
-          .whereGreaterOrEqualThan('formationYear', 1983)
-          .find();
+        const list = await tran.whereGreaterOrEqualThan('formationYear', 1983).find();
         expect(list.length).toEqual(2);
       });
     });
@@ -324,18 +320,14 @@ describe('BaseFirestoreTransactionRepository', () => {
 
     it('must filter with whereLessOrEqualThan', async () => {
       await bandRepository.runTransaction(async tran => {
-        const list = await tran
-          .whereLessOrEqualThan('formationYear', 1983)
-          .find();
+        const list = await tran.whereLessOrEqualThan('formationYear', 1983).find();
         expect(list.length).toEqual(2);
       });
     });
 
     it('must filter with whereArrayContains', async () => {
       await bandRepository.runTransaction(async tran => {
-        const list = await tran
-          .whereArrayContains('genres', 'progressive-rock')
-          .find();
+        const list = await tran.whereArrayContains('genres', 'progressive-rock').find();
         expect(list.length).toEqual(2);
       });
     });
@@ -450,8 +442,7 @@ describe('BaseFirestoreTransactionRepository', () => {
 
       const firstAlbum = new Album();
       firstAlbum.id = 'invalid-album-name';
-      firstAlbum.name =
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+      firstAlbum.name = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
       firstAlbum.releaseDate = new Date('2002-07-22');
 
       await bandRepository.runTransaction(async tran => {

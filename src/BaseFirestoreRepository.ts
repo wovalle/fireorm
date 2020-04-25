@@ -3,21 +3,14 @@ import 'reflect-metadata';
 
 import { CollectionReference, WhereFilterOp } from '@google-cloud/firestore';
 
-import {
-  IRepository,
-  IFireOrmQueryLine,
-  IOrderByParams,
-  IEntity,
-  Instantiable,
-} from './types';
+import { IRepository, IFireOrmQueryLine, IOrderByParams, IEntity, Instantiable } from './types';
 
 import { getMetadataStorage } from './MetadataStorage';
 import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
 import { TransactionRepository } from './Transaction/BaseFirestoreTransactionRepository';
 import { FirestoreBatch } from './Batch/FirestoreBatch';
 
-export class BaseFirestoreRepository<T extends IEntity>
-  extends AbstractFirestoreRepository<T>
+export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestoreRepository<T>
   implements IRepository<T> {
   private readonly firestoreColRef: CollectionReference;
 
@@ -34,10 +27,7 @@ export class BaseFirestoreRepository<T extends IEntity>
   }
 
   async findById(id: string): Promise<T> {
-    return this.firestoreColRef
-      .doc(id)
-      .get()
-      .then(this.extractTFromDocSnap);
+    return this.firestoreColRef.doc(id).get().then(this.extractTFromDocSnap);
   }
 
   async create(item: T): Promise<T> {
@@ -56,9 +46,7 @@ export class BaseFirestoreRepository<T extends IEntity>
       }
     }
 
-    const doc = item.id
-      ? this.firestoreColRef.doc(item.id)
-      : this.firestoreColRef.doc();
+    const doc = item.id ? this.firestoreColRef.doc(item.id) : this.firestoreColRef.doc();
 
     if (!item.id) {
       item.id = doc.id;
@@ -81,9 +69,7 @@ export class BaseFirestoreRepository<T extends IEntity>
     }
 
     // TODO: handle errors
-    await this.firestoreColRef
-      .doc(item.id)
-      .update(this.toSerializableObject(item));
+    await this.firestoreColRef.doc(item.id).update(this.toSerializableObject(item));
     return item;
   }
 
@@ -92,16 +78,12 @@ export class BaseFirestoreRepository<T extends IEntity>
     await this.firestoreColRef.doc(id).delete();
   }
 
-  async runTransaction<R>(
-    executor: (tran: TransactionRepository<T>) => Promise<R>
-  ) {
+  async runTransaction<R>(executor: (tran: TransactionRepository<T>) => Promise<R>) {
     // Importing here to prevent circular dependency
     const { runTransaction } = await import('./helpers');
 
     return runTransaction<R>(tran => {
-      const repository = tran.getRepository(
-        this.colMetadata.entity as Instantiable<T>
-      );
+      const repository = tran.getRepository(this.colMetadata.entity as Instantiable<T>);
       return executor(repository);
     });
   }
@@ -111,9 +93,7 @@ export class BaseFirestoreRepository<T extends IEntity>
 
     const batch = new FirestoreBatch(firestoreRef);
 
-    return batch.getSingleRepository(
-      this.colMetadata.entity as Instantiable<T>
-    );
+    return batch.getSingleRepository(this.colMetadata.entity as Instantiable<T>);
   }
 
   async execute(

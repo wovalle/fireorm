@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Copied from class-validator/validation/ValidationError.d.ts
  */
@@ -7,7 +8,7 @@ export declare class ValidationError {
    *
    * OPTIONAL - configurable via the ValidatorOptions.validationError.target option
    */
-  target?: Object;
+  target?: Record<string, any>;
   /**
    * Object's property that haven't pass validation.
    */
@@ -37,9 +38,5 @@ export declare class ValidationError {
    * @param hasParent true when the error is a child of an another one
    * @param parentPath path as string to the parent of this property
    */
-  toString(
-    shouldDecorate?: boolean,
-    hasParent?: boolean,
-    parentPath?: string
-  ): string;
+  toString(shouldDecorate?: boolean, hasParent?: boolean, parentPath?: string): string;
 }

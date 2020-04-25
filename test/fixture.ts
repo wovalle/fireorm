@@ -194,7 +194,10 @@ export const getBandFixture = (): Band[] => {
 
   return objectifyList(initialData, ({ albums, ...rest }) => ({
     ...rest,
-    ...getCollectionBoilerplate('albums', objectifyList(albums, a => a)),
+    ...getCollectionBoilerplate(
+      'albums',
+      objectifyList(albums, a => a)
+    ),
   }));
 };
 

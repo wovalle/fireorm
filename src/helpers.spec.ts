@@ -1,16 +1,12 @@
-const MockFirebase = require('mock-cloud-firestore');
-
 import { Collection, CustomRepository } from './Decorators';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
-import {
-  getRepository,
-  getBaseRepository,
-  runTransaction,
-  createBatch,
-} from './helpers';
+import { getRepository, getBaseRepository, runTransaction, createBatch } from './helpers';
 import { initialize } from './MetadataStorage';
 import { FirestoreTransaction } from './Transaction/FirestoreTransaction';
 import { FirestoreBatch } from './Batch/FirestoreBatch';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const MockFirebase = require('mock-cloud-firestore');
 
 describe('Helpers', () => {
   beforeEach(() => {
@@ -52,9 +48,7 @@ describe('Helpers', () => {
       id: string;
     }
 
-    expect(() => getRepository(Entity)).toThrow(
-      "'Entity' is not a valid collection"
-    );
+    expect(() => getRepository(Entity)).toThrow("'Entity' is not a valid collection");
   });
 
   it('should get base repository even if a custom one is registered', () => {
@@ -80,9 +74,7 @@ describe('Helpers', () => {
       id: string;
     }
 
-    expect(() => getRepository(Entity)).toThrow(
-      "'Entity' is not a valid collection"
-    );
+    expect(() => getRepository(Entity)).toThrow("'Entity' is not a valid collection");
   });
 
   it('runTransaction: should be able to get a transaction repository', async () => {

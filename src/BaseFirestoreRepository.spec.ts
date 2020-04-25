@@ -1,15 +1,11 @@
-const MockFirebase = require('mock-cloud-firestore');
-
 import { initialize } from './MetadataStorage';
-import {
-  getFixture,
-  Album,
-  Coordinates,
-  FirestoreDocumentReference,
-} from '../test/fixture';
+import { getFixture, Album, Coordinates, FirestoreDocumentReference } from '../test/fixture';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { Band } from '../test/BandCollection';
 import { Firestore } from '@google-cloud/firestore';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const MockFirebase = require('mock-cloud-firestore');
 
 describe('BaseFirestoreRepository', () => {
   class BandRepository extends BaseFirestoreRepository<Band> {}
@@ -68,18 +64,14 @@ describe('BaseFirestoreRepository', () => {
   describe('Ordering', () => {
     describe('orderByAscending', () => {
       it('must order repository objects', async () => {
-        const bands = await bandRepository
-          .orderByAscending('formationYear')
-          .find();
+        const bands = await bandRepository.orderByAscending('formationYear').find();
         expect(bands[0].id).toEqual('pink-floyd');
       });
 
       it('must order the objects in a subcollection', async () => {
         const pt = await bandRepository.findById('porcupine-tree');
         const albumsSubColl = pt.albums;
-        const discographyNewestFirst = await albumsSubColl
-          .orderByAscending('releaseDate')
-          .find();
+        const discographyNewestFirst = await albumsSubColl.orderByAscending('releaseDate').find();
         expect(discographyNewestFirst[0].id).toEqual('lightbulb-sun');
       });
 
@@ -94,10 +86,7 @@ describe('BaseFirestoreRepository', () => {
       });
 
       it('must be chainable with limit', async () => {
-        const bands = await bandRepository
-          .orderByAscending('formationYear')
-          .limit(2)
-          .find();
+        const bands = await bandRepository.orderByAscending('formationYear').limit(2).find();
         const lastBand = bands[bands.length - 1];
         expect(lastBand.id).toEqual('red-hot-chili-peppers');
       });
@@ -106,27 +95,21 @@ describe('BaseFirestoreRepository', () => {
         const pt = await bandRepository.findById('porcupine-tree');
         const albumsSubColl = pt.albums;
         expect(() => {
-          albumsSubColl
-            .orderByAscending('releaseDate')
-            .orderByDescending('releaseDate');
+          albumsSubColl.orderByAscending('releaseDate').orderByDescending('releaseDate');
         }).toThrow();
       });
     });
 
     describe('orderByDescending', () => {
       it('must order repository objects', async () => {
-        const bands = await bandRepository
-          .orderByDescending('formationYear')
-          .find();
+        const bands = await bandRepository.orderByDescending('formationYear').find();
         expect(bands[0].id).toEqual('porcupine-tree');
       });
 
       it('must order the objects in a subcollection', async () => {
         const pt = await bandRepository.findById('porcupine-tree');
         const albumsSubColl = pt.albums;
-        const discographyNewestFirst = await albumsSubColl
-          .orderByDescending('releaseDate')
-          .find();
+        const discographyNewestFirst = await albumsSubColl.orderByDescending('releaseDate').find();
         expect(discographyNewestFirst[0].id).toEqual('fear-blank-planet');
       });
 
@@ -141,10 +124,7 @@ describe('BaseFirestoreRepository', () => {
       });
 
       it('must be chainable with limit', async () => {
-        const bands = await bandRepository
-          .orderByDescending('formationYear')
-          .limit(2)
-          .find();
+        const bands = await bandRepository.orderByDescending('formationYear').limit(2).find();
         const lastBand = bands[bands.length - 1];
         expect(lastBand.id).toEqual('red-hot-chili-peppers');
       });
@@ -153,9 +133,7 @@ describe('BaseFirestoreRepository', () => {
         const pt = await bandRepository.findById('porcupine-tree');
         const albumsSubColl = pt.albums;
         expect(() => {
-          albumsSubColl
-            .orderByAscending('releaseDate')
-            .orderByDescending('releaseDate');
+          albumsSubColl.orderByAscending('releaseDate').orderByDescending('releaseDate');
         }).toThrow();
       });
     });
@@ -360,9 +338,7 @@ describe('BaseFirestoreRepository', () => {
 
   describe('.where*', () => {
     it('whereEqualTo must accept function as first parameter', async () => {
-      const list = await bandRepository
-        .whereEqualTo((b) => b.name, 'Porcupine Tree')
-        .find();
+      const list = await bandRepository.whereEqualTo(b => b.name, 'Porcupine Tree').find();
       expect(list.length).toEqual(1);
       expect(list[0].name).toEqual('Porcupine Tree');
     });
@@ -372,59 +348,45 @@ describe('BaseFirestoreRepository', () => {
         .whereArrayContains('genres', 'progressive-rock')
         .find();
 
-      progressiveRockBands.forEach((b) => {
+      progressiveRockBands.forEach(b => {
         expect(b.getPopularGenre()).toEqual(b.genres[0]);
       });
     });
 
     it("must return same list if where filter doesn't apply", async () => {
-      const list = await bandRepository
-        .whereGreaterOrEqualThan('formationYear', 1983)
-        .find();
+      const list = await bandRepository.whereGreaterOrEqualThan('formationYear', 1983).find();
       expect(list.length).toEqual(2);
     });
 
     it('must filter with whereEqualTo', async () => {
-      const list = await bandRepository
-        .whereEqualTo('name', 'Porcupine Tree')
-        .find();
+      const list = await bandRepository.whereEqualTo('name', 'Porcupine Tree').find();
       expect(list.length).toEqual(1);
       expect(list[0].name).toEqual('Porcupine Tree');
     });
 
     it('must filter with whereGreaterThan', async () => {
-      const list = await bandRepository
-        .whereGreaterThan('formationYear', 1983)
-        .find();
+      const list = await bandRepository.whereGreaterThan('formationYear', 1983).find();
       expect(list.length).toEqual(1);
     });
 
     it('must filter with whereGreaterOrEqualThan', async () => {
-      const list = await bandRepository
-        .whereGreaterOrEqualThan('formationYear', 1983)
-        .find();
+      const list = await bandRepository.whereGreaterOrEqualThan('formationYear', 1983).find();
       expect(list.length).toEqual(2);
     });
 
     it('must filter with whereLessThan', async () => {
-      const list = await bandRepository
-        .whereLessThan('formationYear', 1983)
-        .find();
+      const list = await bandRepository.whereLessThan('formationYear', 1983).find();
 
       expect(list.length).toEqual(1);
     });
 
     it('must filter with whereLessOrEqualThan', async () => {
-      const list = await bandRepository
-        .whereLessOrEqualThan('formationYear', 1983)
-        .find();
+      const list = await bandRepository.whereLessOrEqualThan('formationYear', 1983).find();
       expect(list.length).toEqual(2);
     });
 
     it('must filter with whereArrayContains', async () => {
-      const list = await bandRepository
-        .whereArrayContains('genres', 'progressive-rock')
-        .find();
+      const list = await bandRepository.whereArrayContains('genres', 'progressive-rock').find();
       expect(list.length).toEqual(2);
     });
 
@@ -444,9 +406,7 @@ describe('BaseFirestoreRepository', () => {
       band.relatedBand = docRef;
       await bandRepository.update(band);
 
-      const byReference = await bandRepository
-        .whereEqualTo((b) => b.relatedBand, docRef)
-        .find();
+      const byReference = await bandRepository.whereEqualTo(b => b.relatedBand, docRef).find();
 
       expect(byReference.length).toEqual(1);
       expect(byReference[0].name).toEqual('Porcupine Tree');
@@ -464,14 +424,12 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must return null if not found', async () => {
-      const result = await bandRepository
-        .whereLessThan('formationYear', 0)
-        .findOne();
+      const result = await bandRepository.whereLessThan('formationYear', 0).findOne();
       expect(result).toBeNull();
     });
 
     it('should work within transactions', async () => {
-      await bandRepository.runTransaction(async (tran) => {
+      await bandRepository.runTransaction(async tran => {
         const result = await tran.whereLessThan('formationYear', 0).findOne();
         expect(result).toBeNull();
       });
@@ -510,7 +468,7 @@ describe('BaseFirestoreRepository', () => {
 
   describe('transactions', () => {
     it('should be able to open transactions', async () => {
-      await bandRepository.runTransaction(async (tran) => {
+      await bandRepository.runTransaction(async tran => {
         const band = await tran.findById('porcupine-tree');
         band.name = 'Árbol de Puercoespín';
         await tran.update(band);
@@ -521,7 +479,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('should return TransactionRepository', async () => {
-      await bandRepository.runTransaction(async (tran) => {
+      await bandRepository.runTransaction(async tran => {
         expect(tran.constructor.name).toEqual('TransactionRepository');
       });
     });
@@ -552,15 +510,9 @@ describe('BaseFirestoreRepository', () => {
 
       await batch.commit();
 
-      const batchedBands = await bandRepository
-        .whereEqualTo('formationYear', 2099)
-        .find();
+      const batchedBands = await bandRepository.whereEqualTo('formationYear', 2099).find();
 
-      expect(batchedBands.map((b) => b.name)).toEqual([
-        'Entity1',
-        'Entity2',
-        'Entity3',
-      ]);
+      expect(batchedBands.map(b => b.name)).toEqual(['Entity1', 'Entity2', 'Entity3']);
     });
   });
 
@@ -648,8 +600,7 @@ describe('BaseFirestoreRepository', () => {
 
       const firstAlbum = new Album();
       firstAlbum.id = 'invalid-album-name';
-      firstAlbum.name =
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+      firstAlbum.name = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
       firstAlbum.releaseDate = new Date('2002-07-22');
 
       try {
@@ -733,7 +684,7 @@ describe('BaseFirestoreRepository', () => {
         expect(b.id).not.toBeUndefined();
       }
 
-      const possibleDocWithoutId = bands.find((band) => band.id === docId);
+      const possibleDocWithoutId = bands.find(band => band.id === docId);
       expect(possibleDocWithoutId).not.toBeUndefined();
     });
   });

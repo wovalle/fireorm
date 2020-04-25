@@ -13,18 +13,13 @@ import {
   PartialBy,
 } from './types';
 
-import {
-  getMetadataStorage,
-  CollectionMetadata,
-  MetadataStorageConfig,
-} from './MetadataStorage';
+import { getMetadataStorage, CollectionMetadata, MetadataStorageConfig } from './MetadataStorage';
 
 import { BaseRepository } from './BaseRepository';
 import QueryBuilder from './QueryBuilder';
 import { serializeEntity } from './utils';
 
-export abstract class AbstractFirestoreRepository<T extends IEntity>
-  extends BaseRepository
+export abstract class AbstractFirestoreRepository<T extends IEntity> extends BaseRepository
   implements IRepository<T> {
   protected readonly subColMetadata: CollectionMetadata[];
   protected readonly colMetadata: CollectionMetadata;
@@ -45,15 +40,12 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
     //TODO: add tests to ensure that we can initialize this with name or constructor
     //Also, I'm pretty sure getCollection types can be updated to be Instantiable<T>
 
-    this.colMetadata =
-      getSubCollection(nameOrConstructor) || getCollection(nameOrConstructor);
+    this.colMetadata = getSubCollection(nameOrConstructor) || getCollection(nameOrConstructor);
 
     if (!this.colMetadata) {
       throw new Error(
         `There is no metadata stored for "${
-          typeof nameOrConstructor === 'string'
-            ? nameOrConstructor
-            : nameOrConstructor.name
+          typeof nameOrConstructor === 'string' ? nameOrConstructor : nameOrConstructor.name
         }"`
       );
     }
@@ -64,7 +56,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
     this.subColMetadata = getSubCollectionsFromParent(this.colMetadata.entity);
   }
 
-  protected toSerializableObject = (obj: T): Object =>
+  protected toSerializableObject = (obj: T): Record<string, unknown> =>
     serializeEntity(obj, this.subColMetadata);
 
   protected transformFirestoreTypes = (obj: T): T => {
@@ -87,6 +79,8 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
 
   protected initializeSubCollections = (entity: T) => {
     // Requiring here to prevent circular dependency
+
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { getRepository } = require('./helpers');
 
     this.subColMetadata.forEach(subCol => {
@@ -145,10 +139,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
    * query applied.
    * @memberof AbstractFirestoreRepository
    */
-  whereGreaterThan(
-    prop: IWherePropParam<T>,
-    val: IFirestoreVal
-  ): IQueryBuilder<T> {
+  whereGreaterThan(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T> {
     return new QueryBuilder<T>(this).whereGreaterThan(prop, val);
   }
 
@@ -163,10 +154,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
    * query applied.
    * @memberof AbstractFirestoreRepository
    */
-  whereGreaterOrEqualThan(
-    prop: IWherePropParam<T>,
-    val: IFirestoreVal
-  ): IQueryBuilder<T> {
+  whereGreaterOrEqualThan(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T> {
     return new QueryBuilder<T>(this).whereGreaterOrEqualThan(prop, val);
   }
 
@@ -181,10 +169,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
    * query applied.
    * @memberof AbstractFirestoreRepository
    */
-  whereLessThan(
-    prop: IWherePropParam<T>,
-    val: IFirestoreVal
-  ): IQueryBuilder<T> {
+  whereLessThan(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T> {
     return new QueryBuilder<T>(this).whereLessThan(prop, val);
   }
 
@@ -199,10 +184,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
    * query applied.
    * @memberof AbstractFirestoreRepository
    */
-  whereLessOrEqualThan(
-    prop: IWherePropParam<T>,
-    val: IFirestoreVal
-  ): IQueryBuilder<T> {
+  whereLessOrEqualThan(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T> {
     return new QueryBuilder<T>(this).whereLessOrEqualThan(prop, val);
   }
 
@@ -217,10 +199,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
    * query applied.
    * @memberof AbstractFirestoreRepository
    */
-  whereArrayContains(
-    prop: IWherePropParam<T>,
-    val: IFirestoreVal
-  ): IQueryBuilder<T> {
+  whereArrayContains(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T> {
     return new QueryBuilder<T>(this).whereArrayContains(prop, val);
   }
 
@@ -236,9 +215,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
    */
   limit(limitVal: number): IQueryBuilder<T> {
     if (limitVal < 0) {
-      throw new Error(
-        `limitVal must be greater than 0. It received: ${limitVal}`
-      );
+      throw new Error(`limitVal must be greater than 0. It received: ${limitVal}`);
     }
 
     return new QueryBuilder<T>(this).limit(limitVal);
@@ -306,14 +283,12 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
     try {
       const classValidator = await import('class-validator');
       const { getSubCollection, getCollection } = getMetadataStorage();
-      const { entity: Entity } =
-        getSubCollection(this.colName) || getCollection(this.colName);
+      const { entity: Entity } = getSubCollection(this.colName) || getCollection(this.colName);
 
       /**
        * Instantiate plain objects into an entity class
        */
-      const entity =
-        item instanceof Entity ? item : Object.assign(new Entity(), item);
+      const entity = item instanceof Entity ? item : Object.assign(new Entity(), item);
 
       return classValidator.validate(entity);
     } catch (error) {

@@ -1,9 +1,4 @@
-import {
-  getRepository,
-  Collection,
-  createBatch,
-  BaseFirestoreRepository,
-} from '../../src';
+import { getRepository, Collection, createBatch, BaseFirestoreRepository } from '../../src';
 import { Band as BandEntity } from '../fixture';
 import { getUniqueColName } from '../setup';
 
@@ -48,18 +43,16 @@ describe('Integration test: Batches', () => {
     ];
 
     const batch = bandRepository.createBatch();
-    bands.forEach((b) => batch.create(b));
+    bands.forEach(b => batch.create(b));
 
     await batch.commit();
 
     // Assert that bands were actually created
     const createdBands = await bandRepository
-      .whereArrayContains((b) => b.genres, 'custom-genre')
+      .whereArrayContains(b => b.genres, 'custom-genre')
       .find();
 
-    const orderedBands = createdBands.sort((a, b) =>
-      b.name.localeCompare(a.name)
-    );
+    const orderedBands = createdBands.sort((a, b) => b.name.localeCompare(a.name));
 
     expect(orderedBands.length).toEqual(2);
     expect(orderedBands[0].name).toEqual(bands[0].name);
@@ -68,7 +61,7 @@ describe('Integration test: Batches', () => {
     // Update website for all bands with an update batch
     const updateBatch = bandRepository.createBatch();
 
-    createdBands.forEach((b) => {
+    createdBands.forEach(b => {
       b.extra = { website: 'https://fake.web' };
       updateBatch.update(b);
     });
@@ -77,7 +70,7 @@ describe('Integration test: Batches', () => {
 
     // Assert that bands were actually updated
     const updatedBands = await bandRepository
-      .whereArrayContains((b) => b.genres, 'custom-genre')
+      .whereArrayContains(b => b.genres, 'custom-genre')
       .find();
 
     expect(updatedBands.length).toEqual(2);
@@ -87,13 +80,13 @@ describe('Integration test: Batches', () => {
     // Delete bands with an delete batch
     const deleteBatch = bandRepository.createBatch();
 
-    createdBands.forEach((b) => deleteBatch.delete(b));
+    createdBands.forEach(b => deleteBatch.delete(b));
 
     await deleteBatch.commit();
 
     // Assert that bands were actually deleted
     const deletedBands = await bandRepository
-      .whereArrayContains((b) => b.genres, 'custom-genre')
+      .whereArrayContains(b => b.genres, 'custom-genre')
       .find();
 
     expect(deletedBands.length).toEqual(0);
@@ -125,18 +118,16 @@ describe('Integration test: Batches', () => {
 
     const batch = createBatch();
     const bandBatchRepository = batch.getRepository(Band);
-    bands.forEach((b) => bandBatchRepository.create(b));
+    bands.forEach(b => bandBatchRepository.create(b));
 
     await batch.commit();
 
     // Assert that bands were actually created
     const createdBands = await bandRepository
-      .whereArrayContains((b) => b.genres, 'custom-genre')
+      .whereArrayContains(b => b.genres, 'custom-genre')
       .find();
 
-    const orderedBands = createdBands.sort((a, b) =>
-      b.name.localeCompare(a.name)
-    );
+    const orderedBands = createdBands.sort((a, b) => b.name.localeCompare(a.name));
 
     expect(orderedBands.length).toEqual(2);
     expect(orderedBands[0].name).toEqual(bands[0].name);
@@ -146,7 +137,7 @@ describe('Integration test: Batches', () => {
     const updateBatch = createBatch();
     const bandUpdateBatch = updateBatch.getRepository(Band);
 
-    createdBands.forEach((b) => {
+    createdBands.forEach(b => {
       b.extra = { website: 'https://fake.web' };
       bandUpdateBatch.update(b);
     });
@@ -155,7 +146,7 @@ describe('Integration test: Batches', () => {
 
     // Assert that bands were actually updated
     const updatedBands = await bandRepository
-      .whereArrayContains((b) => b.genres, 'custom-genre')
+      .whereArrayContains(b => b.genres, 'custom-genre')
       .find();
 
     expect(updatedBands.length).toEqual(2);
@@ -166,13 +157,13 @@ describe('Integration test: Batches', () => {
     const deleteBatch = createBatch();
     const bandDeleteBatch = deleteBatch.getRepository(Band);
 
-    createdBands.forEach((b) => bandDeleteBatch.delete(b));
+    createdBands.forEach(b => bandDeleteBatch.delete(b));
 
     await deleteBatch.commit();
 
     // Assert that bands were actually deleted
     const deletedBands = await bandRepository
-      .whereArrayContains((b) => b.genres, 'custom-genre')
+      .whereArrayContains(b => b.genres, 'custom-genre')
       .find();
 
     expect(deletedBands.length).toEqual(0);

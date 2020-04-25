@@ -1,10 +1,12 @@
-const MockFirebase = require('mock-cloud-firestore');
 import { BaseFirestoreBatchRepository } from './BaseFirestoreBatchRepository';
 import { getFixture } from '../../test/fixture';
 import { initialize } from '../MetadataStorage';
 import { Band } from '../../test/BandCollection';
-import { Firestore, WriteBatch, WriteResult } from '@google-cloud/firestore';
+import { Firestore, WriteBatch } from '@google-cloud/firestore';
 import { FirestoreBatchUnit } from './FirestoreBatchUnit';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const MockFirebase = require('mock-cloud-firestore');
 
 describe('BaseFirestoreBatchRepository', () => {
   let bandRepository: BaseFirestoreBatchRepository<Band> = null;
@@ -121,10 +123,7 @@ describe('BaseFirestoreBatchRepository', () => {
       initialize(firestore, { validateModels: true });
 
       const validationBatch = new FirestoreBatchUnit(firestore);
-      const validationBandRepository = new BaseFirestoreBatchRepository(
-        validationBatch,
-        Band
-      );
+      const validationBandRepository = new BaseFirestoreBatchRepository(validationBatch, Band);
 
       const entity = new Band();
       entity.id = 'perfect-circle';
@@ -146,10 +145,7 @@ describe('BaseFirestoreBatchRepository', () => {
       initialize(firestore, { validateModels: true });
 
       const validationBatch = new FirestoreBatchUnit(firestore);
-      const validationBandRepository = new BaseFirestoreBatchRepository(
-        validationBatch,
-        Band
-      );
+      const validationBandRepository = new BaseFirestoreBatchRepository(validationBatch, Band);
 
       const entity = new Band();
       entity.id = 'perfect-circle';
@@ -169,6 +165,6 @@ describe('BaseFirestoreBatchRepository', () => {
 
   //TODO: for this to work I'll probably need to do the collectionPath refactor
   // Copy from BaseFirestoreTransactionRepository.spec
-  // tslint:disable-next-line:no-empty
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   describe('must handle subcollections', () => {});
 });

@@ -1,9 +1,4 @@
-import {
-  getRepository,
-  Collection,
-  Type,
-  BaseFirestoreRepository,
-} from '../../src';
+import { getRepository, Collection, Type, BaseFirestoreRepository } from '../../src';
 import { Band as BandEntity, FirestoreDocumentReference } from '../fixture';
 import { getUniqueColName } from '../setup';
 import { Firestore } from '@google-cloud/firestore';
@@ -51,22 +46,15 @@ describe('Integration test: Using Document References', () => {
     await bandRepository.create(sw);
 
     // Manually storing arbitrary reference
-    await firestore
-      .collection(colName)
-      .doc('steven-wilson')
-      .update({ relatedBand: ptRef });
+    await firestore.collection(colName).doc('steven-wilson').update({ relatedBand: ptRef });
 
     // Is able to retrieve documents with references
-    const swFromDb = await bandRepository
-      .whereEqualTo((b) => b.name, 'Steven Wilson')
-      .findOne();
+    const swFromDb = await bandRepository.whereEqualTo(b => b.name, 'Steven Wilson').findOne();
 
     expect(swFromDb.formationYear).toEqual(1987);
 
     // Is able to filter documents by references
-    const band = await bandRepository
-      .whereEqualTo((b) => b.relatedBand, ptRef)
-      .find();
+    const band = await bandRepository.whereEqualTo(b => b.relatedBand, ptRef).find();
 
     expect(band.length).toEqual(1);
     expect(band[0].name).toEqual('Steven Wilson');

@@ -1,8 +1,4 @@
-import {
-  Band as BandEntity,
-  Album as AlbumEntity,
-  getInitialData,
-} from '../fixture';
+import { Band as BandEntity, Album as AlbumEntity, getInitialData } from '../fixture';
 import {
   getRepository,
   Collection,
@@ -41,7 +37,7 @@ describe('Integration test: SubCollections', () => {
 
       await fullBandRepository.create(band);
 
-      const albums = s.albums.map((a) => {
+      const albums = s.albums.map(a => {
         const album = new Album();
         album.id = a.id;
         album.releaseDate = a.releaseDate;
@@ -50,7 +46,7 @@ describe('Integration test: SubCollections', () => {
         return album;
       });
 
-      await Promise.all(albums.map((a) => band.albums.create(a)));
+      await Promise.all(albums.map(a => band.albums.create(a)));
     }
   });
 
