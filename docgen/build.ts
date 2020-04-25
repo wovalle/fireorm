@@ -9,29 +9,17 @@ const ignoreFiles = ['_sidebar.md'];
   const outDir = path.join(__dirname, '../docs');
 
   const filesInFolder = await fs.promises.readdir(docsDir);
-  const mdFiles = filesInFolder.filter(
-    f => f.endsWith('.md') && !ignoreFiles.includes(f)
-  );
+  const mdFiles = filesInFolder.filter(f => f.endsWith('.md') && !ignoreFiles.includes(f));
 
-  const stat = await fs.promises.lstat(docsDir);
+  await Promise.all(files.map(f => fs.promises.copyFile(`${docsDir}/${f}`, `${outDir}/${f}`)));
 
-  await Promise.all(
-    files.map(f => fs.promises.copyFile(`${docsDir}/${f}`, `${outDir}/${f}`))
-  );
-
-  await Promise.all(
-    mdFiles.map(f => fs.promises.copyFile(`${docsDir}/${f}`, `${outDir}/${f}`))
-  );
+  await Promise.all(mdFiles.map(f => fs.promises.copyFile(`${docsDir}/${f}`, `${outDir}/${f}`)));
 
   // Merge Sidebar
 
-  const typesSidebar = (await fs.promises.readFile(
-    `${outDir}/_sidebar.md`
-  )).toString();
+  const typesSidebar = (await fs.promises.readFile(`${outDir}/_sidebar.md`)).toString();
 
-  const generalSidebar = (await fs.promises.readFile(
-    `${docsDir}/sidebar.md`
-  )).toString();
+  const generalSidebar = (await fs.promises.readFile(`${docsDir}/sidebar.md`)).toString();
 
   const fullSidebar = generalSidebar + '\n' + typesSidebar;
 

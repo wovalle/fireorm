@@ -1,11 +1,5 @@
 import { getInitialData, Band as BandEntity } from '../fixture';
-import {
-  CustomRepository,
-  BaseFirestoreRepository,
-  getRepository,
-  Collection,
-} from '../../src';
-import { expect } from 'chai';
+import { CustomRepository, BaseFirestoreRepository, getRepository, Collection } from '../../src';
 import { getUniqueColName } from '../setup';
 
 describe('Integration test: Custom Repository', () => {
@@ -23,9 +17,12 @@ describe('Integration test: Custom Repository', () => {
   // (if it has the @CustomRepository decorator). Since typescript
   // cannot guess dynamic types, we'll have to cast it to the
   // custom repository
-  const rockBandRepository = getRepository(Band) as CustomRockBandRepository;
+  let rockBandRepository: CustomRockBandRepository = null;
 
-  before(async () => {
+  beforeEach(async () => {
+    // see comment above
+    rockBandRepository = getRepository(Band) as CustomRockBandRepository;
+
     const seed = getInitialData().map(b => rockBandRepository.create(b));
     await Promise.all(seed);
   });
@@ -35,28 +32,22 @@ describe('Integration test: Custom Repository', () => {
     band.id = 'opeth';
     band.name = 'Opeth';
     band.formationYear = 1989;
-    band.genres = [
-      'progressive-death-metal',
-      'progressive-metal',
-      'progressive-rock',
-    ];
+    band.genres = ['progressive-death-metal', 'progressive-metal', 'progressive-rock'];
 
     await rockBandRepository.create(band);
 
     // Filter bands with genre progressive-rock, check that since we didn't
     // called .find in the repository method, we have to do it here
-    const progressiveRockBands = await rockBandRepository
-      .filterByGenre('progressive-rock')
-      .find();
+    const progressiveRockBands = await rockBandRepository.filterByGenre('progressive-rock').find();
 
     const [first, second, third] = progressiveRockBands
       .map(b => b.name)
       .sort((a, b) => a.localeCompare(b));
 
-    expect(progressiveRockBands.length).to.equal(3);
-    expect(first).to.equal('Opeth');
-    expect(second).to.equal('Pink Floyd');
-    expect(third).to.equal('Porcupine Tree');
+    expect(progressiveRockBands.length).toEqual(3);
+    expect(first).toEqual('Opeth');
+    expect(second).toEqual('Pink Floyd');
+    expect(third).toEqual('Porcupine Tree');
 
     // Filter progressive-rock bands formed in 1989
     const millenialProgressiveRockBands = await rockBandRepository
@@ -64,7 +55,7 @@ describe('Integration test: Custom Repository', () => {
       .whereEqualTo('formationYear', 1989)
       .find();
 
-    expect(millenialProgressiveRockBands.length).to.equal(1);
-    expect(progressiveRockBands[0].name).to.equal('Opeth');
+    expect(millenialProgressiveRockBands.length).toEqual(1);
+    expect(progressiveRockBands[0].name).toEqual('Opeth');
   });
 });

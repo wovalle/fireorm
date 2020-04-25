@@ -13,7 +13,7 @@ import { IEntity } from '.';
 export function serializeEntity<T extends IEntity>(
   obj: T,
   subColMetadata: CollectionMetadata[]
-): Object {
+): Record<string, any> {
   const serializableObj = { ...obj };
   subColMetadata.forEach(scm => {
     delete serializableObj[scm.propertyKey];

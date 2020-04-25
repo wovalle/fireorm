@@ -1,6 +1,5 @@
-import { getRepository, Collection, runTransaction } from '../../src';
+import { getRepository, Collection, runTransaction, BaseFirestoreRepository } from '../../src';
 import { Band as BandEntity } from '../fixture';
-import { expect } from 'chai';
 import { getUniqueColName } from '../setup';
 
 describe('Integration test: Transactions', () => {
@@ -9,7 +8,11 @@ describe('Integration test: Transactions', () => {
     extra?: { website: string };
   }
 
-  const bandRepository = getRepository(Band);
+  let bandRepository: BaseFirestoreRepository<Band> = null;
+
+  beforeEach(() => {
+    bandRepository = getRepository(Band);
+  });
 
   it('should do CRUD operations inside transactions in repositories', async () => {
     // Create a band
@@ -38,10 +41,10 @@ describe('Integration test: Transactions', () => {
       return tran.create(dt);
     });
 
-    expect(savedBand.name).to.equal(dt.name);
-    expect(savedBand.id).to.equal(dt.id);
-    expect(savedBand.formationYear).to.equal(dt.formationYear);
-    expect(savedBand.genres).to.equal(dt.genres);
+    expect(savedBand.name).toEqual(dt.name);
+    expect(savedBand.id).toEqual(dt.id);
+    expect(savedBand.formationYear).toEqual(dt.formationYear);
+    expect(savedBand.genres).toEqual(dt.genres);
 
     // Create a band without an id inside transactions
     const devinT = new Band();
@@ -51,15 +54,15 @@ describe('Integration test: Transactions', () => {
 
     await bandRepository.runTransaction(async tran => {
       const savedBandWithoutId = await tran.create(devinT);
-      expect(savedBandWithoutId.name).to.equal(devinT.name);
-      expect(savedBandWithoutId.id).to.equal(devinT.id);
+      expect(savedBandWithoutId.name).toEqual(devinT.name);
+      expect(savedBandWithoutId.id).toEqual(devinT.id);
     });
 
     // Read a band inside transaction
     await bandRepository.runTransaction(async tran => {
       const foundBand = await tran.findById(dt.id);
-      expect(foundBand.id).to.equal(dt.id);
-      expect(foundBand.name).to.equal(dt.name);
+      expect(foundBand.id).toEqual(dt.id);
+      expect(foundBand.name).toEqual(dt.name);
     });
 
     // Update a band inside transaction
@@ -68,19 +71,19 @@ describe('Integration test: Transactions', () => {
 
       dream.name = 'Dream Theater';
       const updatedDt = await tran.update(dream);
-      expect(updatedDt.name).to.equal(dream.name);
+      expect(updatedDt.name).toEqual(dream.name);
     });
 
     // Verify what was done inside the last transaction
     const bandOutsideTransaction = await bandRepository.findById(dt.id);
-    expect(bandOutsideTransaction.name).to.equal('Dream Theater');
+    expect(bandOutsideTransaction.name).toEqual('Dream Theater');
 
     // Filter a band by subfield inside transaction
     await bandRepository.runTransaction(async tran => {
       const byWebsite = await tran
         .whereEqualTo(a => a.extra.website, 'www.dreamtheater.net')
         .find();
-      expect(byWebsite[0].id).to.equal('dream-theater');
+      expect(byWebsite[0].id).toEqual('dream-theater');
     });
 
     // Delete a band
@@ -89,7 +92,7 @@ describe('Integration test: Transactions', () => {
     });
 
     const deletedBand = await bandRepository.findById(dt.id);
-    expect(deletedBand).to.equal(null);
+    expect(deletedBand).toEqual(null);
   });
 
   it('should do CRUD operations inside transactions', async () => {
@@ -119,10 +122,10 @@ describe('Integration test: Transactions', () => {
       return bandTranRepository.create(dt);
     });
 
-    expect(savedBand.name).to.equal(dt.name);
-    expect(savedBand.id).to.equal(dt.id);
-    expect(savedBand.formationYear).to.equal(dt.formationYear);
-    expect(savedBand.genres).to.equal(dt.genres);
+    expect(savedBand.name).toEqual(dt.name);
+    expect(savedBand.id).toEqual(dt.id);
+    expect(savedBand.formationYear).toEqual(dt.formationYear);
+    expect(savedBand.genres).toEqual(dt.genres);
 
     // Create a band without an id inside transactions
     const devinT = new Band();
@@ -134,8 +137,8 @@ describe('Integration test: Transactions', () => {
       const bandTranRepository = tran.getRepository(Band);
 
       const savedBandWithoutId = await bandTranRepository.create(devinT);
-      expect(savedBandWithoutId.name).to.equal(devinT.name);
-      expect(savedBandWithoutId.id).to.equal(devinT.id);
+      expect(savedBandWithoutId.name).toEqual(devinT.name);
+      expect(savedBandWithoutId.id).toEqual(devinT.id);
     });
 
     // Read a band inside transaction
@@ -143,8 +146,8 @@ describe('Integration test: Transactions', () => {
       const bandTranRepository = tran.getRepository(Band);
 
       const foundBand = await bandTranRepository.findById(dt.id);
-      expect(foundBand.id).to.equal(dt.id);
-      expect(foundBand.name).to.equal(dt.name);
+      expect(foundBand.id).toEqual(dt.id);
+      expect(foundBand.name).toEqual(dt.name);
     });
 
     // Update a band inside transaction
@@ -155,14 +158,14 @@ describe('Integration test: Transactions', () => {
 
       dream.name = 'Dream Theater';
       const updatedDt = await bandTranRepository.update(dream);
-      expect(updatedDt.name).to.equal(dream.name);
+      expect(updatedDt.name).toEqual(dream.name);
       return updatedDt;
     });
 
     // Verify what was done inside the last transaction
     const bandOutsideTransaction = await bandRepository.findById(dt.id);
-    expect(bandOutsideTransaction.name).to.equal('Dream Theater');
-    expect(updatedBand.name).to.equal('Dream Theater');
+    expect(bandOutsideTransaction.name).toEqual('Dream Theater');
+    expect(updatedBand.name).toEqual('Dream Theater');
 
     // Filter a band by subfield inside transaction
     await runTransaction(async tran => {
@@ -171,7 +174,7 @@ describe('Integration test: Transactions', () => {
       const byWebsite = await bandTranRepository
         .whereEqualTo(a => a.extra.website, 'www.dreamtheater.net')
         .find();
-      expect(byWebsite[0].id).to.equal('dream-theater');
+      expect(byWebsite[0].id).toEqual('dream-theater');
     });
 
     // Delete a band
@@ -182,6 +185,6 @@ describe('Integration test: Transactions', () => {
     });
 
     const deletedBand = await bandRepository.findById(dt.id);
-    expect(deletedBand).to.equal(null);
+    expect(deletedBand).toEqual(null);
   });
 });

@@ -1,18 +1,18 @@
-import { expect } from 'chai';
-const MockFirebase = require('mock-cloud-firestore');
 import { BaseFirestoreBatchRepository } from './BaseFirestoreBatchRepository';
 import { getFixture } from '../../test/fixture';
 import { initialize } from '../MetadataStorage';
 import { Band } from '../../test/BandCollection';
 import { Firestore, WriteBatch } from '@google-cloud/firestore';
-import sinon from 'sinon';
 import { FirestoreBatchUnit } from './FirestoreBatchUnit';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const MockFirebase = require('mock-cloud-firestore');
 
 describe('BaseFirestoreBatchRepository', () => {
   let bandRepository: BaseFirestoreBatchRepository<Band> = null;
   let firestore: Firestore;
   let batch: FirestoreBatchUnit;
-  let batchStub: sinon.SinonStubbedInstance<WriteBatch>;
+  let batchStub: jest.Mocked<WriteBatch>;
 
   beforeEach(() => {
     const fixture = Object.assign({}, getFixture());
@@ -20,7 +20,13 @@ describe('BaseFirestoreBatchRepository', () => {
       isNaiveSnapshotListenerEnabled: false,
     });
 
-    batchStub = sinon.createStubInstance(WriteBatch);
+    batchStub = {
+      create: jest.fn(),
+      update: jest.fn(),
+      set: jest.fn(),
+      delete: jest.fn(),
+      commit: jest.fn(),
+    };
 
     firestore = Object.assign(firebase.firestore(), { batch: () => batchStub });
     initialize(firestore);
@@ -40,7 +46,7 @@ describe('BaseFirestoreBatchRepository', () => {
       bandRepository.create(entity);
       await batch.commit();
 
-      expect(batchStub.set.firstCall.lastArg).to.eql({
+      expect(batchStub.set.mock.calls[0][1]).toEqual({
         id: 'perfect-circle',
         name: 'A Perfect Circle',
         formationYear: 1999,
@@ -57,15 +63,15 @@ describe('BaseFirestoreBatchRepository', () => {
       bandRepository.create(entity);
       await batch.commit();
 
-      const data = batchStub.set.firstCall.lastArg;
+      const data = batchStub.set.mock.calls[0][1] as Band;
 
-      expect(typeof data.id).to.eql('string');
-      expect(data.name).to.eql('The Pinapple Thief');
-      expect(data.formationYear).to.eql(1999);
-      expect(data.genres).to.eql(['progressive-rock']);
+      expect(typeof data.id).toEqual('string');
+      expect(data.name).toEqual('The Pinapple Thief');
+      expect(data.formationYear).toEqual(1999);
+      expect(data.genres).toEqual(['progressive-rock']);
     });
 
-    it('must be able to create document from anonymous object without id');
+    it.todo('must be able to create document from anonymous object without id');
   });
 
   describe('update', () => {
@@ -83,7 +89,7 @@ describe('BaseFirestoreBatchRepository', () => {
       bandRepository.update(entity);
       await batch.commit();
 
-      expect(batchStub.update.firstCall.lastArg).to.eql({
+      expect(batchStub.update.mock.calls[0][1]).toEqual({
         id: 'perfect-circle',
         name: 'Un Círculo Perfecto',
         formationYear: 1999,
@@ -103,7 +109,7 @@ describe('BaseFirestoreBatchRepository', () => {
       bandRepository.delete(entity);
       await batch.commit();
 
-      expect(batchStub.delete.firstCall.lastArg).to.eql({
+      expect(batchStub.delete.mock.calls[0][1]).toEqual({
         id: 'perfect-circle',
         name: 'A Perfect Circle',
         formationYear: 1999,
@@ -117,10 +123,7 @@ describe('BaseFirestoreBatchRepository', () => {
       initialize(firestore, { validateModels: true });
 
       const validationBatch = new FirestoreBatchUnit(firestore);
-      const validationBandRepository = new BaseFirestoreBatchRepository(
-        validationBatch,
-        Band
-      );
+      const validationBandRepository = new BaseFirestoreBatchRepository(validationBatch, Band);
 
       const entity = new Band();
       entity.id = 'perfect-circle';
@@ -134,7 +137,7 @@ describe('BaseFirestoreBatchRepository', () => {
       try {
         await validationBatch.commit();
       } catch (error) {
-        expect(error[0].constraints.isEmail).to.equal('Invalid email!');
+        expect(error[0].constraints.isEmail).toEqual('Invalid email!');
       }
     });
 
@@ -142,10 +145,7 @@ describe('BaseFirestoreBatchRepository', () => {
       initialize(firestore, { validateModels: true });
 
       const validationBatch = new FirestoreBatchUnit(firestore);
-      const validationBandRepository = new BaseFirestoreBatchRepository(
-        validationBatch,
-        Band
-      );
+      const validationBandRepository = new BaseFirestoreBatchRepository(validationBatch, Band);
 
       const entity = new Band();
       entity.id = 'perfect-circle';
@@ -159,12 +159,12 @@ describe('BaseFirestoreBatchRepository', () => {
 
       entity.contactEmail = 'email';
       validationBandRepository.delete(entity);
-      expect(validationBatch.commit).to.not.to.throw();
+      expect(validationBatch.commit).not.toThrow();
     });
   });
 
   //TODO: for this to work I'll probably need to do the collectionPath refactor
   // Copy from BaseFirestoreTransactionRepository.spec
-  // tslint:disable-next-line:no-empty
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   describe('must handle subcollections', () => {});
 });

@@ -2,18 +2,10 @@ import { OrderByDirection, DocumentReference } from '@google-cloud/firestore';
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
-export type WithOptionalId<T extends { id: unknown }> = Pick<
-  T,
-  Exclude<keyof T, 'id'>
-> &
+export type WithOptionalId<T extends { id: unknown }> = Pick<T, Exclude<keyof T, 'id'>> &
   Partial<Pick<T, 'id'>>;
 
-export type IFirestoreVal =
-  | string
-  | number
-  | Date
-  | Boolean
-  | DocumentReference;
+export type IFirestoreVal = string | number | Date | boolean | DocumentReference;
 
 export enum FirestoreOperators {
   equal = '==',
@@ -41,23 +33,11 @@ export type IWherePropParam<T> = keyof T | ((t: T) => unknown);
 
 export interface IQueryable<T extends IEntity> {
   whereEqualTo(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T>;
-  whereGreaterThan(
-    prop: IWherePropParam<T>,
-    val: IFirestoreVal
-  ): IQueryBuilder<T>;
-  whereGreaterOrEqualThan(
-    prop: IWherePropParam<T>,
-    val: IFirestoreVal
-  ): IQueryBuilder<T>;
+  whereGreaterThan(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T>;
+  whereGreaterOrEqualThan(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T>;
   whereLessThan(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T>;
-  whereLessOrEqualThan(
-    prop: IWherePropParam<T>,
-    val: IFirestoreVal
-  ): IQueryBuilder<T>;
-  whereArrayContains(
-    prop: IWherePropParam<T>,
-    val: IFirestoreVal
-  ): IQueryBuilder<T>;
+  whereLessOrEqualThan(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T>;
+  whereArrayContains(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T>;
   find(): Promise<T[]>;
   findOne(): Promise<T | null>;
 }
@@ -71,9 +51,7 @@ export interface ILimitable<T extends IEntity> {
   limit(limitVal: number): IQueryBuilder<T>;
 }
 
-export type IQueryBuilder<T extends IEntity> = IQueryable<T> &
-  IOrderable<T> &
-  ILimitable<T>;
+export type IQueryBuilder<T extends IEntity> = IQueryable<T> & IOrderable<T> & ILimitable<T>;
 
 export interface IQueryExecutor<T> {
   execute(

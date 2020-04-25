@@ -1,6 +1,5 @@
-import { getRepository, Collection, createBatch } from '../../src';
+import { getRepository, Collection, createBatch, BaseFirestoreRepository } from '../../src';
 import { Band as BandEntity } from '../fixture';
-import { expect } from 'chai';
 import { getUniqueColName } from '../setup';
 
 describe('Integration test: Batches', () => {
@@ -9,7 +8,11 @@ describe('Integration test: Batches', () => {
     extra?: { website: string };
   }
 
-  const bandRepository = getRepository(Band);
+  let bandRepository: BaseFirestoreRepository<Band> = null;
+
+  beforeEach(() => {
+    bandRepository = getRepository(Band);
+  });
 
   it('should do CRUD operations inside batches in repositories', async () => {
     // Array of bands to batch-insert
@@ -49,13 +52,11 @@ describe('Integration test: Batches', () => {
       .whereArrayContains(b => b.genres, 'custom-genre')
       .find();
 
-    const orderedBands = createdBands.sort((a, b) =>
-      b.name.localeCompare(a.name)
-    );
+    const orderedBands = createdBands.sort((a, b) => b.name.localeCompare(a.name));
 
-    expect(orderedBands.length).to.eql(2);
-    expect(orderedBands[0].name).to.eql(bands[0].name);
-    expect(orderedBands[1].name).to.eql(bands[1].name);
+    expect(orderedBands.length).toEqual(2);
+    expect(orderedBands[0].name).toEqual(bands[0].name);
+    expect(orderedBands[1].name).toEqual(bands[1].name);
 
     // Update website for all bands with an update batch
     const updateBatch = bandRepository.createBatch();
@@ -72,9 +73,9 @@ describe('Integration test: Batches', () => {
       .whereArrayContains(b => b.genres, 'custom-genre')
       .find();
 
-    expect(updatedBands.length).to.eql(2);
-    expect(updatedBands[0].extra.website).to.eql('https://fake.web');
-    expect(updatedBands[1].extra.website).to.eql('https://fake.web');
+    expect(updatedBands.length).toEqual(2);
+    expect(updatedBands[0].extra.website).toEqual('https://fake.web');
+    expect(updatedBands[1].extra.website).toEqual('https://fake.web');
 
     // Delete bands with an delete batch
     const deleteBatch = bandRepository.createBatch();
@@ -88,7 +89,7 @@ describe('Integration test: Batches', () => {
       .whereArrayContains(b => b.genres, 'custom-genre')
       .find();
 
-    expect(deletedBands.length).to.eql(0);
+    expect(deletedBands.length).toEqual(0);
   });
 
   it('should do CRUD operations inside batches', async () => {
@@ -126,13 +127,11 @@ describe('Integration test: Batches', () => {
       .whereArrayContains(b => b.genres, 'custom-genre')
       .find();
 
-    const orderedBands = createdBands.sort((a, b) =>
-      b.name.localeCompare(a.name)
-    );
+    const orderedBands = createdBands.sort((a, b) => b.name.localeCompare(a.name));
 
-    expect(orderedBands.length).to.eql(2);
-    expect(orderedBands[0].name).to.eql(bands[0].name);
-    expect(orderedBands[1].name).to.eql(bands[1].name);
+    expect(orderedBands.length).toEqual(2);
+    expect(orderedBands[0].name).toEqual(bands[0].name);
+    expect(orderedBands[1].name).toEqual(bands[1].name);
 
     // Update website for all bands with an update batch
     const updateBatch = createBatch();
@@ -150,9 +149,9 @@ describe('Integration test: Batches', () => {
       .whereArrayContains(b => b.genres, 'custom-genre')
       .find();
 
-    expect(updatedBands.length).to.eql(2);
-    expect(updatedBands[0].extra.website).to.eql('https://fake.web');
-    expect(updatedBands[1].extra.website).to.eql('https://fake.web');
+    expect(updatedBands.length).toEqual(2);
+    expect(updatedBands[0].extra.website).toEqual('https://fake.web');
+    expect(updatedBands[1].extra.website).toEqual('https://fake.web');
 
     // Delete bands with an delete batch
     const deleteBatch = createBatch();
@@ -167,6 +166,6 @@ describe('Integration test: Batches', () => {
       .whereArrayContains(b => b.genres, 'custom-genre')
       .find();
 
-    expect(deletedBands.length).to.eql(0);
+    expect(deletedBands.length).toEqual(0);
   });
 });

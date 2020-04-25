@@ -1,8 +1,7 @@
-import { expect } from 'chai';
 import { initialize, getStore, clearMetadataStorage } from '../MetadataStorage';
 import { Collection } from './Collection';
 
-describe.skip('CollectionDecorator', () => {
+describe('CollectionDecorator', () => {
   const store = getStore();
   beforeEach(() => {
     clearMetadataStorage();
@@ -16,9 +15,9 @@ describe.skip('CollectionDecorator', () => {
     }
 
     const collection = store.metadataStorage.getCollection('foo');
-    expect(store.metadataStorage.collections.length).to.eql(1);
-    expect(collection.name).to.eql('foo');
-    expect(collection.entity).to.eql(Entity);
+    expect(store.metadataStorage.collections.length).toEqual(1);
+    expect(collection.name).toEqual('foo');
+    expect(collection.entity).toEqual(Entity);
   });
 
   it('should register collections with default name', () => {
@@ -28,9 +27,9 @@ describe.skip('CollectionDecorator', () => {
     }
 
     const collection = store.metadataStorage.getCollection('Entities');
-    expect(store.metadataStorage.collections.length).to.eql(1);
-    expect(collection.name).to.eql('Entities');
-    expect(collection.entity).to.eql(Entity);
+    expect(store.metadataStorage.collections.length).toEqual(1);
+    expect(collection.name).toEqual('Entities');
+    expect(collection.entity).toEqual(Entity);
   });
 
   it('should register collections once', () => {
@@ -41,8 +40,8 @@ describe.skip('CollectionDecorator', () => {
     }
 
     const collection = store.metadataStorage.getCollection('Entities');
-    expect(store.metadataStorage.collections.length).to.eql(1);
-    expect(collection.name).to.eql('Entities');
-    expect(collection.entity).to.eql(Entity);
+    expect(store.metadataStorage.collections.length).toEqual(1);
+    expect(collection.name).toEqual('Entities');
+    expect(collection.entity).toEqual(Entity);
   });
 });

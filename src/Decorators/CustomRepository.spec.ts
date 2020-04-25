@@ -1,9 +1,8 @@
-import { expect } from 'chai';
 import { CustomRepository } from './CustomRepository';
 import { initialize, getStore, clearMetadataStorage } from '../MetadataStorage';
 import { BaseFirestoreRepository } from '../BaseFirestoreRepository';
 
-describe.skip('CustomRepositoryDecorator', () => {
+describe('CustomRepositoryDecorator', () => {
   const store = getStore();
 
   beforeEach(() => {
@@ -20,9 +19,9 @@ describe.skip('CustomRepositoryDecorator', () => {
     class EntityRepo extends BaseFirestoreRepository<Entity> {}
 
     const repository = store.metadataStorage.repositories.get(Entity);
-    expect(store.metadataStorage.repositories.size).to.eql(1);
-    expect(repository.entity).to.eql(Entity);
-    expect(repository.target).to.eql(EntityRepo);
+    expect(store.metadataStorage.repositories.size).toEqual(1);
+    expect(repository.entity).toEqual(Entity);
+    expect(repository.target).toEqual(EntityRepo);
   });
 
   it('should only register a repository once', () => {
@@ -36,7 +35,7 @@ describe.skip('CustomRepositoryDecorator', () => {
 
       @CustomRepository(Entity)
       class EntityRepo2 extends BaseFirestoreRepository<Entity> {}
-    }).to.throw;
+    }).toThrow();
   });
 
   it('should only register a repository once', () => {
@@ -49,9 +48,9 @@ describe.skip('CustomRepositoryDecorator', () => {
     class EntityRepo extends BaseFirestoreRepository<Entity> {}
 
     const repository = store.metadataStorage.repositories.get(Entity);
-    expect(store.metadataStorage.repositories.size).to.eql(1);
-    expect(repository.entity).to.eql(Entity);
-    expect(repository.target).to.eql(EntityRepo);
+    expect(store.metadataStorage.repositories.size).toEqual(1);
+    expect(repository.entity).toEqual(Entity);
+    expect(repository.target).toEqual(EntityRepo);
   });
 
   it('should enforce that custom repository inherits from BaseRepository', () => {
@@ -62,6 +61,6 @@ describe.skip('CustomRepositoryDecorator', () => {
     expect(() => {
       @CustomRepository(Entity)
       class EntityRepo {}
-    }).to.throw;
+    }).toThrow();
   });
 });

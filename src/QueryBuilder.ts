@@ -11,8 +11,7 @@ import {
   IWherePropParam,
 } from './types';
 
-export default class QueryBuilder<T extends IEntity>
-  implements IQueryBuilder<T> {
+export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T> {
   protected queries: Array<IFireOrmQueryLine> = [];
   protected limitVal: number;
   protected orderByObj: IOrderByParams;
@@ -33,10 +32,7 @@ export default class QueryBuilder<T extends IEntity>
     return this;
   }
 
-  whereGreaterThan(
-    prop: IWherePropParam<T>,
-    val: IFirestoreVal
-  ): QueryBuilder<T> {
+  whereGreaterThan(prop: IWherePropParam<T>, val: IFirestoreVal): QueryBuilder<T> {
     this.queries.push({
       prop: this.extractWhereParam(prop),
       val,
@@ -45,10 +41,7 @@ export default class QueryBuilder<T extends IEntity>
     return this;
   }
 
-  whereGreaterOrEqualThan(
-    prop: IWherePropParam<T>,
-    val: IFirestoreVal
-  ): QueryBuilder<T> {
+  whereGreaterOrEqualThan(prop: IWherePropParam<T>, val: IFirestoreVal): QueryBuilder<T> {
     this.queries.push({
       prop: this.extractWhereParam(prop),
       val,
@@ -66,10 +59,7 @@ export default class QueryBuilder<T extends IEntity>
     return this;
   }
 
-  whereLessOrEqualThan(
-    prop: IWherePropParam<T>,
-    val: IFirestoreVal
-  ): QueryBuilder<T> {
+  whereLessOrEqualThan(prop: IWherePropParam<T>, val: IFirestoreVal): QueryBuilder<T> {
     this.queries.push({
       prop: this.extractWhereParam(prop),
       val,
@@ -78,10 +68,7 @@ export default class QueryBuilder<T extends IEntity>
     return this;
   }
 
-  whereArrayContains(
-    prop: IWherePropParam<T>,
-    val: IFirestoreVal
-  ): QueryBuilder<T> {
+  whereArrayContains(prop: IWherePropParam<T>, val: IFirestoreVal): QueryBuilder<T> {
     this.queries.push({
       prop: this.extractWhereParam(prop),
       val,
@@ -135,8 +122,13 @@ export default class QueryBuilder<T extends IEntity>
   }
 
   async findOne(): Promise<T | null> {
-    const queryResult = await this.executor.execute(this.queries, this.limitVal, this.orderByObj, true);
-    
+    const queryResult = await this.executor.execute(
+      this.queries,
+      this.limitVal,
+      this.orderByObj,
+      true
+    );
+
     return queryResult.length ? queryResult[0] : null;
   }
 }

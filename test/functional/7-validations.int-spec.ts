@@ -1,10 +1,13 @@
-import { getRepository, Collection } from '../../src';
+import { getRepository, Collection, initialize } from '../../src';
 import { Band as BandEntity } from '../fixture';
-import { expect } from 'chai';
 import { getUniqueColName } from '../setup';
 import { IsEmail } from 'class-validator';
+import { Firestore } from '@google-cloud/firestore';
 
 describe('Integration test: Validations', () => {
+  const firestore = (global as any).firestoreRef as Firestore;
+  initialize(firestore, { validateModels: true });
+
   @Collection(getUniqueColName('validations'))
   class Band extends BandEntity {
     @IsEmail()
@@ -22,15 +25,15 @@ describe('Integration test: Validations', () => {
     await bandRepository.create(dt);
 
     const foundBand = await bandRepository.findById(dt.id);
-    expect(foundBand.id).to.equal(dt.id);
-    expect(foundBand.contactEmail).to.equal(dt.contactEmail);
+    expect(foundBand.id).toEqual(dt.id);
+    expect(foundBand.contactEmail).toEqual(dt.contactEmail);
 
     // Should update a band when passing a valid email
     dt.contactEmail = 'mail@example.com';
     await bandRepository.update(dt);
 
     const updatedDtInDb = await bandRepository.findById(dt.id);
-    expect(updatedDtInDb.contactEmail).to.equal('mail@example.com');
+    expect(updatedDtInDb.contactEmail).toEqual('mail@example.com');
 
     // Should throw when trying to create a band with an invalid email
     const sw = new Band();
@@ -38,10 +41,16 @@ describe('Integration test: Validations', () => {
     sw.name = 'Steven Wilson';
     sw.contactEmail = 'stevenwilson.com';
 
-    expect(async () => await bandRepository.create(sw)).to.throw;
+    expect(bandRepository.create(sw)).rejects.toBeTruthy();
 
     // Should throw when trying to update a band with an invalid email
     dt.contactEmail = 'dreamtheater.com';
-    expect(async () => await bandRepository.update(dt)).to.throw;
+
+    try {
+      await bandRepository.update(dt);
+      expect(false).toBeTruthy();
+    } catch (err) {
+      expect(err).toBeTruthy();
+    }
   });
 });

@@ -1,9 +1,5 @@
 import { Collection, SubCollection } from '../src/Decorators';
-import {
-  Album as AlbumEntity,
-  Coordinates,
-  FirestoreDocumentReference,
-} from './fixture';
+import { Album as AlbumEntity, Coordinates, FirestoreDocumentReference } from './fixture';
 import { ISubCollection } from '../src/types';
 import { Type } from '../src';
 import { IsEmail, IsOptional, Length } from 'class-validator';
@@ -40,9 +36,12 @@ export class Band {
   lastShow: Date;
 
   @IsOptional()
-  @IsEmail({}, {
-    message: 'Invalid email!',
-  })
+  @IsEmail(
+    {},
+    {
+      message: 'Invalid email!',
+    }
+  )
   contactEmail?: string;
 
   // Todo create fireorm bypass decorator

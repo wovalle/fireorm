@@ -80,18 +80,14 @@ export class FirestoreBatchUnit {
     return result;
   };
 
-  async validate(
-    item: IEntity,
-    Entity: Instantiable<IEntity>
-  ): Promise<ValidationError[]> {
+  async validate(item: IEntity, Entity: Instantiable<IEntity>): Promise<ValidationError[]> {
     try {
       const classValidator = await import('class-validator');
 
       /**
        * Instantiate plain objects into an entity class
        */
-      const entity =
-        item instanceof Entity ? item : Object.assign(new Entity(), item);
+      const entity = item instanceof Entity ? item : Object.assign(new Entity(), item);
 
       return classValidator.validate(entity);
     } catch (error) {

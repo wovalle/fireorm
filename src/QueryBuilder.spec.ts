@@ -1,7 +1,5 @@
 import QueryBuilder from './QueryBuilder';
 import { IQueryExecutor, IFireOrmQueryLine, FirestoreOperators } from './types';
-import { expect } from 'chai';
-
 class Test {
   id: string;
 }
@@ -23,10 +21,10 @@ describe('QueryBuilder', () => {
   it('must build query', async () => {
     const queryBuilder = new QueryBuilder<Test>(executor);
     await queryBuilder.whereEqualTo('id', '1').find();
-    expect(executor.queries.length).to.eql(1);
-    expect(executor.queries[0].operator).to.eql(FirestoreOperators.equal);
-    expect(executor.queries[0].prop).to.eql('id');
-    expect(executor.queries[0].val).to.eql('1');
+    expect(executor.queries.length).toEqual(1);
+    expect(executor.queries[0].operator).toEqual(FirestoreOperators.equal);
+    expect(executor.queries[0].prop).toEqual('id');
+    expect(executor.queries[0].val).toEqual('1');
   });
 
   it('must pipe queries', async () => {
@@ -36,9 +34,9 @@ describe('QueryBuilder', () => {
       .whereEqualTo('id', '1')
       .whereEqualTo('id', '2')
       .find();
-    expect(executor.queries.length).to.eql(3);
-    expect(executor.queries[0].val).to.eql('0');
-    expect(executor.queries[1].val).to.eql('1');
-    expect(executor.queries[2].val).to.eql('2');
+    expect(executor.queries.length).toEqual(3);
+    expect(executor.queries[0].val).toEqual('0');
+    expect(executor.queries[1].val).toEqual('1');
+    expect(executor.queries[2].val).toEqual('2');
   });
 });

@@ -7,7 +7,7 @@ export interface IMetadataStore {
 }
 
 export function getStore(): IMetadataStore {
-  return global as any;
+  return global as never;
 }
 
 export interface CollectionMetadata {
@@ -72,9 +72,7 @@ export class MetadataStorage {
     const savedRepo = this.getRepository(repo.entity);
 
     if (savedRepo && repo.target !== savedRepo.target) {
-      throw new Error(
-        'Cannot register a custom repository twice with two different targets'
-      );
+      throw new Error('Cannot register a custom repository twice with two different targets');
     }
 
     if (!(repo.target.prototype instanceof BaseRepository)) {
@@ -89,6 +87,22 @@ export class MetadataStorage {
   public firestoreRef: Firestore = null;
 }
 
+function initializeMetadataStorage(): void {
+  const store = getStore();
+
+  if (!store.metadataStorage) {
+    store.metadataStorage = new MetadataStorage();
+  }
+}
+
+/**
+ * Used for testing to reset metadataStore to clean state
+ */
+export function clearMetadataStorage(): void {
+  const store = getStore();
+  store.metadataStorage = null;
+}
+
 /**
  * Return exisiting metadataStorage, otherwise create if not present
  */
@@ -101,22 +115,6 @@ export const getMetadataStorage = (): MetadataStorage => {
 
   return store.metadataStorage;
 };
-
-function initializeMetadataStorage() {
-  const store = getStore();
-
-  if (!store.metadataStorage) {
-    store.metadataStorage = new MetadataStorage();
-  }
-}
-
-/**
- * Used for testing to reset metadataStore to clean state
- */
-export function clearMetadataStorage() {
-  const store = getStore();
-  store.metadataStorage = null;
-}
 
 export const initialize = (
   firestore: Firestore,

@@ -1,8 +1,4 @@
-import {
-  CollectionReference,
-  Transaction,
-  WhereFilterOp,
-} from '@google-cloud/firestore';
+import { CollectionReference, Transaction, WhereFilterOp } from '@google-cloud/firestore';
 
 import {
   IEntity,
@@ -16,8 +12,7 @@ import {
 import { AbstractFirestoreRepository } from '../AbstractFirestoreRepository';
 import { getMetadataStorage } from '../MetadataStorage';
 
-export class TransactionRepository<T extends IEntity>
-  extends AbstractFirestoreRepository<T>
+export class TransactionRepository<T extends IEntity> extends AbstractFirestoreRepository<T>
   implements IRepository<T> {
   private firestoreColRef: CollectionReference;
   private transaction: Transaction;
@@ -32,9 +27,7 @@ export class TransactionRepository<T extends IEntity>
       throw new Error('Firestore must be initialized first');
     }
 
-    this.firestoreColRef = firestoreRef.collection(
-      this.collectionPath || this.colName
-    );
+    this.firestoreColRef = firestoreRef.collection(this.collectionPath || this.colName);
   }
 
   execute(queries: IFireOrmQueryLine[]): Promise<T[]> {
@@ -60,9 +53,7 @@ export class TransactionRepository<T extends IEntity>
       }
     }
 
-    const doc = item.id
-      ? this.firestoreColRef.doc(item.id)
-      : this.firestoreColRef.doc();
+    const doc = item.id ? this.firestoreColRef.doc(item.id) : this.firestoreColRef.doc();
 
     if (!item.id) {
       item.id = doc.id;

@@ -11,10 +11,12 @@ jobs:
   include:
     - stage: test
       script:
-        - yarn lint
+        - yarn eslint '*/**/*.{js,ts}' --quiet
         - commitlint-travis
         - yarn test
         - yarn test:integration
+        - yarn add --dev codecov
+        - yarn codecov
 
     - stage: deploy
       script:
