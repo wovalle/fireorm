@@ -101,6 +101,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     // tslint:disable-next-line:no-unnecessary-type-assertion
     const entity = plainToClass(this.colMetadata.entity, {
       id: doc.id,
+      __createTime: doc.createTime?.toDate(),
       ...this.transformFirestoreTypes(doc.data() as T),
     }) as T;
 

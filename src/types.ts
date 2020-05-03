@@ -77,6 +77,9 @@ export type ISubCollection<T extends IEntity> = IRepository<T>;
 
 export interface IEntity {
   id: string;
+  __createTime?: Date | null;
+  __readTime?: Date;
+  __updateTime?: Date | null;
 }
 
 export type Instantiable<T> = { new (): T };
