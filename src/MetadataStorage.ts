@@ -1,6 +1,7 @@
 import { Firestore } from '@google-cloud/firestore';
 import { BaseRepository } from './BaseRepository';
 import { InstanstiableIEntity } from './types';
+import { ValidatorOptions } from 'class-validator';
 
 export interface IMetadataStore {
   metadataStorage: MetadataStorage;
@@ -24,6 +25,7 @@ export interface RepositoryMetadata {
 
 export interface MetadataStorageConfig {
   validateModels?: boolean;
+  validatorOptions?: ValidatorOptions;
 }
 
 export class MetadataStorage {
