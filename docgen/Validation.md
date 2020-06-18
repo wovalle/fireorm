@@ -21,10 +21,10 @@ Use this in the same way that you would your other collections and it will valid
 
 ## Disabling validation
 
-Model validation is enabled by default. It can be disabled by initializing FireORM with the `validateModels: false` option.
+Model validation is not enabled by default. It can be enable by initializing FireORM with the `validateModels: true` option.
 
 ```typescript
 initialize(firestore, {
-  validateModels: false
+  validateModels: true
 })
 ```
