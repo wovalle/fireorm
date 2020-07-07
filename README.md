@@ -176,12 +176,12 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   </tr>
   <tr>
     <td align="center"><a href="https://www.smddzcy.com/"><img src="https://avatars3.githubusercontent.com/u/13895224?v=4" width="100px;" alt=""/><br /><sub><b>Samed Düzçay</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=smddzcy" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/stefdelec"><img src="https://avatars1.githubusercontent.com/u/12082478?v=4" width="100px;" alt=""/><br /><sub><b>stefdelec</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=stefdelec" title="Code">💻</a></td>
   </tr>
 </table>
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
-
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
