@@ -1,0 +1,21 @@
+{
+  "name": "Fireorm: ORM for firestore",
+  "type": "library",
+  "platforms": ["Web", "Node"],
+  "content": "README.md",
+  "related": ["wovalle/fireorm"],
+  "tabs": [
+    {
+      "title": "Documentation",
+      "href": "https://fireorm.js.org"
+    },
+    {
+      "title": "Github",
+      "href": "https://github.com/wovalle/fireorm"
+    },
+    {
+      "title": "NPM",
+      "href": "https://www.npmjs.com/package/fireorm"
+    }
+  ]
+}
