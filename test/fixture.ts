@@ -1,3 +1,5 @@
+import { IEntity } from '../src';
+
 export class Coordinates {
   latitude: number;
   longitude: number;
@@ -178,7 +180,7 @@ export const getInitialData = () => {
   ];
 };
 
-const getCollectionBoilerplate = (entity: string, hash: object) => ({
+const getCollectionBoilerplate = (entity: string, hash: Record<string, unknown>) => ({
   __collection__: {
     [entity]: {
       __doc__: hash,
@@ -186,10 +188,11 @@ const getCollectionBoilerplate = (entity: string, hash: object) => ({
   },
 });
 
-export const getBandFixture = (): Band[] => {
+export const getBandFixture = () => {
   const initialData = getInitialData();
 
-  const objectifyList = (arr: Array<any>, cb) =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const objectifyList = (arr: Array<IEntity>, cb) =>
     arr.reduce((acc, cur) => ({ ...acc, [cur.id]: cb(cur) }), {});
 
   return objectifyList(initialData, ({ albums, ...rest }) => ({

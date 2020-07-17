@@ -331,7 +331,6 @@ describe('BaseFirestoreRepository', () => {
 
     // mock-cloud-firestore won't throw here
     it.skip('must throw if item is not found', async () => {
-      //tslint:disable-next-line:rule1 no-void-expression
       expect(async () => await bandRepository.delete('lol')).toThrow();
     });
   });

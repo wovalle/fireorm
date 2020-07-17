@@ -1,6 +1,6 @@
 import { Firestore } from '@google-cloud/firestore';
 import { BaseRepository } from './BaseRepository';
-import { InstanstiableIEntity } from './types';
+import { InstanstiableIEntity, InstantiableIEntityRepository } from './types';
 
 export interface IMetadataStore {
   metadataStorage: MetadataStorage;
@@ -13,12 +13,12 @@ export function getStore(): IMetadataStore {
 export interface CollectionMetadata {
   name: string;
   entity: InstanstiableIEntity;
-  parentEntity?: Function;
+  parentEntity?: InstanstiableIEntity;
   propertyKey?: string;
 }
 
 export interface RepositoryMetadata {
-  target: Function;
+  target: InstantiableIEntityRepository;
   entity: InstanstiableIEntity;
 }
 
@@ -35,7 +35,7 @@ export class MetadataStorage {
     validateModels: false,
   };
 
-  public getCollection = (param: string | Function) => {
+  public getCollection = (param: string | InstanstiableIEntity) => {
     if (typeof param === 'string') {
       return this.collections.find(c => c.name === param);
     }
@@ -49,11 +49,11 @@ export class MetadataStorage {
     }
   };
 
-  public getSubCollectionsFromParent = (parentEntity: Function) => {
+  public getSubCollectionsFromParent = (parentEntity: InstanstiableIEntity) => {
     return this.subCollections.filter(s => s.parentEntity === parentEntity);
   };
 
-  public getSubCollection = (param: string | Function): CollectionMetadata => {
+  public getSubCollection = (param: string | InstanstiableIEntity): CollectionMetadata => {
     if (typeof param === 'string') {
       return this.subCollections.find(c => c.name === param);
     }
@@ -64,7 +64,7 @@ export class MetadataStorage {
     this.subCollections.push(subCol);
   };
 
-  public getRepository = (param: Function) => {
+  public getRepository = (param: InstanstiableIEntity) => {
     return this.repositories.get(param);
   };
 

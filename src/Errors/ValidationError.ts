@@ -3,12 +3,12 @@
  * Copied from class-validator/validation/ValidationError.d.ts
  */
 export declare class ValidationError {
-
   /**
    * Object that was validated.
    *
    * OPTIONAL - configurable via the ValidatorOptions.validationError.target option
    */
+  // eslint-disable-next-line @typescript-eslint/ban-types
   target?: object;
 
   /**
@@ -27,7 +27,7 @@ export declare class ValidationError {
    * Constraints that failed validation with error messages.
    */
   constraints?: {
-      [type: string]: string;
+    [type: string]: string;
   };
 
   /**
@@ -35,12 +35,11 @@ export declare class ValidationError {
    */
   children: ValidationError[];
 
-
   /*
    * A transient set of data passed through to the validation result for response mapping
    */
   contexts?: {
-      [type: string]: any;
+    [type: string]: any;
   };
   /**
    *

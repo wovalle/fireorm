@@ -5,6 +5,7 @@ import { IsEmail } from 'class-validator';
 import { Firestore } from '@google-cloud/firestore';
 
 describe('Integration test: Validations', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const firestore = (global as any).firestoreRef as Firestore;
   initialize(firestore, { validateModels: true });
 

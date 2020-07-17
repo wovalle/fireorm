@@ -24,6 +24,7 @@ describe('Integration test: Using Document References', () => {
      * so I can use the sdk to store references.
      * After fireorm/issues/58 this will be removed
      */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     firestore = (global as any).firestoreRef as Firestore;
   });
 

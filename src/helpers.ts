@@ -40,6 +40,7 @@ function _getRepository<T extends IEntity>(
   }
 
   if (repositoryType === 'custom' || (repositoryType === 'default' && repository)) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return new (repository.target as any)(collection.name, documentPath);
   } else {
     return new BaseFirestoreRepository<T>(collection.name, documentPath);

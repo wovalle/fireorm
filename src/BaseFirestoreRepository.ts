@@ -1,4 +1,3 @@
-// tslint:disable-next-line:no-import-side-effect
 import 'reflect-metadata';
 
 import { CollectionReference, WhereFilterOp } from '@google-cloud/firestore';

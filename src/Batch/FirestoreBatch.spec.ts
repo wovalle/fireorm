@@ -46,11 +46,6 @@ describe('FirestoreBatch', () => {
 
   describe('commit', () => {
     it('should throw error if no ops', () => {
-      @Collection()
-      class Entity {
-        id: string;
-      }
-
       const tran = new FirestoreBatch(firestore);
 
       expect(tran.commit()).rejects.toThrow('Cannot commit a batch with zero operations');

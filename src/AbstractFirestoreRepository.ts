@@ -11,6 +11,7 @@ import {
   IOrderByParams,
   IRepository,
   PartialBy,
+  InstanstiableIEntity,
 } from './types';
 
 import { getMetadataStorage, CollectionMetadata, MetadataStorageConfig } from './MetadataStorage';
@@ -27,7 +28,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   protected readonly config: MetadataStorageConfig;
   protected readonly collectionPath: string;
 
-  constructor(nameOrConstructor: string | Function, collectionPath?: string) {
+  constructor(nameOrConstructor: string | InstanstiableIEntity, collectionPath?: string) {
     super();
 
     const {
@@ -98,7 +99,6 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
       return null;
     }
 
-    // tslint:disable-next-line:no-unnecessary-type-assertion
     const entity = plainToClass(this.colMetadata.entity, {
       id: doc.id,
       ...this.transformFirestoreTypes(doc.data() as T),

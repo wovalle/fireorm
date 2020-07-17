@@ -20,7 +20,7 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
 
   private extractWhereParam = (param: IWherePropParam<T>) => {
     if (typeof param === 'string') return param;
-    return getPath(param as Function).join('.');
+    return getPath<T, (t: T) => unknown>(param).join('.');
   };
 
   whereEqualTo(param: IWherePropParam<T>, val: IFirestoreVal): QueryBuilder<T> {
