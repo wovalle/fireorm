@@ -1,12 +1,12 @@
 import { getMetadataStorage } from '../MetadataStorage';
-import { InstanstiableIEntity, Instantiable, IRepository, IEntity } from '../types';
+import { IEntityConstructor, Constructor, IRepository, IEntity } from '../types';
 
-export function CustomRepository<T extends InstanstiableIEntity>(entity: InstanstiableIEntity) {
-  return function (target: Instantiable<IRepository<IEntity>>) {
-    // TODO: don't know why can't enforce the type to target
+export function CustomRepository(entity: IEntityConstructor) {
+  // TODO: don't know why can't enforce the type to target
+  return function (target: unknown) {
     getMetadataStorage().setRepository({
       entity,
-      target: target as Instantiable<IRepository<InstanceType<T>>>,
+      target: target as Constructor<IRepository<IEntity>>,
     });
   };
 }

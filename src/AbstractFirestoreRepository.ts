@@ -11,7 +11,7 @@ import {
   IOrderByParams,
   IRepository,
   PartialBy,
-  InstanstiableIEntity,
+  IEntityConstructor,
 } from './types';
 
 import { getMetadataStorage, CollectionMetadata, MetadataStorageConfig } from './MetadataStorage';
@@ -28,7 +28,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   protected readonly config: MetadataStorageConfig;
   protected readonly collectionPath: string;
 
-  constructor(nameOrConstructor: string | InstanstiableIEntity, collectionPath?: string) {
+  constructor(nameOrConstructor: string | IEntityConstructor, collectionPath?: string) {
     super();
 
     const {

@@ -1,6 +1,6 @@
 import { Firestore } from '@google-cloud/firestore';
 import { BaseRepository } from './BaseRepository';
-import { InstanstiableIEntity, InstantiableIEntityRepository } from './types';
+import { IEntityConstructor, IEntityRepositoryConstructor } from './types';
 
 export interface IMetadataStore {
   metadataStorage: MetadataStorage;
@@ -12,14 +12,14 @@ export function getStore(): IMetadataStore {
 
 export interface CollectionMetadata {
   name: string;
-  entity: InstanstiableIEntity;
-  parentEntity?: InstanstiableIEntity;
+  entity: IEntityConstructor;
+  parentEntity?: IEntityConstructor;
   propertyKey?: string;
 }
 
 export interface RepositoryMetadata {
-  target: InstantiableIEntityRepository;
-  entity: InstanstiableIEntity;
+  target: IEntityRepositoryConstructor;
+  entity: IEntityConstructor;
 }
 
 export interface MetadataStorageConfig {
@@ -35,7 +35,7 @@ export class MetadataStorage {
     validateModels: false,
   };
 
-  public getCollection = (param: string | InstanstiableIEntity) => {
+  public getCollection = (param: string | IEntityConstructor) => {
     if (typeof param === 'string') {
       return this.collections.find(c => c.name === param);
     }
@@ -49,11 +49,11 @@ export class MetadataStorage {
     }
   };
 
-  public getSubCollectionsFromParent = (parentEntity: InstanstiableIEntity) => {
+  public getSubCollectionsFromParent = (parentEntity: IEntityConstructor) => {
     return this.subCollections.filter(s => s.parentEntity === parentEntity);
   };
 
-  public getSubCollection = (param: string | InstanstiableIEntity): CollectionMetadata => {
+  public getSubCollection = (param: string | IEntityConstructor): CollectionMetadata => {
     if (typeof param === 'string') {
       return this.subCollections.find(c => c.name === param);
     }
@@ -64,7 +64,7 @@ export class MetadataStorage {
     this.subCollections.push(subCol);
   };
 
-  public getRepository = (param: InstanstiableIEntity) => {
+  public getRepository = (param: IEntityConstructor) => {
     return this.repositories.get(param);
   };
 

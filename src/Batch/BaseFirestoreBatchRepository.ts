@@ -1,5 +1,5 @@
 import { CollectionReference } from '@google-cloud/firestore';
-import { IEntity, WithOptionalId, Instantiable } from '../types';
+import { IEntity, WithOptionalId, Constructor } from '../types';
 import { getMetadataStorage, CollectionMetadata, MetadataStorageConfig } from '../MetadataStorage';
 import { FirestoreBatchUnit } from './FirestoreBatchUnit';
 
@@ -12,7 +12,7 @@ export class BaseFirestoreBatchRepository<T extends IEntity> {
 
   constructor(
     protected batch: FirestoreBatchUnit,
-    protected entity: Instantiable<T>,
+    protected entity: Constructor<T>,
     collectionPath?: string
   ) {
     const {

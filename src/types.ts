@@ -79,5 +79,6 @@ export interface IEntity {
   id: string;
 }
 
-export type Instantiable<T> = { new (): T };
-export type InstanstiableIEntity = Instantiable<IEntity>;
+export type Constructor<T> = { new (): T };
+export type IEntityConstructor = Constructor<IEntity>;
+export type IEntityRepositoryConstructor = Constructor<IRepository<IEntity>>;

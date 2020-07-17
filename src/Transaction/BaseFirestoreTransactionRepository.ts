@@ -6,7 +6,7 @@ import {
   WithOptionalId,
   IQueryBuilder,
   IRepository,
-  Instantiable,
+  Constructor,
 } from '../types';
 
 import { AbstractFirestoreRepository } from '../AbstractFirestoreRepository';
@@ -17,7 +17,7 @@ export class TransactionRepository<T extends IEntity> extends AbstractFirestoreR
   private firestoreColRef: CollectionReference;
   private transaction: Transaction;
 
-  constructor(transaction: Transaction, entity: Instantiable<T>) {
+  constructor(transaction: Transaction, entity: Constructor<T>) {
     super(entity);
     this.transaction = transaction;
 

@@ -29,7 +29,7 @@ describe('CustomRepositoryDecorator', () => {
       id: string;
     }
 
-    expect(async () => {
+    expect(() => {
       @CustomRepository(Entity)
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       class EntityRepo extends BaseFirestoreRepository<Entity> {}

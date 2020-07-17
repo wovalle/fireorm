@@ -1,13 +1,13 @@
 import { getMetadataStorage } from './MetadataStorage';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
-import { IEntity, Instantiable } from './types';
+import { IEntity, Constructor } from './types';
 import { FirestoreTransaction } from './Transaction/FirestoreTransaction';
 import { FirestoreBatch } from './Batch/FirestoreBatch';
 
 type RepositoryType = 'default' | 'base' | 'custom';
 
 function _getRepository<T extends IEntity>(
-  entity: Instantiable<T>,
+  entity: Constructor<T>,
   repositoryType: RepositoryType,
   documentPath: string
 ): BaseFirestoreRepository<T> {
@@ -47,7 +47,7 @@ function _getRepository<T extends IEntity>(
   }
 }
 
-export function getRepository<T extends IEntity>(entity: Instantiable<T>, documentPath?: string) {
+export function getRepository<T extends IEntity>(entity: Constructor<T>, documentPath?: string) {
   return _getRepository(entity, 'default', documentPath);
 }
 
@@ -57,7 +57,7 @@ export function getRepository<T extends IEntity>(entity: Instantiable<T>, docume
 export const GetRepository = getRepository;
 
 export function getCustomRepository<T extends IEntity>(
-  entity: Instantiable<T>,
+  entity: Constructor<T>,
   documentPath?: string
 ) {
   return _getRepository(entity, 'custom', documentPath);
@@ -69,7 +69,7 @@ export function getCustomRepository<T extends IEntity>(
 export const GetCustomRepository = getCustomRepository;
 
 export function getBaseRepository<T extends IEntity>(
-  entity: Instantiable<T>,
+  entity: Constructor<T>,
   documentPath?: string
 ) {
   return _getRepository(entity, 'base', documentPath);
