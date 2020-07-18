@@ -1,9 +1,8 @@
-// tslint:disable-next-line:no-import-side-effect
 import 'reflect-metadata';
 
 import { CollectionReference, WhereFilterOp } from '@google-cloud/firestore';
 
-import { IRepository, IFireOrmQueryLine, IOrderByParams, IEntity, Instantiable } from './types';
+import { IRepository, IFireOrmQueryLine, IOrderByParams, IEntity, Constructor } from './types';
 
 import { getMetadataStorage } from './MetadataStorage';
 import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
@@ -83,7 +82,7 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
     const { runTransaction } = await import('./helpers');
 
     return runTransaction<R>(tran => {
-      const repository = tran.getRepository(this.colMetadata.entity as Instantiable<T>);
+      const repository = tran.getRepository(this.colMetadata.entity as Constructor<T>);
       return executor(repository);
     });
   }
@@ -93,7 +92,7 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
 
     const batch = new FirestoreBatch(firestoreRef);
 
-    return batch.getSingleRepository(this.colMetadata.entity as Instantiable<T>);
+    return batch.getSingleRepository(this.colMetadata.entity as Constructor<T>);
   }
 
   async execute(

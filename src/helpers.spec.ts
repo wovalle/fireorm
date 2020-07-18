@@ -58,6 +58,7 @@ describe('Helpers', () => {
     }
 
     @CustomRepository(Entity)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     class EntityRepo extends BaseFirestoreRepository<Entity> {
       meaningOfLife() {
         return 42;

@@ -31,9 +31,11 @@ describe('CustomRepositoryDecorator', () => {
 
     expect(() => {
       @CustomRepository(Entity)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       class EntityRepo extends BaseFirestoreRepository<Entity> {}
 
       @CustomRepository(Entity)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       class EntityRepo2 extends BaseFirestoreRepository<Entity> {}
     }).toThrow();
   });
@@ -60,6 +62,7 @@ describe('CustomRepositoryDecorator', () => {
 
     expect(() => {
       @CustomRepository(Entity)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       class EntityRepo {}
     }).toThrow();
   });

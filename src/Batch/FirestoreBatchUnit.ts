@@ -1,4 +1,4 @@
-import { IEntity, Instantiable } from '../types';
+import { IEntity, Constructor } from '../types';
 import { Firestore, DocumentReference } from '@google-cloud/firestore';
 import { CollectionMetadata } from '../MetadataStorage';
 import { serializeEntity } from '../utils';
@@ -8,7 +8,7 @@ type BatchOperation<T extends IEntity> = {
   type: 'create' | 'update' | 'delete';
   item: IEntity;
   ref: DocumentReference;
-  entity: Instantiable<T>;
+  entity: Constructor<T>;
   subCollectionsMetadata: CollectionMetadata[];
   validateModels: boolean;
 };
@@ -23,7 +23,7 @@ export class FirestoreBatchUnit {
     type: BatchOperation<T>['type'],
     item: T,
     ref: DocumentReference,
-    entity: Instantiable<T>,
+    entity: Constructor<T>,
     subCollectionsMetadata: CollectionMetadata[],
     validateModels: boolean
   ) {
@@ -80,7 +80,7 @@ export class FirestoreBatchUnit {
     return result;
   };
 
-  async validate(item: IEntity, Entity: Instantiable<IEntity>): Promise<ValidationError[]> {
+  async validate(item: IEntity, Entity: Constructor<IEntity>): Promise<ValidationError[]> {
     try {
       const classValidator = await import('class-validator');
 

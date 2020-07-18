@@ -1,13 +1,4 @@
-import { Collection, CustomRepository } from './Decorators';
-import { BaseFirestoreRepository } from './BaseFirestoreRepository';
-import { getRepository, getBaseRepository, runTransaction, createBatch } from './helpers';
-import { initialize } from './MetadataStorage';
-import { FirestoreTransaction } from './Transaction/FirestoreTransaction';
-import { FirestoreBatch } from './Batch/FirestoreBatch';
 import { extractAllGetter } from './utils';
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const MockFirebase = require('mock-cloud-firestore');
 
 describe('Utils', () => {
   describe('extractAllGetter', () => {

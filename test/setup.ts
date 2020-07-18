@@ -17,6 +17,7 @@ admin.initializeApp({
 
 const firestore = admin.firestore();
 // To understand this, see 5-document-references.spec.ts
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 (global as any).firestoreRef = firestore;
 
 const uniqueCollections = [];

@@ -1,5 +1,6 @@
 import { SubCollection } from './SubCollection';
 import { initialize, clearMetadataStorage, getStore } from '../MetadataStorage';
+import { ISubCollection } from '../types';
 
 describe('SubCollectionDecorator', () => {
   const store = getStore();
@@ -14,8 +15,10 @@ describe('SubCollectionDecorator', () => {
       public id: string;
     }
     class Entity {
+      id: string;
+
       @SubCollection(SubEntity, 'subs')
-      readonly subentity: null;
+      subentity: ISubCollection<SubEntity>;
     }
 
     expect(store.metadataStorage.subCollections.length).toEqual(1);
@@ -30,8 +33,10 @@ describe('SubCollectionDecorator', () => {
       public id: string;
     }
     class Entity {
+      id: string;
+
       @SubCollection(SubEntity)
-      readonly subentity: null;
+      subentity: ISubCollection<SubEntity>;
     }
 
     expect(store.metadataStorage.subCollections.length).toEqual(1);

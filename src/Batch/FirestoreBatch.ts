@@ -1,4 +1,4 @@
-import { IEntity, Instantiable, InstanstiableIEntity } from '../types';
+import { IEntity, Constructor } from '../types';
 import { BaseFirestoreBatchRepository } from './BaseFirestoreBatchRepository';
 import { FirestoreBatchSingleRepository } from './FirestoreBatchSingleRepository';
 import { Firestore } from '@google-cloud/firestore';
@@ -17,11 +17,11 @@ export class FirestoreBatch {
    * Returns a batch repository of T.
    *
    * @template T
-   * @param {Instantiable<T>} entity
+   * @param {Constructor<T>} entity
    * @returns
    * @memberof FirestoreBatch
    */
-  getRepository<T extends IEntity>(entity: Instantiable<T>, collectionPath?: string) {
+  getRepository<T extends IEntity>(entity: Constructor<T>, collectionPath?: string) {
     return new BaseFirestoreBatchRepository(this.batch, entity, collectionPath);
   }
 
@@ -31,11 +31,11 @@ export class FirestoreBatch {
    * current features and will be deleted in the next major version.
    *
    * @template T
-   * @param {Instantiable<T>} entity
+   * @param {Constructor<T>} entity
    * @returns
    * @memberof FirestoreBatch
    */
-  getSingleRepository<T extends IEntity>(entity: Instantiable<T>) {
+  getSingleRepository<T extends IEntity>(entity: Constructor<T>) {
     return new FirestoreBatchSingleRepository(this.batch, entity);
   }
 
@@ -44,7 +44,7 @@ export class FirestoreBatch {
    * Commits current batch.
    *
    * @template T
-   * @param {Instantiable<T>} entity
+   * @param {Constructor<T>} entity
    * @returns
    * @memberof FirestoreBatch
    */

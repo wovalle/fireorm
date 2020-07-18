@@ -11,6 +11,7 @@ import {
   IOrderByParams,
   IRepository,
   PartialBy,
+  IEntityConstructor,
 } from './types';
 
 import { getMetadataStorage, CollectionMetadata, MetadataStorageConfig } from './MetadataStorage';
@@ -27,7 +28,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   protected readonly config: MetadataStorageConfig;
   protected readonly collectionPath: string;
 
-  constructor(nameOrConstructor: string | Function, collectionPath?: string) {
+  constructor(nameOrConstructor: string | IEntityConstructor, collectionPath?: string) {
     super();
 
     const {
@@ -38,7 +39,6 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     } = getMetadataStorage();
 
     //TODO: add tests to ensure that we can initialize this with name or constructor
-    //Also, I'm pretty sure getCollection types can be updated to be Instantiable<T>
 
     this.colMetadata = getSubCollection(nameOrConstructor) || getCollection(nameOrConstructor);
 
@@ -98,7 +98,6 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
       return null;
     }
 
-    // tslint:disable-next-line:no-unnecessary-type-assertion
     const entity = plainToClass(this.colMetadata.entity, {
       id: doc.id,
       ...this.transformFirestoreTypes(doc.data() as T),

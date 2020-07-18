@@ -233,7 +233,7 @@ describe('BaseFirestoreTransactionRepository', () => {
         };
 
         try {
-          await tran.update(band);
+          await tran.update(updatedBand as Band);
         } catch (error) {
           expect(error[0].constraints.isEmail).toEqual('Invalid email!');
         }

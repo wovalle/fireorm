@@ -6,7 +6,7 @@ import { IEntity } from '.';
  * @param {T} Entity object
  * @returns {Object} with only data properties
  */
-export function extractAllGetter(obj): any {
+export function extractAllGetter<T>(obj: T): Record<string, unknown> {
   const prototype = Object.getPrototypeOf(obj);
   const fromInstanceObj = Object.keys(obj);
   const fromInstance = Object.getOwnPropertyNames(obj);
@@ -45,8 +45,8 @@ export function extractAllGetter(obj): any {
 export function serializeEntity<T extends IEntity>(
   obj: T,
   subColMetadata: CollectionMetadata[]
-): Record<string, any> {
-  const objectGetters = extractAllGetter(obj);
+): Record<string, unknown> {
+  const objectGetters = extractAllGetter(obj as Record<string, unknown>);
 
   const serializableObj = { ...obj, ...objectGetters };
 
