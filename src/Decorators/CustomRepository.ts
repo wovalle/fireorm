@@ -1,12 +1,17 @@
 import { getMetadataStorage } from '../MetadataStorage';
-import { IEntityConstructor, Constructor, IRepository, IEntity } from '../types';
+import { Constructor, IRepository, IEntity } from '../types';
+import { BaseRepository } from '../BaseRepository';
 
-export function CustomRepository(entity: IEntityConstructor) {
-  // TODO: don't know why can't enforce the type to target
-  return function (target: unknown) {
+/*
+  Cannot enforce the type in target presumably becasuse Typescript
+  cannot verify than the T from the entity param is the same T from
+  the repository. Might be interesting to revisit later
+*/
+export function CustomRepository<T extends IEntity = IEntity>(entity: Constructor<T>) {
+  return function (target: BaseRepository) {
     getMetadataStorage().setRepository({
       entity,
-      target: target as Constructor<IRepository<IEntity>>,
+      target: target as Constructor<IRepository<T>>,
     });
   };
 }

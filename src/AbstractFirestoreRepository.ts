@@ -39,7 +39,6 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     } = getMetadataStorage();
 
     //TODO: add tests to ensure that we can initialize this with name or constructor
-    //Also, I'm pretty sure getCollection types can be updated to be Instantiable<T>
 
     this.colMetadata = getSubCollection(nameOrConstructor) || getCollection(nameOrConstructor);
 
