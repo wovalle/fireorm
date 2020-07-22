@@ -1,5 +1,11 @@
 import { initialize } from './MetadataStorage';
-import { getFixture, Album, Coordinates, FirestoreDocumentReference } from '../test/fixture';
+import {
+  getFixture,
+  Album,
+  Coordinates,
+  FirestoreDocumentReference,
+  AlbumImage,
+} from '../test/fixture';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { Band } from '../test/BandCollection';
 import { Firestore } from '@google-cloud/firestore';
@@ -652,7 +658,36 @@ describe('BaseFirestoreRepository', () => {
       expect(updatedBandAlbums.length).toEqual(3);
     });
 
-    it.todo('should be able to update subcollections of subcollections');
+    it('should be able to update subcollections of subcollections', async () => {
+      const band = new Band();
+      band.id = '30-seconds-to-mars';
+      band.name = '30 Seconds To Mars';
+      band.formationYear = 1998;
+      band.genres = ['alternative-rock'];
+
+      await bandRepository.create(band);
+
+      const firstAlbum = new Album();
+      firstAlbum.id = '30-seconds-to-mars';
+      firstAlbum.name = '30 Seconds to Mars';
+      firstAlbum.releaseDate = new Date('2002-07-22');
+
+      const album = await band.albums.create(firstAlbum);
+
+      const image1 = new AlbumImage();
+      image1.id = 'image1';
+      image1.url = 'http://image1.com';
+
+      const image2 = new AlbumImage();
+      image2.id = 'image2';
+      image2.url = 'http://image2.com';
+
+      await album.images.create(image1);
+      await album.images.create(image2);
+
+      const images = await album.images.find();
+      expect(images.length).toEqual(2);
+    });
 
     describe('miscellaneous', () => {
       it('should correctly parse dates', async () => {
