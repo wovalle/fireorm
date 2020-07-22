@@ -30,9 +30,9 @@
     "lint": "eslint '*/**/*.{js,ts}'",
     "lint:md": "remark README.md -o README.md",
     "release": "semantic-release",
-    "test": "jest src",
+    "test": "jest src --coverage=true",
     "test:integration": "jest -c test/jest.config.js",
-    "test:watch": "jest --watch src --coverage=false",
+    "test:watch": "jest --watch src",
     "t": "yarn test",
     "tw": "yarn test:watch"
   },
