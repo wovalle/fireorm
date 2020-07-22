@@ -21,8 +21,8 @@ export class FirestoreBatch {
    * @returns
    * @memberof FirestoreBatch
    */
-  getRepository<T extends IEntity>(entity: Constructor<T>, collectionPath?: string) {
-    return new BaseFirestoreBatchRepository(this.batch, entity, collectionPath);
+  getRepository<T extends IEntity>(entity: Constructor<T>) {
+    return new BaseFirestoreBatchRepository(this.batch, entity);
   }
 
   /**

@@ -1,6 +1,6 @@
 import { Firestore } from '@google-cloud/firestore';
 import { BaseRepository } from './BaseRepository';
-import { IEntityConstructor, IEntityRepositoryConstructor } from './types';
+import { IEntityConstructor, IEntityRepositoryConstructor, Constructor, IEntity } from './types';
 
 export interface IMetadataStore {
   metadataStorage: MetadataStorage;
@@ -12,11 +12,15 @@ export function getStore(): IMetadataStore {
 
 export interface CollectionMetadata {
   name: string;
-  entity: IEntityConstructor;
-  parentEntity?: IEntityConstructor;
+  entityConstructor: IEntityConstructor;
+  parentEntityConstructor?: IEntityConstructor;
   propertyKey?: string;
+  path: string | null;
 }
 
+export interface GetCollectionViewModel extends CollectionMetadata {
+  subCollections: CollectionMetadata[];
+}
 export interface RepositoryMetadata {
   target: IEntityRepositoryConstructor;
   entity: IEntityConstructor;
@@ -29,39 +33,80 @@ export interface MetadataStorageConfig {
 export class MetadataStorage {
   readonly collections: Array<CollectionMetadata> = [];
   readonly subCollections: Array<CollectionMetadata> = [];
-  readonly repositories: Map<unknown, RepositoryMetadata> = new Map();
+  readonly repositories: Map<IEntityConstructor, RepositoryMetadata> = new Map();
 
   public config: MetadataStorageConfig = {
     validateModels: false,
   };
 
-  public getCollection = (param: string | IEntityConstructor) => {
-    if (typeof param === 'string') {
-      return this.collections.find(c => c.name === param);
+  public getCollection = (
+    pathOrConstructor: string | IEntityConstructor
+  ): GetCollectionViewModel => {
+    const collection =
+      typeof pathOrConstructor === 'string'
+        ? this.collections.find(c => c.path === pathOrConstructor)
+        : this.collections.find(c => c.entityConstructor === pathOrConstructor);
+
+    if (!collection) {
+      return null;
     }
-    return this.collections.find(c => c.entity === param);
+
+    const subCollections = this.collections.filter(
+      s => s.parentEntityConstructor === collection.entityConstructor
+    );
+
+    return {
+      ...collection,
+      subCollections,
+    };
   };
 
   public setCollection = (col: CollectionMetadata) => {
-    const existing = this.getCollection(col.entity);
+    const existing = this.getCollection(col.entityConstructor);
     if (!existing) {
       this.collections.push(col);
+    } else {
+      const foundCol = this.collections.find(
+        e => e.entityConstructor === existing.entityConstructor
+      );
+
+      foundCol.entityConstructor = foundCol.entityConstructor || col.entityConstructor;
+      foundCol.name = foundCol.name || col.name;
+      foundCol.parentEntityConstructor =
+        foundCol.parentEntityConstructor || col.parentEntityConstructor;
+      foundCol.path = foundCol.path || col.path;
+      foundCol.propertyKey = foundCol.propertyKey || col.propertyKey;
+    }
+
+    const getWhereImParent = (p: Constructor<IEntity>) =>
+      this.collections.filter(c => c.parentEntityConstructor === p);
+
+    const colsToUpdate = getWhereImParent(col.entityConstructor);
+
+    // update path for subcollections and subcollections of subcollections
+    while (colsToUpdate.length) {
+      const c = colsToUpdate.pop();
+      const parent = this.collections.find(p => p.entityConstructor === c.parentEntityConstructor);
+
+      c.path = `${parent.path}/${parent.name}$$id/${c.name}`;
+      getWhereImParent(c.entityConstructor).forEach(col => colsToUpdate.push(col));
     }
   };
 
   public getSubCollectionsFromParent = (parentEntity: IEntityConstructor) => {
-    return this.subCollections.filter(s => s.parentEntity === parentEntity);
+    return this.subCollections.filter(s => s.parentEntityConstructor === parentEntity);
   };
 
   public getSubCollection = (param: string | IEntityConstructor): CollectionMetadata => {
     if (typeof param === 'string') {
       return this.subCollections.find(c => c.name === param);
     }
-    return this.subCollections.find(c => c.entity === param);
+    return this.subCollections.find(c => c.entityConstructor === param);
   };
 
   public setSubCollection = (subCol: CollectionMetadata) => {
     this.subCollections.push(subCol);
+    this.setCollection(subCol);
   };
 
   public getRepository = (param: IEntityConstructor) => {
@@ -87,7 +132,7 @@ export class MetadataStorage {
   public firestoreRef: Firestore = null;
 }
 
-function initializeMetadataStorage(): void {
+function initializeMetadataStorage() {
   const store = getStore();
 
   if (!store.metadataStorage) {
@@ -98,7 +143,7 @@ function initializeMetadataStorage(): void {
 /**
  * Used for testing to reset metadataStore to clean state
  */
-export function clearMetadataStorage(): void {
+export function clearMetadataStorage() {
   const store = getStore();
   store.metadataStorage = null;
 }

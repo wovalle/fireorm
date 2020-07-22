@@ -9,7 +9,7 @@ type RepositoryType = 'default' | 'base' | 'custom';
 function _getRepository<T extends IEntity>(
   entity: Constructor<T>,
   repositoryType: RepositoryType,
-  documentPath: string
+  documentPath?: string
 ): BaseFirestoreRepository<T> {
   const metadataStorage = getMetadataStorage();
 
@@ -31,8 +31,8 @@ function _getRepository<T extends IEntity>(
     throw new Error(`'${entity.name}' is not a valid collection`);
   }
 
-  if (collection.parentEntity) {
-    const parentCollection = metadataStorage.getCollection(collection.parentEntity);
+  if (collection.parentEntityConstructor) {
+    const parentCollection = metadataStorage.getCollection(collection.parentEntityConstructor);
 
     if (!parentCollection) {
       throw new Error(`'${entity.name}' does not have a valid parent collection.`);
@@ -41,9 +41,9 @@ function _getRepository<T extends IEntity>(
 
   if (repositoryType === 'custom' || (repositoryType === 'default' && repository)) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return new (repository.target as any)(collection.name, documentPath);
+    return new (repository.target as any)(collection.entityConstructor);
   } else {
-    return new BaseFirestoreRepository<T>(collection.name, documentPath);
+    return new BaseFirestoreRepository<T>(collection.entityConstructor);
   }
 }
 
@@ -68,11 +68,8 @@ export function getCustomRepository<T extends IEntity>(
  */
 export const GetCustomRepository = getCustomRepository;
 
-export function getBaseRepository<T extends IEntity>(
-  entity: Constructor<T>,
-  documentPath?: string
-) {
-  return _getRepository(entity, 'base', documentPath);
+export function getBaseRepository<T extends IEntity>(entity: Constructor<T>) {
+  return _getRepository(entity, 'base');
 }
 
 /**

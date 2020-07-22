@@ -17,7 +17,8 @@ describe('CollectionDecorator', () => {
     const collection = store.metadataStorage.getCollection('foo');
     expect(store.metadataStorage.collections.length).toEqual(1);
     expect(collection.name).toEqual('foo');
-    expect(collection.entity).toEqual(Entity);
+    expect(collection.path).toEqual('foo');
+    expect(collection.entityConstructor).toEqual(Entity);
   });
 
   it('should register collections with default name', () => {
@@ -29,7 +30,8 @@ describe('CollectionDecorator', () => {
     const collection = store.metadataStorage.getCollection('Entities');
     expect(store.metadataStorage.collections.length).toEqual(1);
     expect(collection.name).toEqual('Entities');
-    expect(collection.entity).toEqual(Entity);
+    expect(collection.path).toEqual('Entities');
+    expect(collection.entityConstructor).toEqual(Entity);
   });
 
   it('should register collections once', () => {
@@ -42,6 +44,6 @@ describe('CollectionDecorator', () => {
     const collection = store.metadataStorage.getCollection('Entities');
     expect(store.metadataStorage.collections.length).toEqual(1);
     expect(collection.name).toEqual('Entities');
-    expect(collection.entity).toEqual(Entity);
+    expect(collection.entityConstructor).toEqual(Entity);
   });
 });

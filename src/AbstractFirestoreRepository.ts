@@ -14,7 +14,11 @@ import {
   IEntityConstructor,
 } from './types';
 
-import { getMetadataStorage, CollectionMetadata, MetadataStorageConfig } from './MetadataStorage';
+import {
+  getMetadataStorage,
+  MetadataStorageConfig,
+  GetCollectionViewModel,
+} from './MetadataStorage';
 
 import { BaseRepository } from './BaseRepository';
 import QueryBuilder from './QueryBuilder';
@@ -22,42 +26,29 @@ import { serializeEntity } from './utils';
 
 export abstract class AbstractFirestoreRepository<T extends IEntity> extends BaseRepository
   implements IRepository<T> {
-  protected readonly subColMetadata: CollectionMetadata[];
-  protected readonly colMetadata: CollectionMetadata;
-  protected readonly colName: string;
+  protected readonly colMetadata: GetCollectionViewModel;
+  protected readonly path: string;
   protected readonly config: MetadataStorageConfig;
-  protected readonly collectionPath: string;
 
-  constructor(nameOrConstructor: string | IEntityConstructor, collectionPath?: string) {
+  constructor(pathOrConstructor: string | IEntityConstructor) {
     super();
 
-    const {
-      getCollection,
-      getSubCollection,
-      getSubCollectionsFromParent,
-      config,
-    } = getMetadataStorage();
+    const { getCollection, config } = getMetadataStorage();
 
-    //TODO: add tests to ensure that we can initialize this with name or constructor
-
-    this.colMetadata = getSubCollection(nameOrConstructor) || getCollection(nameOrConstructor);
+    this.config = config;
+    this.colMetadata = getCollection(pathOrConstructor);
 
     if (!this.colMetadata) {
       throw new Error(
         `There is no metadata stored for "${
-          typeof nameOrConstructor === 'string' ? nameOrConstructor : nameOrConstructor.name
+          typeof pathOrConstructor === 'string' ? pathOrConstructor : pathOrConstructor.name
         }"`
       );
     }
-
-    this.colName = this.colMetadata.name;
-    this.config = config;
-    this.collectionPath = collectionPath || this.colName;
-    this.subColMetadata = getSubCollectionsFromParent(this.colMetadata.entity);
   }
 
   protected toSerializableObject = (obj: T): Record<string, unknown> =>
-    serializeEntity(obj, this.subColMetadata);
+    serializeEntity(obj, this.colMetadata.subCollections);
 
   protected transformFirestoreTypes = (obj: T): T => {
     Object.keys(obj).forEach(key => {
@@ -79,15 +70,15 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
 
   protected initializeSubCollections = (entity: T) => {
     // Requiring here to prevent circular dependency
-
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { getRepository } = require('./helpers');
+    const path = this.colMetadata.path;
 
-    this.subColMetadata.forEach(subCol => {
+    this.colMetadata.subCollections.forEach(subCol => {
       Object.assign(entity, {
         [subCol.propertyKey]: getRepository(
-          subCol.entity,
-          `${this.collectionPath}/${entity.id}/${subCol.name}`
+          subCol.entityConstructor,
+          `${path}/${entity.id}/${subCol.name}`
         ),
       });
     });
@@ -98,7 +89,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
       return null;
     }
 
-    const entity = plainToClass(this.colMetadata.entity, {
+    const entity = plainToClass(this.colMetadata.entityConstructor, {
       id: doc.id,
       ...this.transformFirestoreTypes(doc.data() as T),
     }) as T;
@@ -281,8 +272,8 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   async validate(item: T): Promise<ValidationError[]> {
     try {
       const classValidator = await import('class-validator');
-      const { getSubCollection, getCollection } = getMetadataStorage();
-      const { entity: Entity } = getSubCollection(this.colName) || getCollection(this.colName);
+      const { getCollection } = getMetadataStorage();
+      const { entityConstructor: Entity } = getCollection(this.colMetadata.path);
 
       /**
        * Instantiate plain objects into an entity class

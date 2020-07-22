@@ -48,9 +48,8 @@ describe('BaseFirestoreRepository', () => {
 
     it('must limit subcollections', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
-      const albumsSubColl = pt.albums;
-      const albumsLimited = await albumsSubColl.limit(2).find();
-      expect(albumsLimited.length).toEqual(2);
+      const albums = await pt.albums.limit(2).find();
+      expect(albums.length).toEqual(2);
     });
 
     it('must throw an exception if limit call more than once', async () => {
@@ -61,7 +60,7 @@ describe('BaseFirestoreRepository', () => {
     it.todo('must throw if the limit is less than 0');
   });
 
-  describe('Ordering', () => {
+  describe.skip('Ordering', () => {
     describe('orderByAscending', () => {
       it('must order repository objects', async () => {
         const bands = await bandRepository.orderByAscending('formationYear').find();
@@ -335,7 +334,7 @@ describe('BaseFirestoreRepository', () => {
     });
   });
 
-  describe('.where*', () => {
+  describe.skip('.where*', () => {
     it('whereEqualTo must accept function as first parameter', async () => {
       const list = await bandRepository.whereEqualTo(b => b.name, 'Porcupine Tree').find();
       expect(list.length).toEqual(1);
@@ -412,7 +411,7 @@ describe('BaseFirestoreRepository', () => {
     });
   });
 
-  describe('findOne', () => {
+  describe.skip('findOne', () => {
     it('must return T', async () => {
       const result = await bandRepository
         .whereLessOrEqualThan('formationYear', 1983)
@@ -435,7 +434,7 @@ describe('BaseFirestoreRepository', () => {
     });
   });
 
-  describe('miscellaneous', () => {
+  describe.skip('miscellaneous', () => {
     it('should correctly parse dates', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
       expect(pt.lastShow).toBeInstanceOf(Date);
@@ -465,7 +464,7 @@ describe('BaseFirestoreRepository', () => {
     });
   });
 
-  describe('transactions', () => {
+  describe.skip('transactions', () => {
     it('should be able to open transactions', async () => {
       await bandRepository.runTransaction(async tran => {
         const band = await tran.findById('porcupine-tree');
@@ -484,7 +483,7 @@ describe('BaseFirestoreRepository', () => {
     });
   });
 
-  describe('batch', () => {
+  describe.skip('batch', () => {
     it('should be able to create batches from repository', async () => {
       const batch = bandRepository.createBatch();
 
@@ -515,7 +514,7 @@ describe('BaseFirestoreRepository', () => {
     });
   });
 
-  describe('must handle subcollections', () => {
+  describe.skip('must handle subcollections', () => {
     it('should initialize subcollections', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
       expect(pt.name).toEqual('Porcupine Tree');

@@ -1,14 +1,13 @@
 import { Collection, SubCollection } from '../src/Decorators';
-import { Album as AlbumEntity, Coordinates, FirestoreDocumentReference } from './fixture';
+import {
+  Album as AlbumEntity,
+  AlbumImage as AlbumImageEntity,
+  Coordinates,
+  FirestoreDocumentReference,
+} from './fixture';
 import { ISubCollection } from '../src/types';
 import { Type } from '../src';
 import { IsEmail, IsOptional, Length } from 'class-validator';
-
-@Collection()
-class AlbumImage {
-  id: string;
-  url: string;
-}
 
 // Why I do this? Because by using the instance of Album
 // located in fixture.ts, you have the risk to reuse the
@@ -17,7 +16,9 @@ class AlbumImage {
 // with each other (happened with getRepository)
 //
 // Hours lost debugging this: 2
-@Collection()
+
+class AlbumImage extends AlbumImageEntity {}
+
 class Album extends AlbumEntity {
   @Length(1, 50, {
     message: 'Name is too long',

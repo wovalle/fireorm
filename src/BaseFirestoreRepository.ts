@@ -2,7 +2,14 @@ import 'reflect-metadata';
 
 import { CollectionReference, WhereFilterOp } from '@google-cloud/firestore';
 
-import { IRepository, IFireOrmQueryLine, IOrderByParams, IEntity, Constructor } from './types';
+import {
+  IRepository,
+  IFireOrmQueryLine,
+  IOrderByParams,
+  IEntity,
+  Constructor,
+  IEntityConstructor,
+} from './types';
 
 import { getMetadataStorage } from './MetadataStorage';
 import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
@@ -13,8 +20,8 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
   implements IRepository<T> {
   private readonly firestoreColRef: CollectionReference;
 
-  constructor(colName: string, collectionPath?: string) {
-    super(colName, collectionPath);
+  constructor(pathOrConstructor: string | IEntityConstructor) {
+    super(pathOrConstructor);
 
     const { firestoreRef } = getMetadataStorage();
 
@@ -22,7 +29,7 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
       throw new Error('Firestore must be initialized first');
     }
 
-    this.firestoreColRef = firestoreRef.collection(collectionPath || colName);
+    this.firestoreColRef = firestoreRef.collection(this.colMetadata.path);
   }
 
   async findById(id: string): Promise<T> {
@@ -82,7 +89,7 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
     const { runTransaction } = await import('./helpers');
 
     return runTransaction<R>(tran => {
-      const repository = tran.getRepository(this.colMetadata.entity as Constructor<T>);
+      const repository = tran.getRepository(this.colMetadata.entityConstructor as Constructor<T>);
       return executor(repository);
     });
   }
@@ -92,7 +99,7 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
 
     const batch = new FirestoreBatch(firestoreRef);
 
-    return batch.getSingleRepository(this.colMetadata.entity as Constructor<T>);
+    return batch.getSingleRepository(this.colMetadata.entityConstructor as Constructor<T>);
   }
 
   async execute(

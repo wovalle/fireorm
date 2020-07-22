@@ -27,7 +27,7 @@ export class TransactionRepository<T extends IEntity> extends AbstractFirestoreR
       throw new Error('Firestore must be initialized first');
     }
 
-    this.firestoreColRef = firestoreRef.collection(this.collectionPath || this.colName);
+    this.firestoreColRef = firestoreRef.collection(this.colMetadata.path);
   }
 
   execute(queries: IFireOrmQueryLine[]): Promise<T[]> {

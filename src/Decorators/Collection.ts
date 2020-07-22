@@ -3,10 +3,12 @@ import { plural } from 'pluralize';
 import { IEntityConstructor } from '../types';
 
 export function Collection(entityName?: string) {
-  return function (entity: IEntityConstructor) {
+  return function (entityConstructor: IEntityConstructor) {
+    const name = entityName || plural(entityConstructor.name);
     getMetadataStorage().setCollection({
-      name: entityName || plural(entity.name),
-      entity,
+      name,
+      path: name,
+      entityConstructor,
     });
   };
 }
