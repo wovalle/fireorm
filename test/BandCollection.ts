@@ -50,7 +50,7 @@ export class Band {
   lastShowCoordinates: Coordinates;
   genres: Array<string>;
 
-  @SubCollection(Album)
+  @SubCollection(Album, 'albums')
   albums?: ISubCollection<Album>;
 
   @Type(() => FirestoreDocumentReference)

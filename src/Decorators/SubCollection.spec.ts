@@ -41,7 +41,7 @@ describe('SubCollectionDecorator', () => {
     }
 
     expect(store.metadataStorage.subCollections.length).toEqual(1);
-    expect(store.metadataStorage.subCollections[0].name).toEqual('subentities');
+    expect(store.metadataStorage.subCollections[0].name).toEqual('SubEntities');
     expect(store.metadataStorage.subCollections[0].parentEntityConstructor).toEqual(Entity);
     expect(store.metadataStorage.subCollections[0].entityConstructor).toEqual(SubEntity);
     expect(store.metadataStorage.subCollections[0].propertyKey).toEqual('subentity');
