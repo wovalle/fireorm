@@ -23,14 +23,13 @@ function _getRepository<T extends IEntity>(
     throw new Error(`'${entity.name}' does not have a custom repository.`);
   }
 
-  const collection = documentPath
-    ? metadataStorage.getSubCollection(entity)
-    : metadataStorage.getCollection(entity);
+  const collection = metadataStorage.getCollection(entity);
 
   if (!collection) {
     throw new Error(`'${entity.name}' is not a valid collection`);
   }
 
+  // If the collection has a parent, check that we have registered the parent
   if (collection.parentEntityConstructor) {
     const parentCollection = metadataStorage.getCollection(collection.parentEntityConstructor);
 
@@ -41,9 +40,9 @@ function _getRepository<T extends IEntity>(
 
   if (repositoryType === 'custom' || (repositoryType === 'default' && repository)) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return new (repository.target as any)(collection.entityConstructor);
+    return new (repository.target as any)(collection.entityConstructor, documentPath);
   } else {
-    return new BaseFirestoreRepository<T>(collection.entityConstructor);
+    return new BaseFirestoreRepository<T>(collection.entityConstructor, documentPath);
   }
 }
 
@@ -68,8 +67,11 @@ export function getCustomRepository<T extends IEntity>(
  */
 export const GetCustomRepository = getCustomRepository;
 
-export function getBaseRepository<T extends IEntity>(entity: Constructor<T>) {
-  return _getRepository(entity, 'base');
+export function getBaseRepository<T extends IEntity>(
+  entity: Constructor<T>,
+  collectionPath?: string
+) {
+  return _getRepository(entity, 'base', collectionPath);
 }
 
 /**

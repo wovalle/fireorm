@@ -11,3 +11,5 @@ todo: create ticket to add validation as a decorator
 todo: create ticket to standardize errors
 pr documentation: what if you try to get a repository of a subcollection? how the path will be created?
 todo: revisit logic in collection/subcollection decorator
+todo: if a custom collection was passed, validate that it is a valid collection
+todo: get rid of the path in the metadata

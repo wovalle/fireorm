@@ -30,7 +30,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   protected readonly path: string;
   protected readonly config: MetadataStorageConfig;
 
-  constructor(pathOrConstructor: string | IEntityConstructor) {
+  constructor(pathOrConstructor: string | IEntityConstructor, collectionPath?: string) {
     super();
 
     const { getCollection, config } = getMetadataStorage();
@@ -45,6 +45,8 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
         }"`
       );
     }
+
+    this.path = collectionPath || this.colMetadata.path;
   }
 
   protected toSerializableObject = (obj: T): Record<string, unknown> =>
@@ -72,13 +74,12 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     // Requiring here to prevent circular dependency
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { getRepository } = require('./helpers');
-    const path = this.colMetadata.path;
 
     this.colMetadata.subCollections.forEach(subCol => {
       Object.assign(entity, {
         [subCol.propertyKey]: getRepository(
           subCol.entityConstructor,
-          `${path}/${entity.id}/${subCol.name}`
+          `${this.path}/${entity.id}/${subCol.name}`
         ),
       });
     });

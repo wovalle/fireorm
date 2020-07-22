@@ -20,8 +20,8 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
   implements IRepository<T> {
   private readonly firestoreColRef: CollectionReference;
 
-  constructor(pathOrConstructor: string | IEntityConstructor) {
-    super(pathOrConstructor);
+  constructor(pathOrConstructor: string | IEntityConstructor, collectionPath?: string) {
+    super(pathOrConstructor, collectionPath);
 
     const { firestoreRef } = getMetadataStorage();
 
@@ -29,7 +29,7 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
       throw new Error('Firestore must be initialized first');
     }
 
-    this.firestoreColRef = firestoreRef.collection(this.colMetadata.path);
+    this.firestoreColRef = firestoreRef.collection(this.path);
   }
 
   async findById(id: string): Promise<T> {
