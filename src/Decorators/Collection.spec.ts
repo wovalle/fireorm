@@ -33,17 +33,4 @@ describe('CollectionDecorator', () => {
     expect(collection.path).toEqual('Entities');
     expect(collection.entityConstructor).toEqual(Entity);
   });
-
-  it('should register collections once', () => {
-    @Collection()
-    @Collection()
-    class Entity {
-      id: string;
-    }
-
-    const collection = store.metadataStorage.getCollection('Entities');
-    expect(store.metadataStorage.collections.length).toEqual(1);
-    expect(collection.name).toEqual('Entities');
-    expect(collection.entityConstructor).toEqual(Entity);
-  });
 });

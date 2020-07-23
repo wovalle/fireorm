@@ -1,6 +1,6 @@
 import { getMetadataStorage } from '../MetadataStorage';
 import { plural } from 'pluralize';
-import { IEntityConstructor } from '../types';
+import type { IEntityConstructor } from '../types';
 
 export function Collection(entityName?: string) {
   return function (entityConstructor: IEntityConstructor) {

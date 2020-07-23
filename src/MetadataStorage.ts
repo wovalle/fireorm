@@ -32,7 +32,6 @@ export interface MetadataStorageConfig {
 
 export class MetadataStorage {
   readonly collections: Array<CollectionMetadata> = [];
-  readonly subCollections: Array<CollectionMetadata> = [];
   readonly repositories: Map<IEntityConstructor, RepositoryMetadata> = new Map();
 
   public config: MetadataStorageConfig = {
@@ -91,22 +90,6 @@ export class MetadataStorage {
       c.path = `${parent.path}/${parent.name}$$id/${c.name}`;
       getWhereImParent(c.entityConstructor).forEach(col => colsToUpdate.push(col));
     }
-  };
-
-  public getSubCollectionsFromParent = (parentEntity: IEntityConstructor) => {
-    return this.subCollections.filter(s => s.parentEntityConstructor === parentEntity);
-  };
-
-  public getSubCollection = (param: string | IEntityConstructor): CollectionMetadata => {
-    if (typeof param === 'string') {
-      return this.subCollections.find(c => c.name === param);
-    }
-    return this.subCollections.find(c => c.entityConstructor === param);
-  };
-
-  public setSubCollection = (subCol: CollectionMetadata) => {
-    this.subCollections.push(subCol);
-    this.setCollection(subCol);
   };
 
   public getRepository = (param: IEntityConstructor) => {

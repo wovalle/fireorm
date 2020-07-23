@@ -15,6 +15,7 @@ describe('SubCollectionDecorator', () => {
     class SubEntity {
       public id: string;
     }
+    @Collection()
     class Entity {
       id: string;
 
@@ -22,17 +23,20 @@ describe('SubCollectionDecorator', () => {
       subentity: ISubCollection<SubEntity>;
     }
 
-    expect(store.metadataStorage.subCollections.length).toEqual(1);
-    expect(store.metadataStorage.subCollections[0].name).toEqual('subs');
-    expect(store.metadataStorage.subCollections[0].parentEntityConstructor).toEqual(Entity);
-    expect(store.metadataStorage.subCollections[0].entityConstructor).toEqual(SubEntity);
-    expect(store.metadataStorage.subCollections[0].propertyKey).toEqual('subentity');
+    const subCollection = store.metadataStorage.getCollection(SubEntity);
+
+    expect(subCollection.name).toEqual('subs');
+    expect(subCollection.parentEntityConstructor).toEqual(Entity);
+    expect(subCollection.entityConstructor).toEqual(SubEntity);
+    expect(subCollection.propertyKey).toEqual('subentity');
   });
 
   it('should register collections with default name', () => {
     class SubEntity {
       public id: string;
     }
+
+    @Collection()
     class Entity {
       id: string;
 
@@ -40,11 +44,14 @@ describe('SubCollectionDecorator', () => {
       subentity: ISubCollection<SubEntity>;
     }
 
-    expect(store.metadataStorage.subCollections.length).toEqual(1);
-    expect(store.metadataStorage.subCollections[0].name).toEqual('SubEntities');
-    expect(store.metadataStorage.subCollections[0].parentEntityConstructor).toEqual(Entity);
-    expect(store.metadataStorage.subCollections[0].entityConstructor).toEqual(SubEntity);
-    expect(store.metadataStorage.subCollections[0].propertyKey).toEqual('subentity');
+    const collection = store.metadataStorage.getCollection(Entity);
+    const subCollection = collection.subCollections[0];
+
+    expect(collection.subCollections.length).toEqual(1);
+    expect(subCollection.name).toEqual('SubEntities');
+    expect(subCollection.parentEntityConstructor).toEqual(Entity);
+    expect(subCollection.entityConstructor).toEqual(SubEntity);
+    expect(subCollection.propertyKey).toEqual('subentity');
   });
 
   it('should initialize subcollections', () => {
@@ -60,16 +67,16 @@ describe('SubCollectionDecorator', () => {
       subentity: ISubCollection<SubEntity>;
     }
 
-    expect(store.metadataStorage.subCollections.length).toEqual(1);
-    expect(store.metadataStorage.subCollections[0].name).toEqual('sub');
+    const collection = store.metadataStorage.getCollection(Entity);
+    const subCollection = collection.subCollections[0];
 
-    expect(store.metadataStorage.collections.length).toEqual(2);
-    expect(store.metadataStorage.collections[0].name).toEqual('sub');
-    expect(store.metadataStorage.collections[1].name).toEqual('col');
+    expect(collection.subCollections.length).toEqual(1);
+    expect(collection.name).toEqual('col');
+    expect(subCollection.name).toEqual('sub');
 
-    expect(store.metadataStorage.subCollections[0].parentEntityConstructor).toEqual(Entity);
-    expect(store.metadataStorage.subCollections[0].entityConstructor).toEqual(SubEntity);
-    expect(store.metadataStorage.subCollections[0].path).toEqual('col/col$$id/sub');
+    expect(subCollection.parentEntityConstructor).toEqual(Entity);
+    expect(subCollection.entityConstructor).toEqual(SubEntity);
+    expect(subCollection.path).toEqual('col/col$$id/sub');
   });
 
   it('should correctly initialize subcollections inside subcollections', () => {
@@ -93,17 +100,23 @@ describe('SubCollectionDecorator', () => {
       subentity: ISubCollection<SubEntity>;
     }
 
-    expect(store.metadataStorage.subCollections.length).toEqual(2);
-    expect(store.metadataStorage.subCollections[0].name).toEqual('subsub');
-    expect(store.metadataStorage.subCollections[1].name).toEqual('sub');
+    const collection = store.metadataStorage.getCollection(Entity);
+    const subCollection = store.metadataStorage.getCollection(SubEntity);
+    const subSubCollection = store.metadataStorage.getCollection(SubSubEntity);
 
-    expect(store.metadataStorage.collections.length).toEqual(3);
-    expect(store.metadataStorage.collections[0].name).toEqual('subsub');
-    expect(store.metadataStorage.collections[1].name).toEqual('sub');
-    expect(store.metadataStorage.collections[2].name).toEqual('col');
+    expect(collection.subCollections.length).toEqual(1);
+    expect(subCollection.subCollections.length).toEqual(1);
+    expect(subSubCollection.subCollections.length).toEqual(0);
+    expect(collection.name).toEqual('col');
+    expect(subCollection.name).toEqual('sub');
+    expect(subSubCollection.name).toEqual('subsub');
 
-    expect(store.metadataStorage.collections[0].parentEntityConstructor).toEqual(SubEntity);
-    expect(store.metadataStorage.collections[0].entityConstructor).toEqual(SubSubEntity);
-    expect(store.metadataStorage.collections[0].path).toEqual('col/col$$id/sub/sub$$id/subsub');
+    expect(subCollection.parentEntityConstructor).toEqual(Entity);
+    expect(subCollection.entityConstructor).toEqual(SubEntity);
+    expect(subCollection.path).toEqual('col/col$$id/sub');
+
+    expect(subSubCollection.parentEntityConstructor).toEqual(SubEntity);
+    expect(subSubCollection.entityConstructor).toEqual(SubSubEntity);
+    expect(subSubCollection.path).toEqual('col/col$$id/sub/sub$$id/subsub');
   });
 });
