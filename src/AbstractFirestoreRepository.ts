@@ -1,5 +1,5 @@
 import { plainToClass } from 'class-transformer';
-import { DocumentSnapshot, QuerySnapshot } from '@google-cloud/firestore';
+import { DocumentSnapshot, QuerySnapshot, CollectionReference } from '@google-cloud/firestore';
 import { ValidationError } from './Errors/ValidationError';
 
 import {
@@ -29,11 +29,16 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   protected readonly colMetadata: FullCollectionMetadata;
   protected readonly path: string;
   protected readonly config: MetadataStorageConfig;
+  protected readonly firestoreColRef: CollectionReference;
 
   constructor(pathOrConstructor: string | IEntityConstructor, collectionPath?: string) {
     super();
 
-    const { getCollection, config } = getMetadataStorage();
+    const { getCollection, config, firestoreRef } = getMetadataStorage();
+
+    if (!firestoreRef) {
+      throw new Error('Firestore must be initialized first');
+    }
 
     this.config = config;
     this.colMetadata = getCollection(pathOrConstructor);
@@ -47,6 +52,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     }
 
     this.path = collectionPath || this.colMetadata.path;
+    this.firestoreColRef = firestoreRef.collection(this.path);
   }
 
   protected toSerializableObject = (obj: T): Record<string, unknown> =>

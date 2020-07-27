@@ -1,4 +1,4 @@
-import { CollectionReference, Transaction, WhereFilterOp } from '@google-cloud/firestore';
+import { Transaction, WhereFilterOp } from '@google-cloud/firestore';
 
 import {
   IEntity,
@@ -10,24 +10,14 @@ import {
 } from '../types';
 
 import { AbstractFirestoreRepository } from '../AbstractFirestoreRepository';
-import { getMetadataStorage } from '../MetadataStorage';
 
 export class TransactionRepository<T extends IEntity> extends AbstractFirestoreRepository<T>
   implements IRepository<T> {
-  private firestoreColRef: CollectionReference;
   private transaction: Transaction;
 
   constructor(transaction: Transaction, entity: Constructor<T>) {
     super(entity);
     this.transaction = transaction;
-
-    const { firestoreRef } = getMetadataStorage();
-
-    if (!firestoreRef) {
-      throw new Error('Firestore must be initialized first');
-    }
-
-    this.firestoreColRef = firestoreRef.collection(this.colMetadata.path);
   }
 
   execute(queries: IFireOrmQueryLine[]): Promise<T[]> {

@@ -30,7 +30,7 @@ describe('MetadataStorage', () => {
 
   const entityRepository: RepositoryMetadata = {
     entity: Entity,
-    target: (EntityRepository as unknown) as Constructor<IRepository<Ien>>,
+    target: (EntityRepository as unknown) as Constructor<IRepository<Entity>>,
   };
 
   beforeEach(() => {

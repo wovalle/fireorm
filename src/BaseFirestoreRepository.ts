@@ -1,15 +1,8 @@
 import 'reflect-metadata';
 
-import { CollectionReference, WhereFilterOp } from '@google-cloud/firestore';
+import { WhereFilterOp } from '@google-cloud/firestore';
 
-import {
-  IRepository,
-  IFireOrmQueryLine,
-  IOrderByParams,
-  IEntity,
-  Constructor,
-  IEntityConstructor,
-} from './types';
+import { IRepository, IFireOrmQueryLine, IOrderByParams, IEntity, Constructor } from './types';
 
 import { getMetadataStorage } from './MetadataStorage';
 import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
@@ -18,20 +11,6 @@ import { FirestoreBatch } from './Batch/FirestoreBatch';
 
 export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestoreRepository<T>
   implements IRepository<T> {
-  private readonly firestoreColRef: CollectionReference;
-
-  constructor(pathOrConstructor: string | IEntityConstructor, collectionPath?: string) {
-    super(pathOrConstructor, collectionPath);
-
-    const { firestoreRef } = getMetadataStorage();
-
-    if (!firestoreRef) {
-      throw new Error('Firestore must be initialized first');
-    }
-
-    this.firestoreColRef = firestoreRef.collection(this.path);
-  }
-
   async findById(id: string): Promise<T> {
     return this.firestoreColRef.doc(id).get().then(this.extractTFromDocSnap);
   }
