@@ -17,7 +17,7 @@ import {
 import {
   getMetadataStorage,
   MetadataStorageConfig,
-  GetCollectionViewModel,
+  FullCollectionMetadata,
 } from './MetadataStorage';
 
 import { BaseRepository } from './BaseRepository';
@@ -26,7 +26,7 @@ import { serializeEntity } from './utils';
 
 export abstract class AbstractFirestoreRepository<T extends IEntity> extends BaseRepository
   implements IRepository<T> {
-  protected readonly colMetadata: GetCollectionViewModel;
+  protected readonly colMetadata: FullCollectionMetadata;
   protected readonly path: string;
   protected readonly config: MetadataStorageConfig;
 

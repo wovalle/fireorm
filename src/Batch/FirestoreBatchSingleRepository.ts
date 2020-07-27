@@ -4,7 +4,7 @@ import { BaseFirestoreBatchRepository } from './BaseFirestoreBatchRepository';
 /**
  *
  * This class is only needed to maintain current batch functionality
- * inside repositories and will be deleted in the next major version
+ * inside repositories and might be deleted in the next major version
  *
  * @export
  * @class FirestoreBatchRepository

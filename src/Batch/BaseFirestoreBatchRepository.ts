@@ -2,14 +2,13 @@ import { CollectionReference } from '@google-cloud/firestore';
 import { IEntity, WithOptionalId, Constructor } from '../types';
 import {
   getMetadataStorage,
-  CollectionMetadata,
   MetadataStorageConfig,
-  GetCollectionViewModel,
+  FullCollectionMetadata,
 } from '../MetadataStorage';
 import { FirestoreBatchUnit } from './FirestoreBatchUnit';
 
 export class BaseFirestoreBatchRepository<T extends IEntity> {
-  protected colMetadata: GetCollectionViewModel;
+  protected colMetadata: FullCollectionMetadata;
   protected colRef: CollectionReference;
   protected config: MetadataStorageConfig;
 
@@ -27,14 +26,7 @@ export class BaseFirestoreBatchRepository<T extends IEntity> {
       item.id = doc.id;
     }
 
-    this.batch.add(
-      'create',
-      item as T,
-      doc,
-      this.colMetadata.entityConstructor,
-      this.colMetadata.subCollections,
-      this.config.validateModels
-    );
+    this.batch.add('create', item as T, doc, this.colMetadata, this.config.validateModels);
   };
 
   update = (item: T) => {
@@ -42,8 +34,7 @@ export class BaseFirestoreBatchRepository<T extends IEntity> {
       'update',
       item,
       this.colRef.doc(item.id),
-      this.colMetadata.entityConstructor,
-      this.colMetadata.subCollections,
+      this.colMetadata,
       this.config.validateModels
     );
   };
@@ -53,8 +44,7 @@ export class BaseFirestoreBatchRepository<T extends IEntity> {
       'delete',
       item,
       this.colRef.doc(item.id),
-      this.colMetadata.entityConstructor,
-      this.colMetadata.subCollections,
+      this.colMetadata,
       this.config.validateModels
     );
   };

@@ -1,6 +1,6 @@
 import { IEntity, Constructor } from '../types';
 import { Firestore, DocumentReference } from '@google-cloud/firestore';
-import { CollectionMetadata } from '../MetadataStorage';
+import { FullCollectionMetadata } from '../MetadataStorage';
 import { serializeEntity } from '../utils';
 import { ValidationError } from '../Errors/ValidationError';
 
@@ -8,8 +8,7 @@ type BatchOperation<T extends IEntity> = {
   type: 'create' | 'update' | 'delete';
   item: IEntity;
   ref: DocumentReference;
-  entity: Constructor<T>;
-  subCollectionsMetadata: CollectionMetadata[];
+  collectionMetadata: FullCollectionMetadata;
   validateModels: boolean;
 };
 
@@ -23,16 +22,14 @@ export class FirestoreBatchUnit {
     type: BatchOperation<T>['type'],
     item: T,
     ref: DocumentReference,
-    entity: Constructor<T>,
-    subCollectionsMetadata: CollectionMetadata[],
+    collectionMetadata: FullCollectionMetadata,
     validateModels: boolean
   ) {
     this.operations.push({
       type,
       item,
       ref,
-      entity,
-      subCollectionsMetadata,
+      collectionMetadata,
       validateModels,
     });
   }
@@ -51,14 +48,14 @@ export class FirestoreBatchUnit {
 
     for (const op of this.operations) {
       if (op.validateModels && op.type !== 'delete') {
-        const errors = await this.validate(op.item, op.entity);
+        const errors = await this.validate(op.item, op.collectionMetadata.entityConstructor);
 
         if (errors.length) {
           throw errors;
         }
       }
 
-      const serialized = serializeEntity(op.item, op.subCollectionsMetadata);
+      const serialized = serializeEntity(op.item, op.collectionMetadata.subCollections);
 
       switch (op.type) {
         case 'create':

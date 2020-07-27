@@ -18,7 +18,7 @@ export interface CollectionMetadata {
   path: string | null;
 }
 
-export interface GetCollectionViewModel extends CollectionMetadata {
+export interface FullCollectionMetadata extends CollectionMetadata {
   subCollections: CollectionMetadata[];
 }
 export interface RepositoryMetadata {
@@ -40,7 +40,7 @@ export class MetadataStorage {
 
   public getCollection = (
     pathOrConstructor: string | IEntityConstructor
-  ): GetCollectionViewModel => {
+  ): FullCollectionMetadata => {
     const collection =
       typeof pathOrConstructor === 'string'
         ? this.collections.find(c => c.path === pathOrConstructor)

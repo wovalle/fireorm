@@ -348,6 +348,9 @@ describe('BaseFirestoreTransactionRepository', () => {
     it('should correctly parse dates', async () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
+        const { releaseDate } = await pt.albums.findById('deadwing');
+        expect(releaseDate).toBeInstanceOf(Date);
+        expect(releaseDate.toISOString()).toEqual('2005-03-25T00:00:00.000Z');
         expect(pt.lastShow).toBeInstanceOf(Date);
         expect(pt.lastShow.toISOString()).toEqual('2010-10-14T00:00:00.000Z');
       });
@@ -367,7 +370,6 @@ describe('BaseFirestoreTransactionRepository', () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('red-hot-chili-peppers');
         const album = await pt.albums.findById('stadium-arcadium');
-
         expect(album.images).toBeInstanceOf(BaseFirestoreRepository);
       });
     });
@@ -380,7 +382,7 @@ describe('BaseFirestoreTransactionRepository', () => {
       });
     });
 
-    it('should be able to create subcollections', async () => {
+    it('should be able to create subcollections and initialize them', async () => {
       const band = new Band();
       band.id = '30-seconds-to-mars';
       band.name = '30 Seconds To Mars';
@@ -410,26 +412,7 @@ describe('BaseFirestoreTransactionRepository', () => {
 
         const albums = await band.albums.find();
         expect(albums.length).toEqual(3);
-      });
-    });
-
-    it('should initialize nested subcollections on create', async () => {
-      const band = new Band();
-      band.id = '30-seconds-to-mars';
-      band.name = '30 Seconds To Mars';
-      band.formationYear = 1998;
-      band.genres = ['alternative-rock'];
-
-      const firstAlbum = new Album();
-      firstAlbum.id = '30-seconds-to-mars';
-      firstAlbum.name = '30 Seconds to Mars';
-      firstAlbum.releaseDate = new Date('2002-07-22');
-
-      await bandRepository.runTransaction(async tran => {
-        await tran.create(band);
-        const album = await band.albums.create(firstAlbum);
-
-        expect(album.images).toBeInstanceOf(BaseFirestoreRepository);
+        expect(albums[0].images).toBeInstanceOf(BaseFirestoreRepository);
       });
     });
 
@@ -503,17 +486,6 @@ describe('BaseFirestoreTransactionRepository', () => {
 
         const updatedBandAlbums = await pt.albums.find();
         expect(updatedBandAlbums.length).toEqual(3);
-      });
-    });
-
-    describe('miscellaneous', () => {
-      it('should correctly parse dates', async () => {
-        await bandRepository.runTransaction(async tran => {
-          const pt = await tran.findById('porcupine-tree');
-          const { releaseDate } = await pt.albums.findById('deadwing');
-          expect(releaseDate).toBeInstanceOf(Date);
-          expect(releaseDate.toISOString()).toEqual('2005-03-25T00:00:00.000Z');
-        });
       });
     });
   });

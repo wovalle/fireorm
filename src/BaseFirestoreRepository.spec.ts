@@ -443,8 +443,11 @@ describe('BaseFirestoreRepository', () => {
   describe('miscellaneous', () => {
     it('should correctly parse dates', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
+      const { releaseDate } = await pt.albums.findById('deadwing');
       expect(pt.lastShow).toBeInstanceOf(Date);
       expect(pt.lastShow.toISOString()).toEqual('2010-10-14T00:00:00.000Z');
+      expect(releaseDate).toBeInstanceOf(Date);
+      expect(releaseDate.toISOString()).toEqual('2005-03-25T00:00:00.000Z');
     });
 
     it('should correctly parse geopoints', async () => {
@@ -687,15 +690,6 @@ describe('BaseFirestoreRepository', () => {
 
       const images = await album.images.find();
       expect(images.length).toEqual(2);
-    });
-
-    describe('miscellaneous', () => {
-      it('should correctly parse dates', async () => {
-        const pt = await bandRepository.findById('porcupine-tree');
-        const { releaseDate } = await pt.albums.findById('deadwing');
-        expect(releaseDate).toBeInstanceOf(Date);
-        expect(releaseDate.toISOString()).toEqual('2005-03-25T00:00:00.000Z');
-      });
     });
   });
 
