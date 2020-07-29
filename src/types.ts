@@ -62,11 +62,22 @@ export interface IQueryExecutor<T> {
   ): Promise<T[]>;
 }
 
+export interface IBatchRepository<T extends IEntity> {
+  create(item: WithOptionalId<T>): void;
+  update(item: T): void;
+  delete(item: T): void;
+}
+
+export interface ISingleBatchRepository<T extends IEntity> extends IBatchRepository<T> {
+  commit(): Promise<unknown>;
+}
+
 export interface IBaseRepository<T extends IEntity> {
   findById(id: string): Promise<T | null>;
   create(item: PartialBy<T, 'id'>): Promise<T>;
   update(item: T): Promise<T>;
   delete(id: string): Promise<void>;
+  createBatch(): ISingleBatchRepository<T>;
 }
 
 export type IRepository<T extends IEntity> = IBaseRepository<T> &

@@ -1,15 +1,18 @@
 import { BaseFirestoreBatchRepository } from './BaseFirestoreBatchRepository';
 import { getFixture } from '../../test/fixture';
 import { initialize } from '../MetadataStorage';
-import { Band } from '../../test/BandCollection';
+import { Band, Album } from '../../test/BandCollection';
 import { Firestore, WriteBatch } from '@google-cloud/firestore';
 import { FirestoreBatchUnit } from './FirestoreBatchUnit';
+import { BaseFirestoreRepository } from '../BaseFirestoreRepository';
+import { getRepository } from '../helpers';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const MockFirebase = require('mock-cloud-firestore');
 
 describe('BaseFirestoreBatchRepository', () => {
-  let bandRepository: BaseFirestoreBatchRepository<Band> = null;
+  let bandBatchRepository: BaseFirestoreBatchRepository<Band> = null;
+  let bandRepository: BaseFirestoreRepository<Band> = null;
   let firestore: Firestore;
   let batch: FirestoreBatchUnit;
   let batchStub: jest.Mocked<WriteBatch>;
@@ -32,7 +35,8 @@ describe('BaseFirestoreBatchRepository', () => {
     initialize(firestore);
 
     batch = new FirestoreBatchUnit(firestore);
-    bandRepository = new BaseFirestoreBatchRepository(batch, Band);
+    bandBatchRepository = new BaseFirestoreBatchRepository(batch, Band);
+    bandRepository = getRepository(Band);
   });
 
   describe('create', () => {
@@ -43,7 +47,7 @@ describe('BaseFirestoreBatchRepository', () => {
       entity.formationYear = 1999;
       entity.genres = ['alternative-rock', 'alternative-metal', 'hard-rock'];
 
-      bandRepository.create(entity);
+      bandBatchRepository.create(entity);
       await batch.commit();
 
       expect(batchStub.set.mock.calls[0][1]).toEqual({
@@ -60,7 +64,7 @@ describe('BaseFirestoreBatchRepository', () => {
       entity.formationYear = 1999;
       entity.genres = ['progressive-rock'];
 
-      bandRepository.create(entity);
+      bandBatchRepository.create(entity);
       await batch.commit();
 
       const data = batchStub.set.mock.calls[0][1] as Band;
@@ -82,11 +86,11 @@ describe('BaseFirestoreBatchRepository', () => {
       entity.formationYear = 1999;
       entity.genres = ['alternative-rock', 'alternative-metal', 'hard-rock'];
 
-      bandRepository.create(entity);
+      bandBatchRepository.create(entity);
       await batch.commit();
 
       entity.name = 'Un Círculo Perfecto';
-      bandRepository.update(entity);
+      bandBatchRepository.update(entity);
       await batch.commit();
 
       expect(batchStub.update.mock.calls[0][1]).toEqual({
@@ -106,7 +110,7 @@ describe('BaseFirestoreBatchRepository', () => {
       entity.formationYear = 1999;
       entity.genres = ['alternative-rock', 'alternative-metal', 'hard-rock'];
 
-      bandRepository.delete(entity);
+      bandBatchRepository.delete(entity);
       await batch.commit();
 
       expect(batchStub.delete.mock.calls[0][1]).toEqual({
@@ -166,5 +170,120 @@ describe('BaseFirestoreBatchRepository', () => {
   //TODO: for this to work I'll probably need to do the collectionPath refactor
   // Copy from BaseFirestoreTransactionRepository.spec
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  describe('must handle subcollections', () => {});
+  describe('must handle subcollections', () => {
+    it('should be able to create subcollections and initialize them', async () => {
+      const band = new Band();
+      band.id = '30-seconds-to-mars';
+      band.name = '30 Seconds To Mars';
+      band.formationYear = 1998;
+      band.genres = ['alternative-rock'];
+
+      const firstAlbum = new Album();
+      firstAlbum.id = '30-seconds-to-mars';
+      firstAlbum.name = '30 Seconds to Mars';
+      firstAlbum.releaseDate = new Date('2002-07-22');
+
+      const secondAlbum = new Album();
+      secondAlbum.id = 'a-beautiful-lie';
+      secondAlbum.name = 'A Beautiful Lie';
+      secondAlbum.releaseDate = new Date('2005-07-30');
+
+      const thirdAlbum = new Album();
+      thirdAlbum.id = 'this-is-war';
+      thirdAlbum.name = 'This Is War';
+      thirdAlbum.releaseDate = new Date('2009-12-08');
+
+      // To save in db and initialize subcollections
+      await bandRepository.create(band);
+
+      const albumsBatch = band.albums.createBatch();
+
+      albumsBatch.create(firstAlbum);
+      albumsBatch.create(secondAlbum);
+      albumsBatch.create(thirdAlbum);
+      await albumsBatch.commit();
+
+      [firstAlbum, secondAlbum, thirdAlbum].forEach((album, i) => {
+        expect(batchStub.set.mock.calls[i][1]).toEqual({
+          id: album.id,
+          name: album.name,
+          releaseDate: album.releaseDate,
+        });
+      });
+    });
+
+    it('should be able to validate subcollections on create', async () => {
+      const band = new Band();
+      band.id = '30-seconds-to-mars';
+      band.name = '30 Seconds To Mars';
+      band.formationYear = 1998;
+      band.genres = ['alternative-rock'];
+
+      const firstAlbum = new Album();
+      firstAlbum.id = 'invalid-album-name';
+      firstAlbum.name = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+      firstAlbum.releaseDate = new Date('2002-07-22');
+
+      // To save in db and initialize subcollections
+      await bandRepository.create(band);
+
+      const albumsBatch = band.albums.createBatch();
+      albumsBatch.create(firstAlbum);
+
+      try {
+        await albumsBatch.commit();
+      } catch (error) {
+        expect(error[0].constraints.length).toEqual('Name is too long');
+      }
+    });
+
+    it('should be able to update subcollections', async () => {
+      const band = await bandRepository.findById('porcupine-tree');
+      const album = await band.albums.findById('fear-blank-planet');
+      album.comment = 'Anesthethize is top 3 IMHO';
+
+      const albumsBatch = band.albums.createBatch();
+      albumsBatch.update(album);
+
+      await albumsBatch.commit();
+
+      expect(batchStub.update.mock.calls[0][1]).toEqual({
+        id: album.id,
+        name: album.name,
+        releaseDate: album.releaseDate,
+        comment: album.comment,
+      });
+    });
+
+    it('should be able to validate subcollections on update', async () => {
+      const pt = await bandRepository.findById('porcupine-tree');
+      const album = await pt.albums.findById('fear-blank-planet');
+
+      album.name = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+      const albumsBatch = pt.albums.createBatch();
+      albumsBatch.update(album);
+
+      try {
+        await albumsBatch.commit();
+      } catch (error) {
+        expect(error[0].constraints.length).toEqual('Name is too long');
+      }
+    });
+
+    it('should be able to delete subcollections', async () => {
+      const pt = await bandRepository.findById('porcupine-tree');
+      const album = await pt.albums.findById('fear-blank-planet');
+
+      const albumsBatch = pt.albums.createBatch();
+      albumsBatch.delete(album);
+
+      await albumsBatch.commit();
+
+      expect(batchStub.delete.mock.calls[0][1]).toEqual({
+        id: album.id,
+        name: album.name,
+        releaseDate: album.releaseDate,
+      });
+    });
+  });
 });

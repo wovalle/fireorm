@@ -19,7 +19,7 @@ import { IsEmail, IsOptional, Length } from 'class-validator';
 
 class AlbumImage extends AlbumImageEntity {}
 
-class Album extends AlbumEntity {
+export class Album extends AlbumEntity {
   @Length(1, 50, {
     message: 'Name is too long',
   })

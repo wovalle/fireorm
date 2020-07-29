@@ -518,7 +518,6 @@ describe('BaseFirestoreRepository', () => {
       await batch.commit();
 
       const batchedBands = await bandRepository.whereEqualTo('formationYear', 2099).find();
-
       expect(batchedBands.map(b => b.name)).toEqual(['Entity1', 'Entity2', 'Entity3']);
     });
   });
