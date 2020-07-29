@@ -15,7 +15,7 @@ export interface CollectionMetadata {
   entityConstructor: IEntityConstructor;
   parentEntityConstructor?: IEntityConstructor;
   propertyKey?: string;
-  path: string | null;
+  segments?: string[];
 }
 
 export interface FullCollectionMetadata extends CollectionMetadata {
@@ -41,10 +41,20 @@ export class MetadataStorage {
   public getCollection = (
     pathOrConstructor: string | IEntityConstructor
   ): FullCollectionMetadata => {
-    const collection =
-      typeof pathOrConstructor === 'string'
-        ? this.collections.find(c => c.path === pathOrConstructor)
-        : this.collections.find(c => c.entityConstructor === pathOrConstructor);
+    let collection: CollectionMetadata = undefined;
+
+    if (typeof pathOrConstructor === 'string') {
+      const segments = pathOrConstructor.split('/').reduce((acc, cur, index) => {
+        if (index % 2 === 0) {
+          acc = acc.concat(cur);
+        }
+        return acc;
+      }, []);
+
+      collection = this.collections.find(c => c.segments.every((s, i) => s === segments[i]));
+    } else {
+      collection = this.collections.find(c => c.entityConstructor === pathOrConstructor);
+    }
 
     if (!collection) {
       return null;
@@ -63,6 +73,7 @@ export class MetadataStorage {
   public setCollection = (col: CollectionMetadata) => {
     const existing = this.getCollection(col.entityConstructor);
     if (!existing) {
+      col.segments = [col.name];
       this.collections.push(col);
     } else {
       const foundCol = this.collections.find(
@@ -73,7 +84,7 @@ export class MetadataStorage {
       foundCol.name = foundCol.name || col.name;
       foundCol.parentEntityConstructor =
         foundCol.parentEntityConstructor || col.parentEntityConstructor;
-      foundCol.path = foundCol.path || col.path;
+      foundCol.segments = foundCol.segments || col.segments;
       foundCol.propertyKey = foundCol.propertyKey || col.propertyKey;
     }
 
@@ -87,7 +98,7 @@ export class MetadataStorage {
       const c = colsToUpdate.pop();
       const parent = this.collections.find(p => p.entityConstructor === c.parentEntityConstructor);
 
-      c.path = `${parent.path}/${parent.name}$$id/${c.name}`;
+      c.segments = parent.segments.concat(c.name);
       getWhereImParent(c.entityConstructor).forEach(col => colsToUpdate.push(col));
     }
   };

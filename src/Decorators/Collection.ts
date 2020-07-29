@@ -7,8 +7,8 @@ export function Collection(entityName?: string) {
     const name = entityName || plural(entityConstructor.name);
     getMetadataStorage().setCollection({
       name,
-      path: name,
       entityConstructor,
+      segments: [name],
     });
   };
 }

@@ -17,13 +17,11 @@ describe('MetadataStorage', () => {
   const col: CollectionMetadata = {
     entityConstructor: Entity,
     name: 'entity',
-    path: 'entity',
   };
 
   const subCol: CollectionMetadata = {
     entityConstructor: SubEntity,
     name: 'subEntity',
-    path: "['entity', 'subentity']",
     parentEntityConstructor: Entity,
     propertyKey: 'subEntities',
   };
@@ -46,7 +44,7 @@ describe('MetadataStorage', () => {
 
     expect(entityMetadata.entityConstructor).toEqual(col.entityConstructor);
     expect(entityMetadata.name).toEqual(col.name);
-    expect(entityMetadata.path).toEqual(col.path);
+    expect(entityMetadata.segments).toEqual(['entity']);
     expect(entityMetadata.subCollections.length).toEqual(1);
   });
 
@@ -55,7 +53,7 @@ describe('MetadataStorage', () => {
 
     expect(entityMetadata.entityConstructor).toEqual(col.entityConstructor);
     expect(entityMetadata.name).toEqual(col.name);
-    expect(entityMetadata.path).toEqual(col.path);
+    expect(entityMetadata.segments).toEqual(['entity']);
     expect(entityMetadata.subCollections.length).toEqual(1);
   });
 
@@ -64,6 +62,7 @@ describe('MetadataStorage', () => {
 
     expect(entityMetadata.subCollections.length).toEqual(1);
     expect(entityMetadata.subCollections[0]).toEqual(subCol);
+    expect(entityMetadata.subCollections[0].segments).toEqual(['entity', 'subEntity']);
   });
 
   it('must not store repeated collections', () => {

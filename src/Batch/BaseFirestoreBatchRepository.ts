@@ -12,11 +12,15 @@ export class BaseFirestoreBatchRepository<T extends IEntity> {
   protected colRef: CollectionReference;
   protected config: MetadataStorageConfig;
 
-  constructor(protected batch: FirestoreBatchUnit, protected entity: Constructor<T>) {
+  constructor(
+    protected batch: FirestoreBatchUnit,
+    protected entity: Constructor<T>,
+    collectionPath?: string
+  ) {
     const { getCollection, firestoreRef, config } = getMetadataStorage();
 
     this.colMetadata = getCollection(entity);
-    this.colRef = firestoreRef.collection(this.colMetadata.path);
+    this.colRef = firestoreRef.collection(collectionPath || this.colMetadata.name);
     this.config = config;
   }
 

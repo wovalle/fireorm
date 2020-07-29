@@ -51,7 +51,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
       );
     }
 
-    this.path = collectionPath || this.colMetadata.path;
+    this.path = collectionPath || this.colMetadata.name;
     this.firestoreColRef = firestoreRef.collection(this.path);
   }
 
@@ -279,8 +279,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   async validate(item: T): Promise<ValidationError[]> {
     try {
       const classValidator = await import('class-validator');
-      const { getCollection } = getMetadataStorage();
-      const { entityConstructor: Entity } = getCollection(this.colMetadata.path);
+      const { entityConstructor: Entity } = this.colMetadata;
 
       /**
        * Instantiate plain objects into an entity class

@@ -17,7 +17,7 @@ describe('CollectionDecorator', () => {
     const collection = store.metadataStorage.getCollection('foo');
     expect(store.metadataStorage.collections.length).toEqual(1);
     expect(collection.name).toEqual('foo');
-    expect(collection.path).toEqual('foo');
+    expect(collection.segments).toEqual(['foo']);
     expect(collection.entityConstructor).toEqual(Entity);
   });
 
@@ -30,7 +30,7 @@ describe('CollectionDecorator', () => {
     const collection = store.metadataStorage.getCollection('Entities');
     expect(store.metadataStorage.collections.length).toEqual(1);
     expect(collection.name).toEqual('Entities');
-    expect(collection.path).toEqual('Entities');
+    expect(collection.segments).toEqual(['Entities']);
     expect(collection.entityConstructor).toEqual(Entity);
   });
 });

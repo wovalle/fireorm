@@ -76,7 +76,7 @@ describe('SubCollectionDecorator', () => {
 
     expect(subCollection.parentEntityConstructor).toEqual(Entity);
     expect(subCollection.entityConstructor).toEqual(SubEntity);
-    expect(subCollection.path).toEqual('col/col$$id/sub');
+    expect(subCollection.segments).toEqual(['col', 'sub']);
   });
 
   it('should correctly initialize subcollections inside subcollections', () => {
@@ -113,10 +113,10 @@ describe('SubCollectionDecorator', () => {
 
     expect(subCollection.parentEntityConstructor).toEqual(Entity);
     expect(subCollection.entityConstructor).toEqual(SubEntity);
-    expect(subCollection.path).toEqual('col/col$$id/sub');
+    expect(subCollection.segments).toEqual(['col', 'sub']);
 
     expect(subSubCollection.parentEntityConstructor).toEqual(SubEntity);
     expect(subSubCollection.entityConstructor).toEqual(SubSubEntity);
-    expect(subSubCollection.path).toEqual('col/col$$id/sub/sub$$id/subsub');
+    expect(subSubCollection.segments).toEqual(['col', 'sub', 'subsub']);
   });
 });
