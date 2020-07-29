@@ -61,7 +61,7 @@ describe('MetadataStorage', () => {
     const entityMetadata = metadataStorage.getCollection('entity');
 
     expect(entityMetadata.subCollections.length).toEqual(1);
-    expect(entityMetadata.subCollections[0]).toEqual(subCol);
+    expect(entityMetadata.subCollections[0].entityConstructor).toEqual(subCol.entityConstructor);
     expect(entityMetadata.subCollections[0].segments).toEqual(['entity', 'subEntity']);
   });
 

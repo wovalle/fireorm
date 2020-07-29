@@ -15,11 +15,14 @@ export interface CollectionMetadata {
   entityConstructor: IEntityConstructor;
   parentEntityConstructor?: IEntityConstructor;
   propertyKey?: string;
-  segments?: string[];
 }
 
-export interface FullCollectionMetadata extends CollectionMetadata {
-  subCollections: CollectionMetadata[];
+export interface CollectionMetadataWithSegments extends CollectionMetadata {
+  segments: string[];
+}
+
+export interface FullCollectionMetadata extends CollectionMetadataWithSegments {
+  subCollections: CollectionMetadataWithSegments[];
 }
 export interface RepositoryMetadata {
   target: IEntityRepositoryConstructor;
@@ -31,7 +34,7 @@ export interface MetadataStorageConfig {
 }
 
 export class MetadataStorage {
-  readonly collections: Array<CollectionMetadata> = [];
+  readonly collections: Array<CollectionMetadataWithSegments> = [];
   readonly repositories: Map<IEntityConstructor, RepositoryMetadata> = new Map();
 
   public config: MetadataStorageConfig = {
@@ -41,15 +44,12 @@ export class MetadataStorage {
   public getCollection = (
     pathOrConstructor: string | IEntityConstructor
   ): FullCollectionMetadata => {
-    let collection: CollectionMetadata = undefined;
+    let collection: CollectionMetadataWithSegments = undefined;
 
     if (typeof pathOrConstructor === 'string') {
-      const segments = pathOrConstructor.split('/').reduce((acc, cur, index) => {
-        if (index % 2 === 0) {
-          acc = acc.concat(cur);
-        }
-        return acc;
-      }, []);
+      const segments = pathOrConstructor
+        .split('/')
+        .reduce((acc, cur, index) => (index % 2 === 0 ? acc.concat(cur) : acc), []);
 
       collection = this.collections.find(c => c.segments.every((s, i) => s === segments[i]));
     } else {
@@ -73,8 +73,12 @@ export class MetadataStorage {
   public setCollection = (col: CollectionMetadata) => {
     const existing = this.getCollection(col.entityConstructor);
     if (!existing) {
-      col.segments = [col.name];
-      this.collections.push(col);
+      const colToAdd = {
+        ...col,
+        segments: [col.name],
+      };
+
+      this.collections.push(colToAdd);
     } else {
       const foundCol = this.collections.find(
         e => e.entityConstructor === existing.entityConstructor
@@ -84,7 +88,7 @@ export class MetadataStorage {
       foundCol.name = foundCol.name || col.name;
       foundCol.parentEntityConstructor =
         foundCol.parentEntityConstructor || col.parentEntityConstructor;
-      foundCol.segments = foundCol.segments || col.segments;
+      foundCol.segments = foundCol.segments || [col.name];
       foundCol.propertyKey = foundCol.propertyKey || col.propertyKey;
     }
 
@@ -93,7 +97,7 @@ export class MetadataStorage {
 
     const colsToUpdate = getWhereImParent(col.entityConstructor);
 
-    // update path for subcollections and subcollections of subcollections
+    // Update segments for subcollections and subcollections of subcollections
     while (colsToUpdate.length) {
       const c = colsToUpdate.pop();
       const parent = this.collections.find(p => p.entityConstructor === c.parentEntityConstructor);

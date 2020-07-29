@@ -8,7 +8,6 @@ export function Collection(entityName?: string) {
     getMetadataStorage().setCollection({
       name,
       entityConstructor,
-      segments: [name],
     });
   };
 }

@@ -9,7 +9,6 @@ export function SubCollection(entityConstructor: IEntityConstructor, entityName?
       name: entityName || plural(entityConstructor.name),
       parentEntityConstructor: parentEntity.constructor as IEntityConstructor,
       propertyKey,
-      segments: [entityName],
     });
   };
 }
