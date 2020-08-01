@@ -576,7 +576,7 @@ describe('BaseFirestoreTransactionRepository', () => {
           const { releaseDate } = album;
 
           expect(releaseDate).toBeInstanceOf(Date);
-          expect(releaseDate.toISOString()).toEqual('2005-03-25T00:00:00.000Z');
+          expect(releaseDate.toISOString()).toEqual('2007-04-16T00:00:00.000Z');
         });
       });
     });
