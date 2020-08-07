@@ -37,7 +37,7 @@
     "tw": "yarn test:watch"
   },
   "dependencies": {
-    "class-transformer": "^0.2.0",
+    "class-transformer": "^0.3.1",
     "pluralize": "^8.0.0",
     "ts-object-path": "^0.1.2"
   },
