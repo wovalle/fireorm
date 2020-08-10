@@ -368,15 +368,8 @@ describe('BaseFirestoreTransactionRepository', () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('red-hot-chili-peppers');
         const albumsRef = pt.albums;
-        if (!albumsRef) {
-          throw new Error('Albums should not have an undefined value');
-        }
 
         const album = await albumsRef.findById('stadium-arcadium');
-        if (album === null) {
-          throw new Error('Album should not have a null value');
-        }
-
         expect(album.images).toBeInstanceOf(BaseFirestoreRepository);
       });
     });
@@ -385,15 +378,8 @@ describe('BaseFirestoreTransactionRepository', () => {
       await bandRepository.runTransaction(async tran => {
         const band = await tran.findById('red-hot-chili-peppers');
         const albumsRef = band.albums;
-        if (!albumsRef) {
-          throw new Error('Albums should not have an undefined value');
-        }
 
         const bestAlbum = await albumsRef.findById('stadium-arcadium');
-        if (bestAlbum === null) {
-          throw new Error('Album should not have a null value');
-        }
-
         expect(bestAlbum.id).toEqual('stadium-arcadium');
       });
     });
@@ -423,9 +409,6 @@ describe('BaseFirestoreTransactionRepository', () => {
       await bandRepository.runTransaction(async tran => {
         await tran.create(band);
         const albumsRef = band.albums;
-        if (!albumsRef) {
-          throw new Error('Albums should not have an undefined value');
-        }
 
         await albumsRef.create(firstAlbum);
         await albumsRef.create(secondAlbum);
@@ -451,9 +434,6 @@ describe('BaseFirestoreTransactionRepository', () => {
       await bandRepository.runTransaction(async tran => {
         await tran.create(band);
         const albumsRef = band.albums;
-        if (!albumsRef) {
-          throw new Error('Albums should not have an undefined value');
-        }
         const album = await albumsRef.create(firstAlbum);
 
         expect(album.images).toBeInstanceOf(BaseFirestoreRepository);
@@ -475,9 +455,6 @@ describe('BaseFirestoreTransactionRepository', () => {
       await bandRepository.runTransaction(async tran => {
         await tran.create(band);
         const albumsRef = band.albums;
-        if (!albumsRef) {
-          throw new Error('Albums should not have an undefined value');
-        }
 
         try {
           await albumsRef.create(firstAlbum);
@@ -491,22 +468,13 @@ describe('BaseFirestoreTransactionRepository', () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
         const albumsRef = pt.albums;
-        if (!albumsRef) {
-          throw new Error('Albums should not have an undefined value');
-        }
 
         const album = await albumsRef.findById('fear-blank-planet');
-        if (album === null) {
-          throw new Error('Album should not have a null value');
-        }
         album.comment = 'Anesthethize is top 3 IMHO';
 
         await albumsRef.update(album);
 
         const updatedAlbum = await albumsRef.findById('fear-blank-planet');
-        if (updatedAlbum === null) {
-          throw new Error('Updated album should not have a null value');
-        }
 
         expect(updatedAlbum.comment).toEqual('Anesthethize is top 3 IMHO');
       });
@@ -516,14 +484,8 @@ describe('BaseFirestoreTransactionRepository', () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
         const albumsRef = pt.albums;
-        if (!albumsRef) {
-          throw new Error('Albums should not have an undefined value');
-        }
 
         const album = await albumsRef.findById('fear-blank-planet');
-        if (album === null) {
-          throw new Error('Album should not have a null value');
-        }
         album.name = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
 
         try {
@@ -550,9 +512,6 @@ describe('BaseFirestoreTransactionRepository', () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
         const albumsRef = pt.albums;
-        if (!albumsRef) {
-          throw new Error('Albums should not have an undefined value');
-        }
         await albumsRef.delete('fear-blank-planet');
 
         const updatedBandAlbums = await albumsRef.find();
@@ -565,14 +524,8 @@ describe('BaseFirestoreTransactionRepository', () => {
         await bandRepository.runTransaction(async tran => {
           const pt = await tran.findById('porcupine-tree');
           const albumsRef = pt.albums;
-          if (!albumsRef) {
-            throw new Error('Albums should not have an undefined value');
-          }
 
           const album = await albumsRef.findById('fear-blank-planet');
-          if (album === null) {
-            throw new Error('Album should not have a null value');
-          }
           const { releaseDate } = album;
 
           expect(releaseDate).toBeInstanceOf(Date);

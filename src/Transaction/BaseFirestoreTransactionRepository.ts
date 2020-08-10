@@ -1,4 +1,4 @@
-import { CollectionReference, Transaction, WhereFilterOp, Query } from '@google-cloud/firestore';
+import { CollectionReference, Transaction, WhereFilterOp } from '@google-cloud/firestore';
 
 import {
   IEntity,
@@ -31,7 +31,7 @@ export class TransactionRepository<T extends IEntity> extends AbstractFirestoreR
   }
 
   execute(queries: IFireOrmQueryLine[]): Promise<T[]> {
-    const query = queries.reduce((acc: CollectionReference | Query, cur) => {
+    const query = queries.reduce((acc, cur) => {
       const op = cur.operator as WhereFilterOp;
       return acc.where(cur.prop, op, cur.val);
     }, this.firestoreColRef);
