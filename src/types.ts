@@ -14,11 +14,13 @@ export enum FirestoreOperators {
   lessThanEqual = '<=',
   greaterThanEqual = '>=',
   arrayContains = 'array-contains',
+  arrayContainsAny = 'array-contains-any',
+  in = 'in',
 }
 
 export interface IFireOrmQueryLine {
   prop: string;
-  val: IFirestoreVal;
+  val: IFirestoreVal | IFirestoreVal[];
   operator: FirestoreOperators;
 }
 
@@ -38,6 +40,8 @@ export interface IQueryable<T extends IEntity> {
   whereLessThan(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T>;
   whereLessOrEqualThan(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T>;
   whereArrayContains(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T>;
+  whereArrayContainsAny(prop: IWherePropParam<T>, val: IFirestoreVal[]): IQueryBuilder<T>;
+  whereIn(prop: IWherePropParam<T>, val: IFirestoreVal[]): IQueryBuilder<T>;
   find(): Promise<T[]>;
   findOne(): Promise<T | null>;
 }

@@ -389,6 +389,32 @@ describe('BaseFirestoreRepository', () => {
       expect(list.length).toEqual(2);
     });
 
+    it('must filter with whereArrayContainsAny', async () => {
+      const list = await bandRepository
+        .whereArrayContainsAny('genres', ['psychedelic-rock', 'funk-rock'])
+        .find();
+      expect(list.length).toEqual(3);
+    });
+
+    it('must filter with whereIn', async () => {
+      const list = await bandRepository.whereIn('formationYear', [1965, 1983, 1987]).find();
+      expect(list.length).toEqual(3);
+    });
+
+    it('should throw with whereArrayContainsAny and more than 10 items in val array', async () => {
+      expect(async () => {
+        await bandRepository
+          .whereArrayContainsAny('genres', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
+          .find();
+      }).rejects.toThrow(Error);
+    });
+
+    it('should throw with whereIn and more than 10 items in val array', async () => {
+      expect(async () => {
+        await bandRepository.whereIn('formationYear', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]).find();
+      }).rejects.toThrow(Error);
+    });
+
     it('must filter with two or more operators', async () => {
       const list = await bandRepository
         .whereLessOrEqualThan('formationYear', 1983)

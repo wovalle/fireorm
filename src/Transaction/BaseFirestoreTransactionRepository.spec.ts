@@ -332,6 +332,38 @@ describe('BaseFirestoreTransactionRepository', () => {
       });
     });
 
+    it('must filter with whereArrayContainsAny', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const list = await tran
+          .whereArrayContainsAny('genres', ['psychedelic-rock', 'funk-rock'])
+          .find();
+        expect(list.length).toEqual(3);
+      });
+    });
+
+    it('must filter with whereIn', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const list = await tran.whereIn('formationYear', [1965, 1983, 1987]).find();
+        expect(list.length).toEqual(3);
+      });
+    });
+
+    it('should throw with whereArrayContainsAny and more than 10 items in val array', async () => {
+      expect(async () => {
+        await bandRepository.runTransaction(async tran => {
+          await tran.whereArrayContainsAny('genres', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]).find();
+        });
+      }).rejects.toThrow(Error);
+    });
+
+    it('should throw with whereIn and more than 10 items in val array', async () => {
+      expect(async () => {
+        await bandRepository.runTransaction(async tran => {
+          await tran.whereIn('formationYear', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]).find();
+        });
+      }).rejects.toThrow(Error);
+    });
+
     it('must filter with two or more operators', async () => {
       await bandRepository.runTransaction(async tran => {
         const list = await tran
