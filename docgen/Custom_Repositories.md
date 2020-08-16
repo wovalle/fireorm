@@ -3,11 +3,7 @@
 By default, fireorm repositories have methods to create, read, update and delete documents, but what if we want to add extra data access logic? Fireorm supports Custom Repositories. A Custom Repository is a class that extends BaseRepository<T>(where T is a model) and is decorated with fireorm’s [CustomRepository](Globals.md#CustomRepository) decorator.
 
 ```typescript
-import {
-  BaseFirestoreRepository,
-  CustomRepository,
-  getRepository,
-} from 'fireorm';
+import { BaseFirestoreRepository, CustomRepository, getRepository } from 'fireorm';
 import Band from './models/Band';
 
 @CustomRepository(Band)
@@ -25,4 +21,4 @@ Now, `getRepository(Band)` will return the custom repository for Band with the _
 
 ## Casting
 
-As you can see, we have to cast the repository returned by the `getRepository` as the custom repository we want to use (_CustomBandRepository_).
+As you could see in the previous example, we had to cast the repository returned by the `getRepository` as the custom repository we wanted to use (_CustomBandRepository_).
