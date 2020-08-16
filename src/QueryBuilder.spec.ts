@@ -27,6 +27,14 @@ describe('QueryBuilder', () => {
     expect(executor.queries[0].val).toEqual('1');
   });
 
+  it('must build array value query', async () => {
+    const queryBuilder = new QueryBuilder<Test>(executor);
+    await queryBuilder.whereIn('id', ['1', '2']).find();
+    expect(executor.queries[0].operator).toEqual(FirestoreOperators.in);
+    expect(executor.queries[0].prop).toEqual('id');
+    expect(executor.queries[0].val).toEqual(['1', '2']);
+  });
+
   it('must pipe queries', async () => {
     const queryBuilder = new QueryBuilder<Test>(executor);
     await queryBuilder

@@ -177,6 +177,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://www.smddzcy.com/"><img src="https://avatars3.githubusercontent.com/u/13895224?v=4" width="100px;" alt=""/><br /><sub><b>Samed Düzçay</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=smddzcy" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/stefdelec"><img src="https://avatars1.githubusercontent.com/u/12082478?v=4" width="100px;" alt=""/><br /><sub><b>stefdelec</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=stefdelec" title="Code">💻</a></td>
+    <td align="center"><a href="http://www.innvia.com"><img src="https://avatars0.githubusercontent.com/u/35846271?v=4" width="100px;" alt=""/><br /><sub><b>Łukasz Kuciel</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=LukaszKuciel" title="Code">💻</a></td>
   </tr>
 </table>
 

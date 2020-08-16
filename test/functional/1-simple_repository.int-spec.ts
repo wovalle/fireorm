@@ -58,6 +58,18 @@ describe('Integration test: Simple Repository', () => {
     const byWebsiteOne = await bandRepository.whereEqualTo(a => a.name, 'Dream Theater').findOne();
     expect(byWebsiteOne.id).toEqual('dream-theater');
 
+    // Find two bands matching some criteria
+    const whereIn = await bandRepository
+      .whereIn(a => a.name, ['Dream Theater', 'Devin Townsend Project'])
+      .find();
+    expect(whereIn.length).toEqual(2);
+
+    // Find two bands matching some criteria
+    const whereArrayIn = await bandRepository
+      .whereArrayContainsAny(a => a.genres, ['progressive-metal'])
+      .find();
+    expect(whereArrayIn.length).toEqual(2);
+
     // Should be able to run transactions
     await bandRepository.runTransaction(async tran => {
       const band = await tran.findById('dream-theater');

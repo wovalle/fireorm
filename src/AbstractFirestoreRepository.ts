@@ -203,6 +203,36 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   }
 
   /**
+   * Returns a new QueryBuilder with a filter specifying that the
+   * field @param prop is an array that contains one or more of the comparison values in @param val
+   *
+   * @param {IWherePropParam<T>} prop field to be filtered on, where
+   * prop could be keyof T or a lambda where T is the first parameter
+   * @param {IFirestoreVal[]} val array of values to compare in the filter (max 10 items in array)
+   * @returns {QueryBuilder<T>} A new QueryBuilder with the specified
+   * query applied.
+   * @memberof AbstractFirestoreRepository
+   */
+  whereArrayContainsAny(prop: IWherePropParam<T>, val: IFirestoreVal[]): IQueryBuilder<T> {
+    return new QueryBuilder<T>(this).whereArrayContainsAny(prop, val);
+  }
+
+  /**
+   * Returns a new QueryBuilder with a filter specifying that the
+   * field @param prop matches any of the comparison values in @param val
+   *
+   * @param {IWherePropParam<T>} prop field to be filtered on, where
+   * prop could be keyof T or a lambda where T is the first parameter
+   * @param {IFirestoreVal[]} val[] array of values to compare in the filter (max 10 items in array)
+   * @returns {QueryBuilder<T>} A new QueryBuilder with the specified
+   * query applied.
+   * @memberof AbstractFirestoreRepository
+   */
+  whereIn(prop: IWherePropParam<T>, val: IFirestoreVal[]): IQueryBuilder<T> {
+    return new QueryBuilder<T>(this).whereIn(prop, val);
+  }
+
+  /**
    * Returns a new QueryBuilder with a maximum number of results
    * to return. Can only be used once per query.
    *

@@ -30,7 +30,7 @@ Now the variable band is an instance of our Band model that contains the informa
 
 ## Complex Queries
 
-Only being able to find documents by id is a bit limiting, that's why fireorm repositories provide a lot of helper functions to ease the filtering of data in queries. These are [whereEqualTo](Classes/BaseFirestoreRepository.md#WhereEqualTo), [whereGreaterThan](Classes/BaseFirestoreRepository.md#WhereGreaterThan), [whereGreaterOrEqualTha](Classes/BaseFirestoreRepository.md#WhereGreaterOrEqualThan), [whereLessThan](Classes/BaseFirestoreRepository.md#WhereLessThan), [whereLessOrEqualThan](Classes/BaseFirestoreRepository.md#WhereLessOrEqualThan), and [whereArrayContains](Classes/BaseFirestoreRepository.md#WhereArrayContains) methods. We can pipe as many methods as we need to perform complex queries, as long as we don’t forget to call the [find](Classes/BaseFirestoreRepository.md#Find) method at the end.
+Only being able to find documents by id is a bit limiting, that's why fireorm repositories provide a lot of helper functions to ease the filtering of data in queries. These are [whereEqualTo](Classes/BaseFirestoreRepository.md#WhereEqualTo), [whereGreaterThan](Classes/BaseFirestoreRepository.md#WhereGreaterThan), [whereGreaterOrEqualTha](Classes/BaseFirestoreRepository.md#WhereGreaterOrEqualThan), [whereLessThan](Classes/BaseFirestoreRepository.md#WhereLessThan), [whereLessOrEqualThan](Classes/BaseFirestoreRepository.md#WhereLessOrEqualThan), [whereArrayContains](Classes/BaseFirestoreRepository.md#WhereArrayContains), [whereIn](Classes/BaseFirestoreRepository.md#whereIn), and [whereArrayContainsAny](Classes/BaseFirestoreRepository.md#whereArrayContainsAny) methods. We can pipe as many methods as we need to perform complex queries, as long as we don’t forget to call the [find](Classes/BaseFirestoreRepository.md#Find) method at the end.
 
 ```typescript
 // Bands formed from 1990 onwards
@@ -52,9 +52,7 @@ All the \*Where methods have a similar api, where the first parameter is a strin
 // This example is exactly the same than the last one, but using the alternative API.
 
 // Bands formed from 1990 onwards
-await bandRepository
-  .whereGreaterOrEqualThan(band => band.formationYear, 1990)
-  .find();
+await bandRepository.whereGreaterOrEqualThan(band => band.formationYear, 1990).find();
 
 // Bands whose name is Porcupine Tree
 await bandRepository.whereEqualTo(band => band.name, 'Porcupine Tree').find();
