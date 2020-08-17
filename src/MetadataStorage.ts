@@ -3,7 +3,7 @@ import { BaseRepository } from './BaseRepository';
 import { IEntityConstructor, IEntityRepositoryConstructor } from './types';
 
 export interface IMetadataStore {
-  metadataStorage: MetadataStorage;
+  metadataStorage: MetadataStorage | null;
 }
 
 export function getStore(): IMetadataStore {
@@ -53,7 +53,9 @@ export class MetadataStorage {
     return this.subCollections.filter(s => s.parentEntity === parentEntity);
   };
 
-  public getSubCollection = (param: string | IEntityConstructor): CollectionMetadata => {
+  public getSubCollection = (
+    param: string | IEntityConstructor
+  ): CollectionMetadata | undefined => {
     if (typeof param === 'string') {
       return this.subCollections.find(c => c.name === param);
     }
@@ -84,7 +86,7 @@ export class MetadataStorage {
     this.repositories.set(repo.entity, repo);
   };
 
-  public firestoreRef: Firestore = null;
+  public firestoreRef: Firestore | null = null;
 }
 
 function initializeMetadataStorage(): void {
@@ -113,16 +115,14 @@ export const getMetadataStorage = (): MetadataStorage => {
     initializeMetadataStorage();
   }
 
-  return store.metadataStorage;
+  return store.metadataStorage as MetadataStorage;
 };
 
 export const initialize = (
   firestore: Firestore,
   config: MetadataStorageConfig = { validateModels: false }
 ): void => {
-  initializeMetadataStorage();
-
-  const { metadataStorage } = getStore();
+  const metadataStorage = getMetadataStorage();
 
   metadataStorage.firestoreRef = firestore;
   metadataStorage.config = config;

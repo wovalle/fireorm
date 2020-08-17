@@ -1,3 +1,4 @@
+import { Firestore } from '@google-cloud/firestore';
 import { BaseFirestoreRepository } from '../BaseFirestoreRepository';
 import { getFixture, Album } from '../../test/fixture';
 import { initialize } from '../MetadataStorage';
@@ -16,8 +17,8 @@ type TestTransactionRepository<T extends { id: string }> = Pick<
 class BandRepository extends BaseFirestoreRepository<Band> {}
 
 describe('BaseFirestoreTransactionRepository', () => {
-  let bandRepository: TestTransactionRepository<Band> = null;
-  let firestore;
+  let bandRepository: TestTransactionRepository<Band>;
+  let firestore: Firestore;
 
   beforeEach(() => {
     const fixture = Object.assign({}, getFixture());
@@ -398,8 +399,9 @@ describe('BaseFirestoreTransactionRepository', () => {
     it('should initialize nested subcollections', async () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('red-hot-chili-peppers');
-        const album = await pt.albums.findById('stadium-arcadium');
+        const albumsRef = pt.albums;
 
+        const album = await albumsRef.findById('stadium-arcadium');
         expect(album.images).toBeInstanceOf(BaseFirestoreRepository);
       });
     });
@@ -407,7 +409,9 @@ describe('BaseFirestoreTransactionRepository', () => {
     it('should be able to execute operations in the subcollection', async () => {
       await bandRepository.runTransaction(async tran => {
         const band = await tran.findById('red-hot-chili-peppers');
-        const bestAlbum = await band.albums.findById('stadium-arcadium');
+        const albumsRef = band.albums;
+
+        const bestAlbum = await albumsRef.findById('stadium-arcadium');
         expect(bestAlbum.id).toEqual('stadium-arcadium');
       });
     });
@@ -436,11 +440,13 @@ describe('BaseFirestoreTransactionRepository', () => {
 
       await bandRepository.runTransaction(async tran => {
         await tran.create(band);
-        await band.albums.create(firstAlbum);
-        await band.albums.create(secondAlbum);
-        await band.albums.create(thirdAlbum);
+        const albumsRef = band.albums;
 
-        const albums = await band.albums.find();
+        await albumsRef.create(firstAlbum);
+        await albumsRef.create(secondAlbum);
+        await albumsRef.create(thirdAlbum);
+
+        const albums = await albumsRef.find();
         expect(albums.length).toEqual(3);
       });
     });
@@ -459,7 +465,8 @@ describe('BaseFirestoreTransactionRepository', () => {
 
       await bandRepository.runTransaction(async tran => {
         await tran.create(band);
-        const album = await band.albums.create(firstAlbum);
+        const albumsRef = band.albums;
+        const album = await albumsRef.create(firstAlbum);
 
         expect(album.images).toBeInstanceOf(BaseFirestoreRepository);
       });
@@ -479,9 +486,10 @@ describe('BaseFirestoreTransactionRepository', () => {
 
       await bandRepository.runTransaction(async tran => {
         await tran.create(band);
+        const albumsRef = band.albums;
 
         try {
-          await band.albums.create(firstAlbum);
+          await albumsRef.create(firstAlbum);
         } catch (error) {
           expect(error[0].constraints.length).toEqual('Name is too long');
         }
@@ -491,12 +499,15 @@ describe('BaseFirestoreTransactionRepository', () => {
     it('should be able to update subcollections', async () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
-        const album = await pt.albums.findById('fear-blank-planet');
+        const albumsRef = pt.albums;
+
+        const album = await albumsRef.findById('fear-blank-planet');
         album.comment = 'Anesthethize is top 3 IMHO';
 
-        await pt.albums.update(album);
+        await albumsRef.update(album);
 
-        const updatedAlbum = await pt.albums.findById('fear-blank-planet');
+        const updatedAlbum = await albumsRef.findById('fear-blank-planet');
+
         expect(updatedAlbum.comment).toEqual('Anesthethize is top 3 IMHO');
       });
     });
@@ -504,12 +515,13 @@ describe('BaseFirestoreTransactionRepository', () => {
     it('should be able to validate subcollections on update', async () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
-        const album = await pt.albums.findById('fear-blank-planet');
+        const albumsRef = pt.albums;
 
+        const album = await albumsRef.findById('fear-blank-planet');
         album.name = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
 
         try {
-          await pt.albums.update(album);
+          await albumsRef.update(album);
         } catch (error) {
           expect(error[0].constraints.length).toEqual('Name is too long');
         }
@@ -531,9 +543,10 @@ describe('BaseFirestoreTransactionRepository', () => {
     it('should be able to delete subcollections', async () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
-        await pt.albums.delete('fear-blank-planet');
+        const albumsRef = pt.albums;
+        await albumsRef.delete('fear-blank-planet');
 
-        const updatedBandAlbums = await pt.albums.find();
+        const updatedBandAlbums = await albumsRef.find();
         expect(updatedBandAlbums.length).toEqual(3);
       });
     });
@@ -542,9 +555,13 @@ describe('BaseFirestoreTransactionRepository', () => {
       it('should correctly parse dates', async () => {
         await bandRepository.runTransaction(async tran => {
           const pt = await tran.findById('porcupine-tree');
-          const { releaseDate } = await pt.albums.findById('deadwing');
+          const albumsRef = pt.albums;
+
+          const album = await albumsRef.findById('fear-blank-planet');
+          const { releaseDate } = album;
+
           expect(releaseDate).toBeInstanceOf(Date);
-          expect(releaseDate.toISOString()).toEqual('2005-03-25T00:00:00.000Z');
+          expect(releaseDate.toISOString()).toEqual('2007-04-16T00:00:00.000Z');
         });
       });
     });
