@@ -1,5 +1,5 @@
 import { plainToClass } from 'class-transformer';
-import { DocumentSnapshot, QuerySnapshot } from '@google-cloud/firestore';
+import { DocumentSnapshot, QuerySnapshot, DocumentReference } from '@google-cloud/firestore';
 import { ValidationError } from './Errors/ValidationError';
 
 import {
@@ -397,4 +397,15 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
    * @memberof AbstractFirestoreRepository
    */
   abstract delete(id: string): Promise<void>;
+
+  /**
+   * Return the firestore Document Reference
+   * Must be implemented by base repositores
+   *
+   * @abstract
+   * @param {string} id
+   * @returns {DocumentReference}
+   * @memberof AbstractFirestoreRepository
+   */
+  abstract getReference(id: string): DocumentReference;
 }

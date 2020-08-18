@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import { CollectionReference, WhereFilterOp } from '@google-cloud/firestore';
+import { CollectionReference, DocumentReference, WhereFilterOp } from '@google-cloud/firestore';
 
 import { IRepository, IFireOrmQueryLine, IOrderByParams, IEntity, Constructor } from './types';
 
@@ -75,6 +75,10 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
   async delete(id: string): Promise<void> {
     // TODO: handle errors
     await this.firestoreColRef.doc(id).delete();
+  }
+
+  getReference(id: string): DocumentReference {
+    return this.firestoreColRef.doc(id);
   }
 
   async runTransaction<R>(executor: (tran: TransactionRepository<T>) => Promise<R>) {

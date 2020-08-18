@@ -71,6 +71,7 @@ export interface IBaseRepository<T extends IEntity> {
   create(item: PartialBy<T, 'id'>): Promise<T>;
   update(item: T): Promise<T>;
   delete(id: string): Promise<void>;
+  getReference(id: string): DocumentReference;
 }
 
 export type IRepository<T extends IEntity> = IBaseRepository<T> &

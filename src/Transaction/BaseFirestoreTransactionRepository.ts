@@ -1,4 +1,4 @@
-import { CollectionReference, Transaction, WhereFilterOp } from '@google-cloud/firestore';
+import { CollectionReference, Transaction, WhereFilterOp, DocumentReference } from '@google-cloud/firestore';
 
 import {
   IEntity,
@@ -83,6 +83,10 @@ export class TransactionRepository<T extends IEntity> extends AbstractFirestoreR
 
   async delete(id: string): Promise<void> {
     this.transaction.delete(this.firestoreColRef.doc(id));
+  }
+
+  getReference(id: string): DocumentReference {
+    return this.firestoreColRef.doc(id);
   }
 
   limit(): IQueryBuilder<T> {
