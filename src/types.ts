@@ -53,6 +53,7 @@ export interface IOrderable<T extends IEntity> {
 
 export interface ILimitable<T extends IEntity> {
   limit(limitVal: number): IQueryBuilder<T>;
+  offset(offsetVal: number): IQueryBuilder<T>;
 }
 
 export type IQueryBuilder<T extends IEntity> = IQueryable<T> & IOrderable<T> & ILimitable<T>;
@@ -61,6 +62,7 @@ export interface IQueryExecutor<T> {
   execute(
     queries: IFireOrmQueryLine[],
     limitVal?: number,
+    offsetVal?: number,
     orderByObj?: IOrderByParams,
     single?: boolean
   ): Promise<T[]>;
