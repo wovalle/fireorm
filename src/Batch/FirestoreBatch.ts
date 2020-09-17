@@ -18,6 +18,7 @@ export class FirestoreBatch {
    *
    * @template T
    * @param {Constructor<T>} entity
+   * @param {String} [collectionPath]
    * @returns
    * @memberof FirestoreBatch
    */
@@ -32,11 +33,12 @@ export class FirestoreBatch {
    *
    * @template T
    * @param {Constructor<T>} entity
+   * @param {String} [collectionPath]
    * @returns
    * @memberof FirestoreBatch
    */
-  getSingleRepository<T extends IEntity>(entity: Constructor<T>) {
-    return new FirestoreBatchSingleRepository(this.batch, entity);
+  getSingleRepository<T extends IEntity>(entity: Constructor<T>, collectionPath?: string) {
+    return new FirestoreBatchSingleRepository(this.batch, entity, collectionPath);
   }
 
   /**

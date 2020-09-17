@@ -1,11 +1,5 @@
 import { Band as BandEntity, Album as AlbumEntity, getInitialData } from '../fixture';
-import {
-  getRepository,
-  Collection,
-  SubCollection,
-  ISubCollection,
-  BaseFirestoreRepository,
-} from '../../src';
+import { getRepository, Collection, SubCollection, BaseFirestoreRepository } from '../../src';
 import { getUniqueColName } from '../setup';
 
 describe('Integration test: SubCollections', () => {
@@ -14,7 +8,7 @@ describe('Integration test: SubCollections', () => {
   @Collection(getUniqueColName('band-with-subcollections'))
   class FullBand extends BandEntity {
     @SubCollection(Album)
-    albums: ISubCollection<Album>;
+    albums: BaseFirestoreRepository<Album>;
   }
 
   let fullBandRepository: BaseFirestoreRepository<FullBand> = null;
@@ -57,7 +51,7 @@ describe('Integration test: SubCollections', () => {
     rush.formationYear = 1968;
     rush.genres = ['progressive-rock', 'hard-rock', 'heavy-metal'];
 
-    await fullBandRepository.create(rush);
+    const repo = await fullBandRepository.create(rush);
 
     // Inserting some albums (subcollections)
     const secondAlbum = new Album();
@@ -75,9 +69,13 @@ describe('Integration test: SubCollections', () => {
     eighthAlbum.name = 'Moving Pictures';
     eighthAlbum.releaseDate = new Date('1982-02-12');
 
+    const batch = repo.albums.createBatch();
+
     await rush.albums.create(secondAlbum);
-    await rush.albums.create(fourthAlbum);
-    await rush.albums.create(eighthAlbum);
+    batch.create(fourthAlbum);
+    batch.create(eighthAlbum);
+
+    await batch.commit();
 
     // Retrieving albums before 1980
     const albumsBefore1980 = await rush.albums

@@ -92,7 +92,10 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
 
     const batch = new FirestoreBatch(firestoreRef);
 
-    return batch.getSingleRepository(this.colMetadata.entity as Constructor<T>);
+    return batch.getSingleRepository(
+      this.colMetadata.entity as Constructor<T>,
+      this.collectionPath
+    );
   }
 
   async execute(
