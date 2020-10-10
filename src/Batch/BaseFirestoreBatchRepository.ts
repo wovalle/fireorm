@@ -1,5 +1,5 @@
 import { CollectionReference } from '@google-cloud/firestore';
-import { IEntity, WithOptionalId, Constructor, IBatchRepository } from '../types';
+import { IEntity, WithOptionalId, IBatchRepository, EntityConstructorOrPath } from '../types';
 import {
   getMetadataStorage,
   MetadataStorageConfig,
@@ -10,16 +10,17 @@ export class BaseFirestoreBatchRepository<T extends IEntity> implements IBatchRe
   protected colMetadata: FullCollectionMetadata;
   protected colRef: CollectionReference;
   protected config: MetadataStorageConfig;
+  protected path: string;
 
   constructor(
     protected batch: FirestoreBatchUnit,
-    protected entity: Constructor<T>,
-    collectionPath?: string
+    protected pathOrConstructor: EntityConstructorOrPath<T>
   ) {
     const { getCollection, firestoreRef, config } = getMetadataStorage();
 
-    this.colMetadata = getCollection(entity);
-    this.colRef = firestoreRef.collection(collectionPath || this.colMetadata.name);
+    this.colMetadata = getCollection(pathOrConstructor);
+    this.path = typeof pathOrConstructor === 'string' ? pathOrConstructor : this.colMetadata.name;
+    this.colRef = firestoreRef.collection(this.path);
     this.config = config;
   }
 

@@ -56,7 +56,6 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
       );
     }
 
-    // TODO: check
     this.path = typeof pathOrConstructor === 'string' ? pathOrConstructor : this.colMetadata.name;
     this.firestoreColRef = firestoreRef.collection(this.path);
   }

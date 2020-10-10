@@ -49,10 +49,18 @@ describe('BaseFirestoreRepository', () => {
       );
     });
 
+    // TODO: Should I be able to do this?!?!?
     it('should correctly initialize a subcollection repository with custom path', async () => {
       const albumRepositoryWithPath = new BandRepository('bands/porcupine-tree/albums');
       const albums = await albumRepositoryWithPath.find();
       expect(albums.length).toEqual(4);
+
+      const imagesRepositoryWithPath = new BandRepository(
+        'bands/porcupine-tree/albums/fear-blank-planet/images'
+      );
+
+      const images = await imagesRepositoryWithPath.find();
+      expect(images.length).toEqual(2);
     });
     it.todo('should throw error if initialized with an incomplete path');
     it.todo('should throw error if initialized with an invalid subcollection path');
@@ -96,7 +104,7 @@ describe('BaseFirestoreRepository', () => {
     it.todo('must throw if the limit is less than 0');
   });
 
-  describe('Ordering', () => {
+  describe('ordering', () => {
     describe('orderByAscending', () => {
       it('must order repository objects', async () => {
         const bands = await bandRepository.orderByAscending('formationYear').find();
@@ -515,7 +523,7 @@ describe('BaseFirestoreRepository', () => {
       expect(updated.name).toEqual('Árbol de Puercoespín');
     });
 
-    it('should return TransactionRepository', async () => {
+    it('runTransaction should return TransactionRepository', async () => {
       await bandRepository.runTransaction(async tran => {
         expect(tran.constructor.name).toEqual('TransactionRepository');
       });
@@ -553,23 +561,14 @@ describe('BaseFirestoreRepository', () => {
   });
 
   describe('must handle subcollections', () => {
-    it('should initialize subcollections', async () => {
-      const pt = await bandRepository.findById('porcupine-tree');
-      expect(pt.name).toEqual('Porcupine Tree');
-      expect(pt.albums).toBeInstanceOf(BaseFirestoreRepository);
-    });
-
     it('should initialize nested subcollections', async () => {
       const pt = await bandRepository.findById('red-hot-chili-peppers');
+      expect(pt.name).toEqual('Red Hot Chili Peppers');
+      expect(pt.albums).toBeInstanceOf(BaseFirestoreRepository);
+
       const album = await pt.albums.findById('stadium-arcadium');
-
+      expect(album.name).toEqual('Stadium Arcadium');
       expect(album.images).toBeInstanceOf(BaseFirestoreRepository);
-    });
-
-    it('should be able to execute operations in the subcollection', async () => {
-      const band = await bandRepository.findById('red-hot-chili-peppers');
-      const bestAlbum = await band.albums.findById('stadium-arcadium');
-      expect(bestAlbum.id).toEqual('stadium-arcadium');
     });
 
     it('should be able to create subcollections', async () => {
@@ -701,7 +700,7 @@ describe('BaseFirestoreRepository', () => {
 
       const firstAlbum = new Album();
       firstAlbum.id = '30-seconds-to-mars';
-      firstAlbum.name = '30 Seconds to Mars';
+      firstAlbum.name = '30 Seconds to Mars (Album)';
       firstAlbum.releaseDate = new Date('2002-07-22');
 
       const album = await band.albums.create(firstAlbum);
@@ -719,6 +718,18 @@ describe('BaseFirestoreRepository', () => {
 
       const images = await album.images.find();
       expect(images.length).toEqual(2);
+
+      const foundBand = await bandRepository.findById('30-seconds-to-mars');
+      expect(foundBand.name).toEqual('30 Seconds To Mars');
+
+      const foundAlbums = await foundBand.albums.find();
+
+      expect(foundAlbums.length).toEqual(1);
+      expect(foundAlbums[0].name).toEqual('30 Seconds to Mars (Album)');
+
+      const foundImages = await foundAlbums[0].images.find();
+      expect(foundImages.length).toEqual(2);
+      expect(foundImages[0].id).toEqual('image1');
     });
   });
 

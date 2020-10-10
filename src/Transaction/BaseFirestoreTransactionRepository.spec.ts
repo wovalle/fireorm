@@ -1,5 +1,5 @@
 import { BaseFirestoreRepository } from '../BaseFirestoreRepository';
-import { getFixture, Album } from '../../test/fixture';
+import { getFixture, Album, AlbumImage } from '../../test/fixture';
 import { initialize } from '../MetadataStorage';
 import { Band } from '../../test/BandCollection';
 import { TransactionRepository } from './BaseFirestoreTransactionRepository';
@@ -359,27 +359,15 @@ describe('BaseFirestoreTransactionRepository', () => {
   });
 
   describe('must handle subcollections', () => {
-    it('should initialize subcollections', async () => {
-      await bandRepository.runTransaction(async tran => {
-        const pt = await tran.findById('porcupine-tree');
-        expect(pt.name).toEqual('Porcupine Tree');
-        expect(pt.albums).toBeInstanceOf(TransactionRepository);
-      });
-    });
-
     it('should initialize nested subcollections', async () => {
       await bandRepository.runTransaction(async tran => {
-        const pt = await tran.findById('red-hot-chili-peppers');
-        const album = await pt.albums.findById('stadium-arcadium');
-        expect(album.images).toBeInstanceOf(TransactionRepository);
-      });
-    });
-
-    it('should be able to execute operations in the subcollection', async () => {
-      await bandRepository.runTransaction(async tran => {
         const band = await tran.findById('red-hot-chili-peppers');
-        const bestAlbum = await band.albums.findById('stadium-arcadium');
-        expect(bestAlbum.id).toEqual('stadium-arcadium');
+        expect(band.name).toEqual('Red Hot Chili Peppers');
+        expect(band.albums).toBeInstanceOf(TransactionRepository);
+
+        const album = await band.albums.findById('stadium-arcadium');
+        expect(album.name).toEqual('Stadium Arcadium');
+        expect(album.images).toBeInstanceOf(TransactionRepository);
       });
     });
 
@@ -487,6 +475,52 @@ describe('BaseFirestoreTransactionRepository', () => {
 
         const updatedBandAlbums = await pt.albums.find();
         expect(updatedBandAlbums.length).toEqual(3);
+      });
+    });
+
+    it('should be able to update subcollections of subcollections', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const band = new Band();
+        band.id = '30-seconds-to-mars';
+        band.name = '30 Seconds To Mars';
+        band.formationYear = 1998;
+        band.genres = ['alternative-rock'];
+
+        await tran.create(band);
+
+        const firstAlbum = new Album();
+        firstAlbum.id = '30-seconds-to-mars';
+        firstAlbum.name = '30 Seconds to Mars (Album)';
+        firstAlbum.releaseDate = new Date('2002-07-22');
+
+        const album = await band.albums.create(firstAlbum);
+
+        const image1 = new AlbumImage();
+        image1.id = 'image1';
+        image1.url = 'http://image1.com';
+
+        const image2 = new AlbumImage();
+        image2.id = 'image2';
+        image2.url = 'http://image2.com';
+
+        await album.images.create(image1);
+        await album.images.create(image2);
+
+        const images = await album.images.find();
+        expect(images.length).toEqual(2);
+      });
+
+      await bandRepository.runTransaction(async tran => {
+        const band = await tran.findById('30-seconds-to-mars');
+        expect(band.name).toEqual('30 Seconds To Mars');
+        const albums = await band.albums.find();
+
+        expect(albums.length).toEqual(1);
+        expect(albums[0].name).toEqual('30 Seconds to Mars (Album)');
+
+        const images = await albums[0].images.find();
+        expect(images.length).toEqual(2);
+        expect(images[0].id).toEqual('image1');
       });
     });
   });

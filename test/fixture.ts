@@ -83,6 +83,10 @@ export const getInitialData = () => {
               id: 'album-artwork',
               url: 'http://lorempixel.com/100/100',
             },
+            {
+              id: 'album-cover',
+              url: 'http://lorempixel.com/100/100',
+            },
           ],
         },
       ],
