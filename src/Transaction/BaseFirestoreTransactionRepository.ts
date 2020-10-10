@@ -51,7 +51,7 @@ export class TransactionRepository<T extends IEntity> extends AbstractFirestoreR
 
     this.transaction.set(doc, this.toSerializableObject(item as T));
 
-    this.initializeSubCollections(item as T);
+    this.initializeSubCollections(item as T, this.transaction);
 
     return item as T;
   }

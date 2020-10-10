@@ -401,7 +401,7 @@ describe('BaseFirestoreTransactionRepository', () => {
 
         const albums = await band.albums.find();
         expect(albums.length).toEqual(3);
-        expect(albums[0].images).toBeInstanceOf(BaseFirestoreRepository);
+        expect(albums[0].images).toBeInstanceOf(TransactionRepository);
       });
     });
 
