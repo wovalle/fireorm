@@ -3,15 +3,13 @@ import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { IEntity, EntityConstructorOrPath } from './types';
 import { FirestoreTransaction } from './Transaction/FirestoreTransaction';
 import { FirestoreBatch } from './Batch/FirestoreBatch';
-import { Transaction } from '@google-cloud/firestore';
 
 type RepositoryType = 'default' | 'base' | 'custom' | 'transaction';
 
 // TODO: return transaction repo. Is it needed?!?
 function _getRepository<T extends IEntity = IEntity>(
   entityConstructorOrPath: EntityConstructorOrPath<T>,
-  repositoryType: RepositoryType,
-  tran?: Transaction
+  repositoryType: RepositoryType
 ): BaseFirestoreRepository<T> {
   const metadataStorage = getMetadataStorage();
 
@@ -62,13 +60,6 @@ export function getRepository<T extends IEntity>(
   entityConstructorOrPath: EntityConstructorOrPath<T>
 ) {
   return _getRepository(entityConstructorOrPath, 'default');
-}
-
-export function getTransactionRepository<T extends IEntity>(
-  entityConstructorOrPath: EntityConstructorOrPath<T>,
-  transaction: Transaction
-) {
-  return _getRepository(entityConstructorOrPath, 'transaction', transaction);
 }
 
 /**
