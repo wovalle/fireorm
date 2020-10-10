@@ -19,11 +19,8 @@ import {
   IEntityConstructor,
 } from './types';
 
-import {
-  getMetadataStorage,
-  MetadataStorageConfig,
-  FullCollectionMetadata,
-} from './MetadataStorage';
+import { getMetadataStorage } from './MetadataUtils';
+import { MetadataStorageConfig, FullCollectionMetadata } from './MetadataStorage';
 
 import { BaseRepository } from './BaseRepository';
 import QueryBuilder from './QueryBuilder';

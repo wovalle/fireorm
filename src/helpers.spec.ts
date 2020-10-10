@@ -1,7 +1,7 @@
 import { Collection, CustomRepository } from './Decorators';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { getRepository, getBaseRepository, runTransaction, createBatch } from './helpers';
-import { initialize } from './MetadataStorage';
+import { initialize } from './MetadataUtils';
 import { FirestoreTransaction } from './Transaction/FirestoreTransaction';
 import { FirestoreBatch } from './Batch/FirestoreBatch';
 

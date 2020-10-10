@@ -1,17 +1,16 @@
 import { CustomRepository } from './CustomRepository';
 import { BaseFirestoreRepository } from '../BaseFirestoreRepository';
 
-const metadataStorageMock = {
-  setRepository: jest.fn(),
-};
-
-jest.mock('../MetadataStorage', () => ({
-  getMetadataStorage: () => metadataStorageMock,
+const setRepository = jest.fn();
+jest.mock('../MetadataUtils', () => ({
+  getMetadataStorage: jest.fn().mockImplementation(() => ({
+    setRepository,
+  })),
 }));
 
 describe('CustomRepositoryDecorator', () => {
   beforeEach(() => {
-    metadataStorageMock.setRepository.mockReset();
+    // MockedMetatadataStorage.
   });
   it('should call metadataStorage.setRepository with right params', () => {
     class Entity {
@@ -21,6 +20,9 @@ describe('CustomRepositoryDecorator', () => {
     @CustomRepository(Entity)
     class EntityRepo extends BaseFirestoreRepository<Entity> {}
 
-    expect(metadataStorageMock);
+    expect(setRepository).toHaveBeenCalledWith({
+      entity: Entity,
+      target: EntityRepo,
+    });
   });
 });

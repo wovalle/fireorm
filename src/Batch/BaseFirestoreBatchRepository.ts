@@ -1,10 +1,7 @@
 import { CollectionReference } from '@google-cloud/firestore';
 import { IEntity, WithOptionalId, IBatchRepository, EntityConstructorOrPath } from '../types';
-import {
-  getMetadataStorage,
-  MetadataStorageConfig,
-  FullCollectionMetadata,
-} from '../MetadataStorage';
+import { getMetadataStorage } from '../MetadataUtils';
+import { MetadataStorageConfig, FullCollectionMetadata } from '../MetadataStorage';
 import { FirestoreBatchUnit } from './FirestoreBatchUnit';
 export class BaseFirestoreBatchRepository<T extends IEntity> implements IBatchRepository<T> {
   protected colMetadata: FullCollectionMetadata;

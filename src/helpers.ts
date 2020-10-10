@@ -1,4 +1,4 @@
-import { getMetadataStorage } from './MetadataStorage';
+import { getMetadataStorage } from './MetadataUtils';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { IEntity, EntityConstructorOrPath } from './types';
 import { FirestoreTransaction } from './Transaction/FirestoreTransaction';

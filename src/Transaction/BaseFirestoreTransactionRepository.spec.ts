@@ -1,6 +1,6 @@
 import { BaseFirestoreRepository } from '../BaseFirestoreRepository';
 import { getFixture, Album, AlbumImage } from '../../test/fixture';
-import { initialize } from '../MetadataStorage';
+import { initialize } from '../MetadataUtils';
 import { Band } from '../../test/BandCollection';
 import { TransactionRepository } from './BaseFirestoreTransactionRepository';
 

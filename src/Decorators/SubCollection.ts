@@ -1,4 +1,4 @@
-import { getMetadataStorage } from '../MetadataStorage';
+import { getMetadataStorage } from '../MetadataUtils';
 import { plural } from 'pluralize';
 import { IEntityConstructor, IEntity } from '../types';
 

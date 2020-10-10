@@ -4,7 +4,7 @@ import { WhereFilterOp } from '@google-cloud/firestore';
 
 import { IRepository, IFireOrmQueryLine, IOrderByParams, IEntity, Constructor } from './types';
 
-import { getMetadataStorage } from './MetadataStorage';
+import { getMetadataStorage } from './MetadataUtils';
 import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
 import { TransactionRepository } from './Transaction/BaseFirestoreTransactionRepository';
 import { FirestoreBatch } from './Batch/FirestoreBatch';

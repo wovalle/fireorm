@@ -1,4 +1,4 @@
-import { initialize } from './MetadataStorage';
+import { initialize } from './MetadataUtils';
 import {
   getFixture,
   Album,

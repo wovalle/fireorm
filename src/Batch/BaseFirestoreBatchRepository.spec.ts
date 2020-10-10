@@ -1,6 +1,6 @@
 import { BaseFirestoreBatchRepository } from './BaseFirestoreBatchRepository';
 import { getFixture } from '../../test/fixture';
-import { initialize } from '../MetadataStorage';
+import { initialize } from '../MetadataUtils';
 import { Band, Album } from '../../test/BandCollection';
 import { Firestore, WriteBatch } from '@google-cloud/firestore';
 import { FirestoreBatchUnit } from './FirestoreBatchUnit';

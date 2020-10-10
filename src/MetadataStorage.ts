@@ -1,14 +1,6 @@
 import { Firestore } from '@google-cloud/firestore';
 import { BaseRepository } from './BaseRepository';
-import { IEntityConstructor, IEntityRepositoryConstructor, Constructor, IEntity } from './types';
-
-export interface IMetadataStore {
-  metadataStorage: MetadataStorage;
-}
-
-export function getStore(): IMetadataStore {
-  return global as never;
-}
+import { IEntityConstructor, Constructor, IEntity, IEntityRepositoryConstructor } from './types';
 
 export interface CollectionMetadata {
   name: string;
@@ -49,7 +41,6 @@ export class MetadataStorage {
     // If is a path like users/user-id/messages/message-id/senders,
     // take all the even segments [users/messages/senders] and
     // look for an entity with those segments
-
     if (typeof pathOrConstructor === 'string') {
       const segments = pathOrConstructor
         .split('/')
@@ -125,49 +116,3 @@ export class MetadataStorage {
 
   public firestoreRef: Firestore = null;
 }
-
-function initializeMetadataStorage() {
-  const store = getStore();
-
-  if (!store.metadataStorage) {
-    store.metadataStorage = new MetadataStorage();
-  }
-}
-
-/**
- * Used for testing to reset metadataStore to clean state
- */
-export function clearMetadataStorage() {
-  const store = getStore();
-  store.metadataStorage = null;
-}
-
-/**
- * Return exisiting metadataStorage, otherwise create if not present
- */
-export const getMetadataStorage = (): MetadataStorage => {
-  const store = getStore();
-
-  if (!store.metadataStorage) {
-    initializeMetadataStorage();
-  }
-
-  return store.metadataStorage;
-};
-
-export const initialize = (
-  firestore: Firestore,
-  config: MetadataStorageConfig = { validateModels: false }
-): void => {
-  initializeMetadataStorage();
-
-  const { metadataStorage } = getStore();
-
-  metadataStorage.firestoreRef = firestore;
-  metadataStorage.config = config;
-};
-
-/**
- * @deprecated Use initialize. This will be removed in a future version.
- */
-export const Initialize = initialize;
