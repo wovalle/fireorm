@@ -30,6 +30,36 @@ describe('BaseFirestoreRepository', () => {
     bandRepository = new BandRepository('bands');
   });
 
+  describe('constructor', () => {
+    it('should correctly initialize a repository with custom path', async () => {
+      const bandRepositoryWithPath = new BandRepository('bands');
+      const band = await bandRepositoryWithPath.findById('porcupine-tree');
+      expect(band.name).toEqual('Porcupine Tree');
+    });
+
+    it('should correctly initialize a repository with an entity', async () => {
+      const bandRepositoryWithPath = new BandRepository(Band);
+      const band = await bandRepositoryWithPath.findById('porcupine-tree');
+      expect(band.name).toEqual('Porcupine Tree');
+    });
+
+    it('should throw error if initialized with an invalid path', async () => {
+      expect(() => new BandRepository('invalidpath')).toThrow(
+        'There is no metadata stored for "invalidpath"'
+      );
+    });
+
+    it('should correctly initialize a subcollection repository with custom path', async () => {
+      const albumRepositoryWithPath = new BandRepository('bands/porcupine-tree/albums');
+      const albums = await albumRepositoryWithPath.find();
+      expect(albums.length).toEqual(4);
+    });
+    it.todo('should throw error if initialized with an incomplete path');
+    it.todo('should throw error if initialized with an invalid subcollection path');
+    it.todo('should throw if passed an invalid entity');
+    it.todo('should throw if passed an invalid entity string');
+  });
+
   describe('limit', () => {
     it('must limit the documents in a collection', async () => {
       const twoBands = await bandRepository.limit(2).find();

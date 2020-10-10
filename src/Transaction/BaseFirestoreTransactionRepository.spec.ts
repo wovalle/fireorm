@@ -2,6 +2,7 @@ import { BaseFirestoreRepository } from '../BaseFirestoreRepository';
 import { getFixture, Album } from '../../test/fixture';
 import { initialize } from '../MetadataStorage';
 import { Band } from '../../test/BandCollection';
+import { TransactionRepository } from './BaseFirestoreTransactionRepository';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const MockFirebase = require('mock-cloud-firestore');
@@ -362,7 +363,7 @@ describe('BaseFirestoreTransactionRepository', () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
         expect(pt.name).toEqual('Porcupine Tree');
-        expect(pt.albums).toBeInstanceOf(BaseFirestoreRepository);
+        expect(pt.albums).toBeInstanceOf(TransactionRepository);
       });
     });
 
@@ -370,7 +371,7 @@ describe('BaseFirestoreTransactionRepository', () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('red-hot-chili-peppers');
         const album = await pt.albums.findById('stadium-arcadium');
-        expect(album.images).toBeInstanceOf(BaseFirestoreRepository);
+        expect(album.images).toBeInstanceOf(TransactionRepository);
       });
     });
 
