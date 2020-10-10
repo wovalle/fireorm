@@ -1,6 +1,5 @@
-import { IEntity } from '../types';
+import { IEntity, IFirestoreBatchSingleRepository } from '../types';
 import { BaseFirestoreBatchRepository } from './BaseFirestoreBatchRepository';
-import { ISingleBatchRepository } from '..';
 
 /**
  *
@@ -14,8 +13,8 @@ import { ISingleBatchRepository } from '..';
  */
 export class FirestoreBatchSingleRepository<T extends IEntity>
   extends BaseFirestoreBatchRepository<T>
-  implements ISingleBatchRepository<T> {
-  commit() {
-    return this.batch.commit();
+  implements IFirestoreBatchSingleRepository<T> {
+  async commit() {
+    await this.batch.commit();
   }
 }

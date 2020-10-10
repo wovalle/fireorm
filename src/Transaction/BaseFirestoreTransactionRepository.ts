@@ -6,7 +6,7 @@ import {
   WithOptionalId,
   IQueryBuilder,
   IRepository,
-  Constructor,
+  EntityConstructorOrPath,
 } from '../types';
 
 import { AbstractFirestoreRepository } from '../AbstractFirestoreRepository';
@@ -15,7 +15,7 @@ export class TransactionRepository<T extends IEntity> extends AbstractFirestoreR
   implements IRepository<T> {
   private transaction: Transaction;
 
-  constructor(transaction: Transaction, entity: Constructor<T>) {
+  constructor(transaction: Transaction, entity: EntityConstructorOrPath<T>) {
     super(entity);
     this.transaction = transaction;
   }
@@ -26,12 +26,12 @@ export class TransactionRepository<T extends IEntity> extends AbstractFirestoreR
       return acc.where(cur.prop, op, cur.val);
     }, this.firestoreColRef);
 
-    return this.transaction.get(query).then(this.extractTFromColSnap);
+    return this.transaction.get(query).then(q => this.extractTFromColSnap(q, this.transaction));
   }
 
   findById(id: string): Promise<T> {
     const query = this.firestoreColRef.doc(id);
-    return this.transaction.get(query).then(this.extractTFromDocSnap);
+    return this.transaction.get(query).then(c => this.extractTFromDocSnap(c, this.transaction));
   }
 
   async create(item: WithOptionalId<T>): Promise<T> {

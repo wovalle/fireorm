@@ -46,6 +46,12 @@ export class MetadataStorage {
   ): FullCollectionMetadata => {
     let collection: CollectionMetadataWithSegments = undefined;
 
+    // If is a path like users/user-id/messages/message-id/senders,
+    // take all the even segments [users/messages/senders] and
+    // look for an entity with those segments
+
+    // TODO: do I need to store who's your parent? Where?
+
     if (typeof pathOrConstructor === 'string') {
       const segments = pathOrConstructor
         .split('/')
@@ -72,6 +78,8 @@ export class MetadataStorage {
 
   public setCollection = (col: CollectionMetadata) => {
     const existing = this.getCollection(col.entityConstructor);
+
+    // TODO: revisit this logic, can I re-register collections?
     if (!existing) {
       const colToAdd = {
         ...col,

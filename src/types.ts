@@ -77,19 +77,31 @@ export interface IBaseRepository<T extends IEntity> {
   create(item: PartialBy<T, 'id'>): Promise<T>;
   update(item: T): Promise<T>;
   delete(id: string): Promise<void>;
-  createBatch(): ISingleBatchRepository<T>;
 }
 
 export type IRepository<T extends IEntity> = IBaseRepository<T> &
   IQueryBuilder<T> &
   IQueryExecutor<T>;
 
-export type ISubCollection<T extends IEntity> = IRepository<T>;
+// TODO: shouldn't this be in IRepository?
+export type ISubCollection<T extends IEntity> = IRepository<T> & {
+  createBatch: () => IFirestoreBatchSingleRepository<T>;
+};
 
 export interface IEntity {
   id: string;
 }
 
 export type Constructor<T> = { new (): T };
+export type EntityConstructorOrPathConstructor<T> = { new (): T };
 export type IEntityConstructor = Constructor<IEntity>;
 export type IEntityRepositoryConstructor = Constructor<IRepository<IEntity>>;
+export type EntityConstructorOrPath<T> = Constructor<T> | string;
+
+export interface IFirestoreBatchSingleRepository<T extends IEntity> extends IBatchRepository<T> {
+  commit(): Promise<void>;
+}
+
+export interface IFirestoreTransaction<T extends IEntity = IEntity> {
+  getRepository(entityOrConstructor: EntityConstructorOrPath<T>): IRepository<T>;
+}

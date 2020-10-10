@@ -1,5 +1,10 @@
 import { plainToClass } from 'class-transformer';
-import { DocumentSnapshot, QuerySnapshot, CollectionReference } from '@google-cloud/firestore';
+import {
+  DocumentSnapshot,
+  QuerySnapshot,
+  CollectionReference,
+  Transaction,
+} from '@google-cloud/firestore';
 import { ValidationError } from './Errors/ValidationError';
 
 import {
@@ -31,7 +36,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   protected readonly config: MetadataStorageConfig;
   protected readonly firestoreColRef: CollectionReference;
 
-  constructor(pathOrConstructor: string | IEntityConstructor, collectionPath?: string) {
+  constructor(pathOrConstructor: string | IEntityConstructor) {
     super();
 
     const { getCollection, config, firestoreRef } = getMetadataStorage();
@@ -51,7 +56,8 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
       );
     }
 
-    this.path = collectionPath || this.colMetadata.name;
+    // TODO: check
+    this.path = typeof pathOrConstructor === 'string' ? pathOrConstructor : this.colMetadata.name;
     this.firestoreColRef = firestoreRef.collection(this.path);
   }
 
@@ -76,22 +82,32 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     return obj;
   };
 
-  protected initializeSubCollections = (entity: T) => {
+  protected initializeSubCollections = (entity: T, tran?: Transaction) => {
     // Requiring here to prevent circular dependency
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { getRepository } = require('./helpers');
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { FirestoreTransaction } = require('./Transaction/FirestoreTransaction');
 
+    //todo: got rid of subCol.entityConstructor
+    //todo: how the children repository will maintain path info?
     this.colMetadata.subCollections.forEach(subCol => {
-      Object.assign(entity, {
-        [subCol.propertyKey]: getRepository(
-          subCol.entityConstructor,
-          `${this.path}/${entity.id}/${subCol.name}`
-        ),
-      });
+      const pathWithSubCol = `${this.path}/${entity.id}/${subCol.name}`;
+
+      if (tran) {
+        const firestoreTransaction = new FirestoreTransaction(tran);
+        Object.assign(entity, {
+          [subCol.propertyKey]: firestoreTransaction.getRepository(pathWithSubCol),
+        });
+      } else {
+        Object.assign(entity, {
+          [subCol.propertyKey]: getRepository(pathWithSubCol),
+        });
+      }
     });
   };
 
-  protected extractTFromDocSnap = (doc: DocumentSnapshot): T => {
+  protected extractTFromDocSnap = (doc: DocumentSnapshot, tran?: Transaction): T => {
     if (!doc.exists) {
       return null;
     }
@@ -101,13 +117,13 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
       ...this.transformFirestoreTypes(doc.data() as T),
     }) as T;
 
-    this.initializeSubCollections(entity);
+    this.initializeSubCollections(entity, tran);
 
     return entity;
   };
 
-  protected extractTFromColSnap = (q: QuerySnapshot): T[] => {
-    return q.docs.map(this.extractTFromDocSnap);
+  protected extractTFromColSnap = (q: QuerySnapshot, tran?: Transaction): T[] => {
+    return q.docs.map(d => this.extractTFromDocSnap(d, tran));
   };
 
   /**

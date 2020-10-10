@@ -1,15 +1,17 @@
 import { getMetadataStorage } from './MetadataStorage';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
-import { IEntity, Constructor } from './types';
+import { IEntity, EntityConstructorOrPath } from './types';
 import { FirestoreTransaction } from './Transaction/FirestoreTransaction';
 import { FirestoreBatch } from './Batch/FirestoreBatch';
+import { Transaction } from '@google-cloud/firestore';
 
-type RepositoryType = 'default' | 'base' | 'custom';
+type RepositoryType = 'default' | 'base' | 'custom' | 'transaction';
 
-function _getRepository<T extends IEntity>(
-  entity: Constructor<T>,
+// TODO: return transaction repo. Is it needed?!?
+function _getRepository<T extends IEntity = IEntity>(
+  entityConstructorOrPath: EntityConstructorOrPath<T>,
   repositoryType: RepositoryType,
-  documentPath?: string
+  tran?: Transaction
 ): BaseFirestoreRepository<T> {
   const metadataStorage = getMetadataStorage();
 
@@ -17,16 +19,26 @@ function _getRepository<T extends IEntity>(
     throw new Error('Firestore must be initialized first');
   }
 
-  const repository = metadataStorage.getRepository(entity);
+  const collection = metadataStorage.getCollection(entityConstructorOrPath);
 
-  if (repositoryType === 'custom' && !repository) {
-    throw new Error(`'${entity.name}' does not have a custom repository.`);
+  const isPath = typeof entityConstructorOrPath === 'string';
+  const collectionName =
+    typeof entityConstructorOrPath === 'string'
+      ? entityConstructorOrPath
+      : entityConstructorOrPath.name;
+
+  // TODO: create tests
+  if (!collection) {
+    const error = isPath
+      ? `'${collectionName}' is not a valid path for a collection`
+      : `'${collectionName}' is not a valid collection`;
+    throw new Error(error);
   }
 
-  const collection = metadataStorage.getCollection(entity);
+  const repository = metadataStorage.getRepository(collection.entityConstructor);
 
-  if (!collection) {
-    throw new Error(`'${entity.name}' is not a valid collection`);
+  if (repositoryType === 'custom' && !repository) {
+    throw new Error(`'${collectionName}' does not have a custom repository.`);
   }
 
   // If the collection has a parent, check that we have registered the parent
@@ -34,20 +46,29 @@ function _getRepository<T extends IEntity>(
     const parentCollection = metadataStorage.getCollection(collection.parentEntityConstructor);
 
     if (!parentCollection) {
-      throw new Error(`'${entity.name}' does not have a valid parent collection.`);
+      throw new Error(`'${collectionName}' does not have a valid parent collection.`);
     }
   }
 
   if (repositoryType === 'custom' || (repositoryType === 'default' && repository)) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return new (repository.target as any)(collection.entityConstructor, documentPath);
+    return new (repository.target as any)(entityConstructorOrPath);
   } else {
-    return new BaseFirestoreRepository<T>(collection.entityConstructor, documentPath);
+    return new BaseFirestoreRepository<T>(entityConstructorOrPath);
   }
 }
 
-export function getRepository<T extends IEntity>(entity: Constructor<T>, documentPath?: string) {
-  return _getRepository(entity, 'default', documentPath);
+export function getRepository<T extends IEntity>(
+  entityConstructorOrPath: EntityConstructorOrPath<T>
+) {
+  return _getRepository(entityConstructorOrPath, 'default');
+}
+
+export function getTransactionRepository<T extends IEntity>(
+  entityConstructorOrPath: EntityConstructorOrPath<T>,
+  transaction: Transaction
+) {
+  return _getRepository(entityConstructorOrPath, 'transaction', transaction);
 }
 
 /**
@@ -55,11 +76,8 @@ export function getRepository<T extends IEntity>(entity: Constructor<T>, documen
  */
 export const GetRepository = getRepository;
 
-export function getCustomRepository<T extends IEntity>(
-  entity: Constructor<T>,
-  documentPath?: string
-) {
-  return _getRepository(entity, 'custom', documentPath);
+export function getCustomRepository<T extends IEntity>(entityOrPath: EntityConstructorOrPath<T>) {
+  return _getRepository(entityOrPath, 'custom');
 }
 
 /**
@@ -67,11 +85,8 @@ export function getCustomRepository<T extends IEntity>(
  */
 export const GetCustomRepository = getCustomRepository;
 
-export function getBaseRepository<T extends IEntity>(
-  entity: Constructor<T>,
-  collectionPath?: string
-) {
-  return _getRepository(entity, 'base', collectionPath);
+export function getBaseRepository<T extends IEntity>(entityOrPath: EntityConstructorOrPath<T>) {
+  return _getRepository(entityOrPath, 'base');
 }
 
 /**
