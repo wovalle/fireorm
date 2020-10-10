@@ -50,8 +50,6 @@ export class MetadataStorage {
     // take all the even segments [users/messages/senders] and
     // look for an entity with those segments
 
-    // TODO: do I need to store who's your parent? Where?
-
     if (typeof pathOrConstructor === 'string') {
       const segments = pathOrConstructor
         .split('/')
@@ -79,26 +77,16 @@ export class MetadataStorage {
   public setCollection = (col: CollectionMetadata) => {
     const existing = this.getCollection(col.entityConstructor);
 
-    // TODO: revisit this logic, can I re-register collections?
-    if (!existing) {
-      const colToAdd = {
-        ...col,
-        segments: [col.name],
-      };
-
-      this.collections.push(colToAdd);
-    } else {
-      const foundCol = this.collections.find(
-        e => e.entityConstructor === existing.entityConstructor
-      );
-
-      foundCol.entityConstructor = foundCol.entityConstructor || col.entityConstructor;
-      foundCol.name = foundCol.name || col.name;
-      foundCol.parentEntityConstructor =
-        foundCol.parentEntityConstructor || col.parentEntityConstructor;
-      foundCol.segments = foundCol.segments || [col.name];
-      foundCol.propertyKey = foundCol.propertyKey || col.propertyKey;
+    if (existing) {
+      throw new Error(`Collection with name ${existing.name} has already been registered`);
     }
+
+    const colToAdd = {
+      ...col,
+      segments: [col.name],
+    };
+
+    this.collections.push(colToAdd);
 
     const getWhereImParent = (p: Constructor<IEntity>) =>
       this.collections.filter(c => c.parentEntityConstructor === p);
@@ -116,7 +104,7 @@ export class MetadataStorage {
   };
 
   public getRepository = (param: IEntityConstructor) => {
-    return this.repositories.get(param);
+    return this.repositories.get(param) || null;
   };
 
   public setRepository = (repo: RepositoryMetadata) => {

@@ -88,11 +88,10 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { FirestoreTransaction } = require('./Transaction/FirestoreTransaction');
 
-    //todo: got rid of subCol.entityConstructor
-    //todo: how the children repository will maintain path info?
     this.colMetadata.subCollections.forEach(subCol => {
       const pathWithSubCol = `${this.path}/${entity.id}/${subCol.name}`;
 
+      // If we are inside a transaction, our subcollections should also be TransactionRepositories
       if (tran) {
         const firestoreTransaction = new FirestoreTransaction(tran);
         Object.assign(entity, {
