@@ -2,12 +2,16 @@ import { Collection } from './Collection';
 
 const setCollection = jest.fn();
 jest.mock('../MetadataUtils', () => ({
-  getMetadataStorage: jest.fn().mockImplementation(() => ({
+  getMetadataStorage: () => ({
     setCollection,
-  })),
+  }),
 }));
 
 describe('CollectionDecorator', () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
   it('should register collections', () => {
     @Collection('foo')
     class Entity {

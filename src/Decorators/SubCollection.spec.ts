@@ -10,6 +10,10 @@ jest.mock('../MetadataUtils', () => ({
 }));
 
 describe('SubCollectionDecorator', () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
   it('should register collections', () => {
     class SubEntity {
       public id: string;

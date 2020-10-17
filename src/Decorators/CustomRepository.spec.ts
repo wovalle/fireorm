@@ -3,15 +3,16 @@ import { BaseFirestoreRepository } from '../BaseFirestoreRepository';
 
 const setRepository = jest.fn();
 jest.mock('../MetadataUtils', () => ({
-  getMetadataStorage: jest.fn().mockImplementation(() => ({
+  getMetadataStorage: () => ({
     setRepository,
-  })),
+  }),
 }));
 
 describe('CustomRepositoryDecorator', () => {
   beforeEach(() => {
-    // MockedMetatadataStorage.
+    jest.resetAllMocks();
   });
+
   it('should call metadataStorage.setRepository with right params', () => {
     class Entity {
       id: string;
