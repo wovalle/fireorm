@@ -41,11 +41,12 @@ describe('MetadataStorage', () => {
 
   describe('getCollection', () => {
     beforeEach(() => {
+      metadataStorage.setCollection(subSubCol);
       metadataStorage.setCollection(subCol);
       metadataStorage.setCollection(col);
     });
 
-    it('should get collection by string', () => {
+    it('should get Collection by string', () => {
       const entityMetadata = metadataStorage.getCollection('entity');
 
       expect(entityMetadata.entityConstructor).toEqual(col.entityConstructor);
@@ -54,7 +55,7 @@ describe('MetadataStorage', () => {
       expect(entityMetadata.subCollections.length).toEqual(1);
     });
 
-    it('should get collection by constructor', () => {
+    it('should get Collection by constructor', () => {
       const entityMetadata = metadataStorage.getCollection(Entity);
 
       expect(entityMetadata.entityConstructor).toEqual(col.entityConstructor);
@@ -63,8 +64,35 @@ describe('MetadataStorage', () => {
       expect(entityMetadata.subCollections.length).toEqual(1);
     });
 
+    it('should get SubCollection by string', () => {
+      const entityMetadata = metadataStorage.getCollection(
+        'entity/entity-id/subEntity/subEntity-id/subSubEntity'
+      );
+
+      expect(entityMetadata.entityConstructor).toEqual(subSubCol.entityConstructor);
+      expect(entityMetadata.name).toEqual(subSubCol.name);
+      expect(entityMetadata.segments).toEqual(['entity', 'subEntity', 'subSubEntity']);
+      expect(entityMetadata.subCollections.length).toEqual(0);
+    });
+
+    it('should get SubCollection by constructor', () => {
+      const entityMetadata = metadataStorage.getCollection(subSubCol.entityConstructor);
+
+      expect(entityMetadata.entityConstructor).toEqual(subSubCol.entityConstructor);
+      expect(entityMetadata.name).toEqual(subSubCol.name);
+      expect(entityMetadata.segments).toEqual(['entity', 'subEntity', 'subSubEntity']);
+      expect(entityMetadata.subCollections.length).toEqual(0);
+    });
+
     it('should return null when using invalid collection path', () => {
       const entityMetadata = metadataStorage.getCollection('this_is_not_a_path');
+      expect(entityMetadata).toEqual(null);
+    });
+
+    it('should throw error if initialized with an invalid subcollection path', () => {
+      const entityMetadata = metadataStorage.getCollection(
+        'entity/entity-id/subEntity/subEntity-id/fake-path'
+      );
       expect(entityMetadata).toEqual(null);
     });
 
@@ -83,6 +111,12 @@ describe('MetadataStorage', () => {
       expect(entityMetadata.subCollections.length).toEqual(1);
       expect(entityMetadata.subCollections[0].entityConstructor).toEqual(subCol.entityConstructor);
       expect(entityMetadata.subCollections[0].segments).toEqual(['entity', 'subEntity']);
+    });
+
+    it('should throw error if initialized with an incomplete path', () => {
+      expect(() =>
+        metadataStorage.getCollection('entity/entity-id/subEntity/subEntity-id')
+      ).toThrow('Invalid collection path: entity/entity-id/subEntity/subEntity-id');
     });
   });
 

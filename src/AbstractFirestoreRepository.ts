@@ -332,7 +332,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   ): Promise<T[]>;
 
   /**
-   * Retreive a document with the specified id.
+   * Retrieve a document with the specified id.
    * Must be implemented by base repositores
    *
    * @abstract

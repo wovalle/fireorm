@@ -1,6 +1,7 @@
 import { Firestore } from '@google-cloud/firestore';
 import { BaseRepository } from './BaseRepository';
 import { IEntityConstructor, Constructor, IEntity, IEntityRepositoryConstructor } from './types';
+import { arraysAreEqual } from './utils';
 
 export interface CollectionMetadata {
   name: string;
@@ -42,11 +43,19 @@ export class MetadataStorage {
     // take all the even segments [users/messages/senders] and
     // look for an entity with those segments
     if (typeof pathOrConstructor === 'string') {
-      const segments = pathOrConstructor
-        .split('/')
-        .reduce((acc, cur, index) => (index % 2 === 0 ? acc.concat(cur) : acc), []);
+      const segments = pathOrConstructor.split('/');
 
-      collection = this.collections.find(c => c.segments.every((s, i) => s === segments[i]));
+      // Return null if incomplete segment
+      if (segments.length % 2 === 0) {
+        throw new Error(`Invalid collection path: ${pathOrConstructor}`);
+      }
+
+      const collectionSegments: string[] = segments.reduce(
+        (acc, cur, index) => (index % 2 === 0 ? acc.concat(cur) : acc),
+        []
+      );
+
+      collection = this.collections.find(c => arraysAreEqual(c.segments, collectionSegments));
     } else {
       collection = this.collections.find(c => c.entityConstructor === pathOrConstructor);
     }

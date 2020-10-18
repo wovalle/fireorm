@@ -20,12 +20,10 @@ import { IsEmail, IsOptional, Length } from 'class-validator';
 class AlbumImage extends AlbumImageEntity {}
 
 export class Album extends AlbumEntity {
-  @Length(1, 50, {
-    message: 'Name is too long',
-  })
+  @Length(1, 50, { message: 'Name is too long' })
   name: string;
 
-  @SubCollection(AlbumImage)
+  @SubCollection(AlbumImage, 'images')
   images?: ISubCollection<AlbumImage>;
 }
 
@@ -37,12 +35,7 @@ export class Band {
   lastShow: Date;
 
   @IsOptional()
-  @IsEmail(
-    {},
-    {
-      message: 'Invalid email!',
-    }
-  )
+  @IsEmail({}, { message: 'Invalid email!' })
   contactEmail?: string;
 
   // Todo create fireorm bypass decorator

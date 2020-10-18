@@ -43,7 +43,7 @@ export function extractAllGetter<T>(obj: T): Record<string, unknown> {
  * @returns {Object} Serialiable object
  */
 export function serializeEntity<T extends IEntity>(
-  obj: T,
+  obj: Partial<T>,
   subColMetadata: CollectionMetadata[]
 ): Record<string, unknown> {
   const objectGetters = extractAllGetter(obj as Record<string, unknown>);
@@ -54,4 +54,20 @@ export function serializeEntity<T extends IEntity>(
     delete serializableObj[scm.propertyKey];
   });
   return serializableObj;
+}
+
+/**
+ * Returns true if arrays are equal
+ *
+ * @export
+ * @param {Array<unknown>} arr1
+ * @param {Array<unknown>} arr2
+ * @returns {boolean}
+ */
+export function arraysAreEqual(arr1: unknown[], arr2: unknown[]): boolean {
+  if (arr1.length !== arr2.length) {
+    return false;
+  }
+
+  return arr1.every((a, i) => a === arr2[i]);
 }

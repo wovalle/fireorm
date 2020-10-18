@@ -2,7 +2,14 @@ import 'reflect-metadata';
 
 import { WhereFilterOp } from '@google-cloud/firestore';
 
-import { IRepository, IFireOrmQueryLine, IOrderByParams, IEntity, Constructor } from './types';
+import {
+  IRepository,
+  IFireOrmQueryLine,
+  IOrderByParams,
+  IEntity,
+  Constructor,
+  PartialBy,
+} from './types';
 
 import { getMetadataStorage } from './MetadataUtils';
 import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
@@ -15,9 +22,9 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
     return this.firestoreColRef.doc(id).get().then(this.extractTFromDocSnap);
   }
 
-  async create(item: T): Promise<T> {
+  async create(item: PartialBy<T, 'id'>): Promise<T> {
     if (this.config.validateModels) {
-      const errors = await this.validate(item);
+      const errors = await this.validate(item as T);
 
       if (errors.length) {
         throw errors;
@@ -37,11 +44,11 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
       item.id = doc.id;
     }
 
-    await doc.set(this.toSerializableObject(item));
+    await doc.set(this.toSerializableObject(item as T));
 
-    this.initializeSubCollections(item);
+    this.initializeSubCollections(item as T);
 
-    return item;
+    return item as T;
   }
 
   async update(item: T): Promise<T> {

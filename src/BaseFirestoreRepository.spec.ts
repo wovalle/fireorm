@@ -30,6 +30,7 @@ describe('BaseFirestoreRepository', () => {
     bandRepository = new BandRepository('bands');
   });
 
+  // TODO: revisit tests
   describe('constructor', () => {
     it('should correctly initialize a repository with custom path', async () => {
       const bandRepositoryWithPath = new BandRepository('bands');
@@ -48,24 +49,6 @@ describe('BaseFirestoreRepository', () => {
         'There is no metadata stored for "invalidpath"'
       );
     });
-
-    // TODO: Should I be able to do this?!?!?
-    it('should correctly initialize a subcollection repository with custom path', async () => {
-      const albumRepositoryWithPath = new BandRepository('bands/porcupine-tree/albums');
-      const albums = await albumRepositoryWithPath.find();
-      expect(albums.length).toEqual(4);
-
-      const imagesRepositoryWithPath = new BandRepository(
-        'bands/porcupine-tree/albums/fear-blank-planet/images'
-      );
-
-      const images = await imagesRepositoryWithPath.find();
-      expect(images.length).toEqual(2);
-    });
-    it.todo('should throw error if initialized with an incomplete path');
-    it.todo('should throw error if initialized with an invalid subcollection path');
-    it.todo('should throw if passed an invalid entity');
-    it.todo('should throw if passed an invalid entity string');
   });
 
   describe('limit', () => {
@@ -305,6 +288,16 @@ describe('BaseFirestoreRepository', () => {
       const foundBand = await bandRepository.findById(band.id);
 
       expect(band.id).toEqual(foundBand.id);
+    });
+
+    it('throw error when trying to create objects with duplicated id', async () => {
+      expect.assertions(1);
+      const entity = new Band();
+      entity.id = 'pink-floyd';
+
+      await expect(bandRepository.create(entity)).rejects.toThrowError(
+        'A document with id pink-floyd already exists.'
+      );
     });
   });
 
