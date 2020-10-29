@@ -1,6 +1,7 @@
 import { OrderByDirection, DocumentReference } from '@google-cloud/firestore';
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+export type PartialWithRequiredBy<T, K extends keyof T> = Pick<T, K> & Partial<Omit<T, K>>;
 
 export type WithOptionalId<T extends { id: unknown }> = Pick<T, Exclude<keyof T, 'id'>> &
   Partial<Pick<T, 'id'>>;
@@ -69,7 +70,7 @@ export interface IQueryExecutor<T> {
 export interface IBaseRepository<T extends IEntity> {
   findById(id: string): Promise<T | null>;
   create(item: PartialBy<T, 'id'>): Promise<T>;
-  update(item: T): Promise<T>;
+  update(item: PartialWithRequiredBy<T, 'id'>): Promise<PartialWithRequiredBy<T, 'id'>>;
   delete(id: string): Promise<void>;
 }
 
