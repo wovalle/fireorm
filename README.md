@@ -179,6 +179,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/stefdelec"><img src="https://avatars1.githubusercontent.com/u/12082478?v=4" width="100px;" alt=""/><br /><sub><b>stefdelec</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=stefdelec" title="Code">💻</a></td>
     <td align="center"><a href="http://www.innvia.com"><img src="https://avatars0.githubusercontent.com/u/35846271?v=4" width="100px;" alt=""/><br /><sub><b>Łukasz Kuciel</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=LukaszKuciel" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/Fame513"><img src="https://avatars1.githubusercontent.com/u/2944505?v=4" width="100px;" alt=""/><br /><sub><b>Yaroslav Nekryach</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=Fame513" title="Code">💻</a></td>
+    <td align="center"><a href="https://www.linkedin.com/in/dmytro-nikitiuk/"><img src="https://avatars0.githubusercontent.com/u/40293865?v=4" width="100px;" alt=""/><br /><sub><b>Dmytro Nikitiuk</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=tomorroN" title="Code">💻</a></td>
   </tr>
 </table>
 
