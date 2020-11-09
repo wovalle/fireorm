@@ -25,6 +25,7 @@ jest.setTimeout(10000); // 10 seconds
 
 beforeEach(() => {
   initialize(firestore);
+  expect.hasAssertions();
 });
 
 afterAll(async () => {

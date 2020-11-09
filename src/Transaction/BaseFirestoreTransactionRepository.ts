@@ -5,14 +5,13 @@ import {
   IFireOrmQueryLine,
   WithOptionalId,
   IQueryBuilder,
-  IRepository,
+  ITransactionRepository,
   EntityConstructorOrPath,
 } from '../types';
 
 import { AbstractFirestoreRepository } from '../AbstractFirestoreRepository';
-
 export class TransactionRepository<T extends IEntity> extends AbstractFirestoreRepository<T>
-  implements IRepository<T> {
+  implements ITransactionRepository<T> {
   private transaction: Transaction;
 
   constructor(transaction: Transaction, entity: EntityConstructorOrPath<T>) {
@@ -20,13 +19,13 @@ export class TransactionRepository<T extends IEntity> extends AbstractFirestoreR
     this.transaction = transaction;
   }
 
-  execute(queries: IFireOrmQueryLine[]): Promise<T[]> {
+  async execute(queries: IFireOrmQueryLine[]): Promise<T[]> {
     const query = queries.reduce((acc, cur) => {
       const op = cur.operator as WhereFilterOp;
       return acc.where(cur.prop, op, cur.val);
     }, this.firestoreColRef);
 
-    return this.transaction.get(query).then(q => this.extractTFromColSnap(q, this.transaction));
+    return this.transaction.get(query).then(c => this.extractTFromColSnap(c, this.transaction));
   }
 
   findById(id: string): Promise<T> {
@@ -50,7 +49,6 @@ export class TransactionRepository<T extends IEntity> extends AbstractFirestoreR
     }
 
     this.transaction.set(doc, this.toSerializableObject(item as T));
-
     this.initializeSubCollections(item as T, this.transaction);
 
     return item as T;

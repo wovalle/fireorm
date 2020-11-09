@@ -9,11 +9,11 @@ import {
   IEntity,
   Constructor,
   PartialBy,
+  ITransactionRepository,
 } from './types';
 
 import { getMetadataStorage } from './MetadataUtils';
 import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
-import { TransactionRepository } from './Transaction/BaseFirestoreTransactionRepository';
 import { FirestoreBatch } from './Batch/FirestoreBatch';
 
 export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestoreRepository<T>
@@ -70,7 +70,7 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
     await this.firestoreColRef.doc(id).delete();
   }
 
-  async runTransaction<R>(executor: (tran: TransactionRepository<T>) => Promise<R>) {
+  async runTransaction<R>(executor: (tran: ITransactionRepository<T>) => Promise<R>) {
     // Importing here to prevent circular dependency
     const { runTransaction } = await import('./helpers');
 
@@ -85,7 +85,7 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
 
     const batch = new FirestoreBatch(firestoreRef);
 
-    return batch.getSingleRepository(this.colMetadata.entityConstructor);
+    return batch.getSingleRepository(this.path);
   }
 
   async execute(

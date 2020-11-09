@@ -72,6 +72,19 @@ export interface ISingleBatchRepository<T extends IEntity> extends IBatchReposit
   commit(): Promise<unknown>;
 }
 
+export interface IFirestoreBatchSingleRepository<T extends IEntity> extends IBatchRepository<T> {
+  commit(): Promise<void>;
+}
+
+export interface IFirestoreBatch {
+  getRepository<T extends IEntity>(entity: Constructor<T>): IBatchRepository<T>;
+  getSingleRepository<T extends IEntity>(
+    pathOrConstructor: EntityConstructorOrPath<T>
+  ): IFirestoreBatchSingleRepository<T>;
+
+  commit(): Promise<unknown>;
+}
+
 export interface IBaseRepository<T extends IEntity> {
   findById(id: string): Promise<T | null>;
   create(item: PartialBy<T, 'id'>): Promise<T>;
@@ -83,9 +96,12 @@ export type IRepository<T extends IEntity> = IBaseRepository<T> &
   IQueryBuilder<T> &
   IQueryExecutor<T>;
 
+export type ITransactionRepository<T extends IEntity> = IRepository<T>;
+
 // TODO: shouldn't this be in IRepository?
 export type ISubCollection<T extends IEntity> = IRepository<T> & {
   createBatch: () => IFirestoreBatchSingleRepository<T>;
+  runTransaction<R = void>(executor: (tran: ITransactionRepository<T>) => Promise<R>): Promise<R>;
 };
 
 export interface IEntity {
@@ -97,10 +113,6 @@ export type EntityConstructorOrPathConstructor<T> = { new (): T };
 export type IEntityConstructor = Constructor<IEntity>;
 export type IEntityRepositoryConstructor = Constructor<IRepository<IEntity>>;
 export type EntityConstructorOrPath<T> = Constructor<T> | string;
-
-export interface IFirestoreBatchSingleRepository<T extends IEntity> extends IBatchRepository<T> {
-  commit(): Promise<void>;
-}
 
 export interface IFirestoreTransaction<T extends IEntity = IEntity> {
   getRepository(entityOrConstructor: EntityConstructorOrPath<T>): IRepository<T>;

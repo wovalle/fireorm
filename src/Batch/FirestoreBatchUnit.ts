@@ -47,7 +47,7 @@ export class FirestoreBatchUnit {
     const batch = this.firestoreRef.batch();
 
     for (const op of this.operations) {
-      if (op.validateModels && op.type !== 'delete') {
+      if (op.validateModels && ['create', 'update'].includes(op.type)) {
         const errors = await this.validate(op.item, op.collectionMetadata.entityConstructor);
 
         if (errors.length) {

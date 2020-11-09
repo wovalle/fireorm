@@ -33,7 +33,7 @@ describe('BaseFirestoreTransactionRepository', () => {
   describe('limit', () => {
     it('must throw when using limit', async () => {
       await bandRepository.runTransaction(async tran => {
-        expect(() => tran.limit()).toThrow();
+        expect(() => tran.limit(1)).toThrow();
       });
     });
   });
@@ -41,13 +41,13 @@ describe('BaseFirestoreTransactionRepository', () => {
   describe('orderBy*', () => {
     it('must throw when using orderByAscending', async () => {
       await bandRepository.runTransaction(async tran => {
-        expect(() => tran.orderByAscending()).toThrow();
+        expect(() => tran.orderByAscending(a => a.id)).toThrow();
       });
     });
 
     it('must throw when using orderByDescending', async () => {
       await bandRepository.runTransaction(async tran => {
-        expect(() => tran.orderByDescending()).toThrow();
+        expect(() => tran.orderByDescending(a => a.id)).toThrow();
       });
     });
   });

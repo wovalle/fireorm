@@ -168,7 +168,7 @@ describe('BaseFirestoreBatchRepository', () => {
   });
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  describe('must handle subcollections', () => {
+  describe('should handle subcollections', () => {
     it('should be able to create subcollections and initialize them', async () => {
       const band = new Band();
       band.id = '30-seconds-to-mars';

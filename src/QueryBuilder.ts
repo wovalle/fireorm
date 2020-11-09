@@ -23,7 +23,7 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
     return getPath<T, (t: T) => unknown>(param).join('.');
   };
 
-  whereEqualTo(param: IWherePropParam<T>, val: IFirestoreVal): QueryBuilder<T> {
+  whereEqualTo(param: IWherePropParam<T>, val: IFirestoreVal) {
     this.queries.push({
       prop: this.extractWhereParam(param),
       val,
@@ -32,7 +32,7 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
     return this;
   }
 
-  whereGreaterThan(prop: IWherePropParam<T>, val: IFirestoreVal): QueryBuilder<T> {
+  whereGreaterThan(prop: IWherePropParam<T>, val: IFirestoreVal) {
     this.queries.push({
       prop: this.extractWhereParam(prop),
       val,
@@ -41,7 +41,7 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
     return this;
   }
 
-  whereGreaterOrEqualThan(prop: IWherePropParam<T>, val: IFirestoreVal): QueryBuilder<T> {
+  whereGreaterOrEqualThan(prop: IWherePropParam<T>, val: IFirestoreVal) {
     this.queries.push({
       prop: this.extractWhereParam(prop),
       val,
@@ -50,7 +50,7 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
     return this;
   }
 
-  whereLessThan(prop: IWherePropParam<T>, val: IFirestoreVal): QueryBuilder<T> {
+  whereLessThan(prop: IWherePropParam<T>, val: IFirestoreVal) {
     this.queries.push({
       prop: this.extractWhereParam(prop),
       val,
@@ -59,7 +59,7 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
     return this;
   }
 
-  whereLessOrEqualThan(prop: IWherePropParam<T>, val: IFirestoreVal): QueryBuilder<T> {
+  whereLessOrEqualThan(prop: IWherePropParam<T>, val: IFirestoreVal) {
     this.queries.push({
       prop: this.extractWhereParam(prop),
       val,
@@ -68,7 +68,7 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
     return this;
   }
 
-  whereArrayContains(prop: IWherePropParam<T>, val: IFirestoreVal): QueryBuilder<T> {
+  whereArrayContains(prop: IWherePropParam<T>, val: IFirestoreVal) {
     this.queries.push({
       prop: this.extractWhereParam(prop),
       val,
@@ -77,7 +77,7 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
     return this;
   }
 
-  limit(limitVal: number): QueryBuilder<T> {
+  limit(limitVal: number) {
     if (this.limitVal) {
       throw new Error(
         'A limit function cannot be called more than once in the same query expression'
@@ -87,7 +87,7 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
     return this;
   }
 
-  orderByAscending(prop: IWherePropParam<T>): QueryBuilder<T> {
+  orderByAscending(prop: IWherePropParam<T>) {
     if (this.orderByObj) {
       throw new Error(
         'An orderBy function cannot be called more than once in the same query expression'
@@ -102,7 +102,7 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
     return this;
   }
 
-  orderByDescending(prop: IWherePropParam<T>): QueryBuilder<T> {
+  orderByDescending(prop: IWherePropParam<T>) {
     if (this.orderByObj) {
       throw new Error(
         'An orderBy function cannot be called more than once in the same query expression'
@@ -117,11 +117,11 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
     return this;
   }
 
-  find(): Promise<T[]> {
+  find() {
     return this.executor.execute(this.queries, this.limitVal, this.orderByObj);
   }
 
-  async findOne(): Promise<T | null> {
+  async findOne() {
     const queryResult = await this.executor.execute(
       this.queries,
       this.limitVal,

@@ -1,11 +1,23 @@
-import { getRepository, Collection, runTransaction, BaseFirestoreRepository } from '../../src';
-import { Band as BandEntity } from '../fixture';
+import {
+  getRepository,
+  Collection,
+  runTransaction,
+  BaseFirestoreRepository,
+  SubCollection,
+  ISubCollection,
+} from '../../src';
+import { Band as BandEntity, Album as AlbumEntity } from '../fixture';
 import { getUniqueColName } from '../setup';
 
 describe('Integration test: Transactions', () => {
+  class Album extends AlbumEntity {}
+
   @Collection(getUniqueColName('band-with-transactions'))
   class Band extends BandEntity {
     extra?: { website: string };
+
+    @SubCollection(Album)
+    albums?: ISubCollection<Album>;
   }
 
   let bandRepository: BaseFirestoreRepository<Band> = null;
@@ -186,5 +198,78 @@ describe('Integration test: Transactions', () => {
 
     const deletedBand = await bandRepository.findById(dt.id);
     expect(deletedBand).toEqual(null);
+  });
+
+  it.only('should do CRUD operations inside subcollections', async () => {
+    // Create another band
+    const band = new Band();
+    band.id = 'tame-impala';
+    band.name = 'Tame Impala';
+    band.formationYear = 2007;
+    band.genres = ['psychedelic-pop', 'psychedelic-rock', 'neo-psychedelia'];
+    band.extra = {
+      website: 'www.tameimpala.com',
+    };
+
+    const albums = [
+      {
+        id: 'currents',
+        name: 'Currents',
+        releaseDate: new Date('2015-07-17T00:00:00.000Z'),
+      },
+      {
+        id: 'slow-rush',
+        name: 'The Slow Rush',
+        releaseDate: new Date('2020-02-14T00:00:00.000Z'),
+      },
+    ];
+
+    // Create band and albums inside transaction
+    // Be careful, savedBand is a transaction repository of a dead transaction
+    // TODO: see where the errors is not being thrown and... throw it
+    const savedBand = await runTransaction<Band>(async tran => {
+      const bandTranRepository = tran.getRepository(Band);
+      const created = await bandTranRepository.create(band);
+
+      for (const a of albums) {
+        await created.albums.create(a);
+      }
+
+      return created;
+    });
+
+    // const savedBand = await bandRepository.findById(band.id);
+
+    expect(savedBand.name).toEqual(band.name);
+    expect(savedBand.id).toEqual(band.id);
+
+    const createdAlbums = await band.albums.find();
+    const orderedAlbums = createdAlbums.sort((a, b) => a.name.localeCompare(b.name));
+
+    expect(orderedAlbums.length).toEqual(2);
+    expect(orderedAlbums[0].name).toEqual(albums[0].name);
+    expect(orderedAlbums[1].name).toEqual(albums[1].name);
+
+    // Update albums inside transaction
+
+    band.albums.runTransaction(async tran => {
+      for (const album of createdAlbums) {
+        album.comment = 'Edited';
+        await tran.update(album);
+      }
+    });
+
+    // Verify what was done inside the last transaction
+    const editedAlbums = await band.albums.whereEqualTo(a => a.comment, 'Edited').find();
+    expect(editedAlbums.length).toEqual(2);
+
+    band.albums.runTransaction(async tran => {
+      for (const album of createdAlbums) {
+        await tran.delete(album.id);
+      }
+    });
+
+    const deletedAlbums = await band.albums.find();
+    expect(deletedAlbums.length).toEqual(0);
   });
 });

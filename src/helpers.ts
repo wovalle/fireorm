@@ -85,7 +85,7 @@ export function getBaseRepository<T extends IEntity>(entityOrPath: EntityConstru
  */
 export const GetBaseRepository = getBaseRepository;
 
-export const runTransaction = <T>(executor: (tran: FirestoreTransaction) => Promise<T>) => {
+export const runTransaction = async <T>(executor: (tran: FirestoreTransaction) => Promise<T>) => {
   const metadataStorage = getMetadataStorage();
 
   if (!metadataStorage.firestoreRef) {

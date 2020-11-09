@@ -31,7 +31,7 @@
     "lint:md": "remark README.md -o README.md",
     "release": "semantic-release",
     "test": "jest src --coverage=true",
-    "test:integration": "jest -c test/jest.config.js",
+    "test:integration": "jest -c test/jest.integration.js",
     "test:watch": "jest --watch src",
     "t": "yarn test",
     "tw": "yarn test:watch"

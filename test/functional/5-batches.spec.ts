@@ -1,11 +1,22 @@
-import { getRepository, Collection, createBatch, BaseFirestoreRepository } from '../../src';
-import { Band as BandEntity } from '../fixture';
+import {
+  getRepository,
+  Collection,
+  createBatch,
+  BaseFirestoreRepository,
+  ISubCollection,
+  SubCollection,
+} from '../../src';
+import { Album as AlbumEntity, Band as BandEntity } from '../fixture';
 import { getUniqueColName } from '../setup';
 
 describe('Integration test: Batches', () => {
+  class Album extends AlbumEntity {}
   @Collection(getUniqueColName('band-in-batch'))
   class Band extends BandEntity {
     extra?: { website: string };
+
+    @SubCollection(Album)
+    albums?: ISubCollection<Album>;
   }
 
   let bandRepository: BaseFirestoreRepository<Band> = null;
@@ -166,6 +177,72 @@ describe('Integration test: Batches', () => {
       .whereArrayContains(b => b.genres, 'custom-genre')
       .find();
 
+    expect(deletedBands.length).toEqual(0);
+  });
+
+  it('should do CRUD operations in subcollections', async () => {
+    const bandRepository = getRepository(Band);
+
+    const band = await bandRepository.create({
+      name: 'Opeth',
+      formationYear: 1989,
+      genres: ['progressive-death-metal', 'progressive-metal', 'progressive-rock', 'custom-genre'],
+      lastShow: new Date(),
+      extra: {
+        website: '',
+      },
+    });
+
+    const albums = [
+      {
+        id: 'blackwater-park',
+        name: 'Blackwater Park',
+        releaseDate: new Date('2001-12-03T00:00:00.000Z'),
+      },
+      {
+        id: 'deliverance',
+        name: 'Deliverance',
+        releaseDate: new Date('2002-11-12T00:00:00.000Z'),
+      },
+    ];
+
+    const albumsBatch = band.albums.createBatch();
+    albums.forEach(a => albumsBatch.create(a));
+
+    await albumsBatch.commit();
+
+    // Assert that the subcollection was actually created
+    const createdAlbums = await band.albums.find();
+
+    const orderedAlbums = createdAlbums.sort((a, b) => a.name.localeCompare(b.name));
+
+    expect(orderedAlbums.length).toEqual(2);
+    expect(orderedAlbums[0].name).toEqual(albums[0].name);
+    expect(orderedAlbums[1].name).toEqual(albums[1].name);
+
+    // Update comment for all albums in an update batch
+    const updateBatch = band.albums.createBatch();
+
+    createdAlbums.forEach(a => {
+      a.comment = 'edited album';
+      updateBatch.update(a);
+    });
+
+    await updateBatch.commit();
+
+    // Assert that subcollection was actually updated
+    const updatedAlbums = await band.albums.whereEqualTo(a => a.comment, 'edited album').find();
+
+    expect(updatedAlbums.length).toEqual(2);
+
+    // Delete subcollections with an delete batch
+    const deleteBatch = band.albums.createBatch();
+    createdAlbums.forEach(a => deleteBatch.delete(a));
+
+    await deleteBatch.commit();
+
+    // Assert that the subcollection items were actually deleted
+    const deletedBands = await band.albums.find();
     expect(deletedBands.length).toEqual(0);
   });
 });

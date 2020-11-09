@@ -10,7 +10,7 @@ jest.mock('../MetadataUtils', () => ({
 
 describe('CustomRepositoryDecorator', () => {
   beforeEach(() => {
-    jest.resetAllMocks();
+    setRepository.mockReset();
   });
 
   it('should call metadataStorage.setRepository with right params', () => {
