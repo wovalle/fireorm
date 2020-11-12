@@ -358,6 +358,45 @@ describe('BaseFirestoreTransactionRepository', () => {
     });
   });
 
+  describe('references', () => {
+    const band = new Band();
+    it('should initialize transactionRepositories', async () => {
+      await bandRepository.runTransaction(async tran => {
+        band.id = '30-seconds-to-mars';
+        band.name = '30 Seconds To Mars';
+        band.formationYear = 1998;
+        band.genres = ['alternative-rock'];
+
+        await tran.create(band);
+
+        const firstAlbum = new Album();
+        firstAlbum.id = '30-seconds-to-mars';
+        firstAlbum.name = '30 Seconds to Mars (Album)';
+        firstAlbum.releaseDate = new Date('2002-07-22');
+
+        const album = await band.albums.create(firstAlbum);
+
+        const image1 = new AlbumImage();
+        image1.id = 'image1';
+        image1.url = 'http://image1.com';
+
+        const image2 = new AlbumImage();
+        image2.id = 'image2';
+        image2.url = 'http://image2.com';
+
+        await album.images.create(image1);
+        await album.images.create(image2);
+
+        expect(band.albums.constructor.name).toEqual('TransactionRepository');
+        expect(album.images.constructor.name).toEqual('TransactionRepository');
+      });
+    });
+
+    it('should revert transaction repositories to normal repositories', () => {
+      expect(band.albums.constructor.name).toEqual('BaseFirestoreRepository');
+    });
+  });
+
   describe('must handle subcollections', () => {
     it('should initialize nested subcollections', async () => {
       await bandRepository.runTransaction(async tran => {

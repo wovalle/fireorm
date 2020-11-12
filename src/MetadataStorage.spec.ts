@@ -195,8 +195,8 @@ describe('MetadataStorage', () => {
 
     it('should store repositories', () => {
       metadataStorage.setRepository(entityRepository);
-      expect(metadataStorage.repositories.size).toEqual(1);
-      expect(metadataStorage.repositories.get(entityRepository.entity).entity).toEqual(Entity);
+      expect(metadataStorage.getRepositories().size).toEqual(1);
+      expect(metadataStorage.getRepositories().get(entityRepository.entity).entity).toEqual(Entity);
     });
 
     it('should throw when trying to store two repositories with the same entity class', () => {

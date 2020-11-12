@@ -227,7 +227,7 @@ describe('Integration test: Transactions', () => {
     // Create band and albums inside transaction
     // Be careful, savedBand is a transaction repository of a dead transaction
     // TODO: see where the errors is not being thrown and... throw it
-    const savedBand = await runTransaction<Band>(async tran => {
+    await runTransaction<Band>(async tran => {
       const bandTranRepository = tran.getRepository(Band);
       const created = await bandTranRepository.create(band);
 
@@ -238,7 +238,7 @@ describe('Integration test: Transactions', () => {
       return created;
     });
 
-    // const savedBand = await bandRepository.findById(band.id);
+    const savedBand = await bandRepository.findById(band.id);
 
     expect(savedBand.name).toEqual(band.name);
     expect(savedBand.id).toEqual(band.id);

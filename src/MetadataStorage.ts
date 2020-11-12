@@ -28,7 +28,7 @@ export interface MetadataStorageConfig {
 
 export class MetadataStorage {
   readonly collections: Array<CollectionMetadataWithSegments> = [];
-  readonly repositories: Map<IEntityConstructor, RepositoryMetadata> = new Map();
+  protected readonly repositories: Map<IEntityConstructor, RepositoryMetadata> = new Map();
 
   public config: MetadataStorageConfig = {
     validateModels: false,
@@ -121,6 +121,10 @@ export class MetadataStorage {
     }
 
     this.repositories.set(repo.entity, repo);
+  };
+
+  public getRepositories = () => {
+    return this.repositories;
   };
 
   public firestoreRef: Firestore = null;

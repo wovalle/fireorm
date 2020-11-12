@@ -1,6 +1,6 @@
 import { getMetadataStorage } from './MetadataUtils';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
-import { IEntity, EntityConstructorOrPath } from './types';
+import { IEntity, EntityConstructorOrPath, ITransactionReferenceStorage } from './types';
 import { FirestoreTransaction } from './Transaction/FirestoreTransaction';
 import { FirestoreBatch } from './Batch/FirestoreBatch';
 
@@ -93,7 +93,14 @@ export const runTransaction = async <T>(executor: (tran: FirestoreTransaction) =
   }
 
   return metadataStorage.firestoreRef.runTransaction(async t => {
-    return executor(new FirestoreTransaction(t));
+    const tranRefStorage: ITransactionReferenceStorage = new Set();
+    const result = await executor(new FirestoreTransaction(t, tranRefStorage));
+
+    tranRefStorage.forEach(({ entity, path, propertyKey }) => {
+      entity[propertyKey] = getRepository(path);
+    });
+
+    return result;
   });
 };
 

@@ -98,6 +98,14 @@ export type IRepository<T extends IEntity> = IBaseRepository<T> &
 
 export type ITransactionRepository<T extends IEntity> = IRepository<T>;
 
+export interface ITransactionReference<T = IEntity> {
+  entity: T;
+  propertyKey: string;
+  path: string;
+}
+
+export type ITransactionReferenceStorage = Set<ITransactionReference>;
+
 // TODO: shouldn't this be in IRepository?
 export type ISubCollection<T extends IEntity> = IRepository<T> & {
   createBatch: () => IFirestoreBatchSingleRepository<T>;
@@ -109,7 +117,7 @@ export interface IEntity {
 }
 
 export type Constructor<T> = { new (): T };
-export type EntityConstructorOrPathConstructor<T> = { new (): T };
+export type EntityConstructorOrPathConstructor<T extends IEntity> = { new (): T };
 export type IEntityConstructor = Constructor<IEntity>;
 export type IEntityRepositoryConstructor = Constructor<IRepository<IEntity>>;
 export type EntityConstructorOrPath<T> = Constructor<T> | string;

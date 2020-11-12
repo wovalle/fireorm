@@ -17,6 +17,7 @@ import {
   IRepository,
   PartialBy,
   IEntityConstructor,
+  ITransactionReferenceStorage,
 } from './types';
 
 import { getMetadataStorage } from './MetadataUtils';
@@ -78,7 +79,11 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     return obj;
   };
 
-  protected initializeSubCollections = (entity: T, tran?: Transaction) => {
+  protected initializeSubCollections = (
+    entity: T,
+    tran?: Transaction,
+    tranRefStorage?: ITransactionReferenceStorage
+  ) => {
     // Requiring here to prevent circular dependency
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { getRepository } = require('./helpers');
@@ -87,22 +92,29 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
 
     this.colMetadata.subCollections.forEach(subCol => {
       const pathWithSubCol = `${this.path}/${entity.id}/${subCol.name}`;
+      const { propertyKey } = subCol;
 
       // If we are inside a transaction, our subcollections should also be TransactionRepositories
       if (tran) {
-        const firestoreTransaction = new FirestoreTransaction(tran);
+        const firestoreTransaction = new FirestoreTransaction(tran, tranRefStorage);
+        const repository = firestoreTransaction.getRepository(pathWithSubCol);
+        tranRefStorage.add({ propertyKey, path: pathWithSubCol, entity });
         Object.assign(entity, {
-          [subCol.propertyKey]: firestoreTransaction.getRepository(pathWithSubCol),
+          [propertyKey]: repository,
         });
       } else {
         Object.assign(entity, {
-          [subCol.propertyKey]: getRepository(pathWithSubCol),
+          [propertyKey]: getRepository(pathWithSubCol),
         });
       }
     });
   };
 
-  protected extractTFromDocSnap = (doc: DocumentSnapshot, tran?: Transaction): T => {
+  protected extractTFromDocSnap = (
+    doc: DocumentSnapshot,
+    tran?: Transaction,
+    tranRefStorage?: ITransactionReferenceStorage
+  ): T => {
     if (!doc.exists) {
       return null;
     }
@@ -112,13 +124,17 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
       ...this.transformFirestoreTypes(doc.data() as T),
     }) as T;
 
-    this.initializeSubCollections(entity, tran);
+    this.initializeSubCollections(entity, tran, tranRefStorage);
 
     return entity;
   };
 
-  protected extractTFromColSnap = (q: QuerySnapshot, tran?: Transaction): T[] => {
-    return q.docs.map(d => this.extractTFromDocSnap(d, tran));
+  protected extractTFromColSnap = (
+    q: QuerySnapshot,
+    tran?: Transaction,
+    tranRefStorage?: ITransactionReferenceStorage
+  ): T[] => {
+    return q.docs.map(d => this.extractTFromDocSnap(d, tran, tranRefStorage));
   };
 
   /**

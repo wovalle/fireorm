@@ -7,16 +7,20 @@ import {
   IQueryBuilder,
   ITransactionRepository,
   EntityConstructorOrPath,
+  ITransactionReferenceStorage,
 } from '../types';
 
 import { AbstractFirestoreRepository } from '../AbstractFirestoreRepository';
 export class TransactionRepository<T extends IEntity> extends AbstractFirestoreRepository<T>
   implements ITransactionRepository<T> {
-  private transaction: Transaction;
-
-  constructor(transaction: Transaction, entity: EntityConstructorOrPath<T>) {
-    super(entity);
+  constructor(
+    pathOrConstructor: EntityConstructorOrPath<T>,
+    private transaction: Transaction,
+    private tranRefStorage: ITransactionReferenceStorage
+  ) {
+    super(pathOrConstructor);
     this.transaction = transaction;
+    this.tranRefStorage = tranRefStorage;
   }
 
   async execute(queries: IFireOrmQueryLine[]): Promise<T[]> {
@@ -25,12 +29,16 @@ export class TransactionRepository<T extends IEntity> extends AbstractFirestoreR
       return acc.where(cur.prop, op, cur.val);
     }, this.firestoreColRef);
 
-    return this.transaction.get(query).then(c => this.extractTFromColSnap(c, this.transaction));
+    return this.transaction
+      .get(query)
+      .then(c => this.extractTFromColSnap(c, this.transaction, this.tranRefStorage));
   }
 
   findById(id: string): Promise<T> {
     const query = this.firestoreColRef.doc(id);
-    return this.transaction.get(query).then(c => this.extractTFromDocSnap(c, this.transaction));
+    return this.transaction
+      .get(query)
+      .then(c => this.extractTFromDocSnap(c, this.transaction, this.tranRefStorage));
   }
 
   async create(item: WithOptionalId<T>): Promise<T> {
@@ -49,7 +57,7 @@ export class TransactionRepository<T extends IEntity> extends AbstractFirestoreR
     }
 
     this.transaction.set(doc, this.toSerializableObject(item as T));
-    this.initializeSubCollections(item as T, this.transaction);
+    this.initializeSubCollections(item as T, this.transaction, this.tranRefStorage);
 
     return item as T;
   }
