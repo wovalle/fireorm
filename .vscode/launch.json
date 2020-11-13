@@ -18,16 +18,16 @@
       "type": "node",
       "request": "launch",
       "name": "Launch current integration test w/ jest",
-      "program": "${workspaceRoot}/node_modules/.bin/jest",
+      "runtimeArgs": ["--inspect-brk", "${workspaceRoot}/node_modules/.bin/jest", "--runInBand"],
       "args": [
-        "--runInBand",
         "-c",
-        "test/jest.config.js",
-        "test/functional/4-transactions.int-spec",
+        "test/jest.integration.js",
+        "test/functional/4-transactions.spec.ts",
         "--verbose"
       ],
-      "cwd": "${workspaceRoot}",
-      "internalConsoleOptions": "openOnSessionStart"
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "port": 9229
     }
   ]
 }

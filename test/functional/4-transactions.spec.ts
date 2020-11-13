@@ -200,7 +200,7 @@ describe('Integration test: Transactions', () => {
     expect(deletedBand).toEqual(null);
   });
 
-  it.only('should do CRUD operations inside subcollections', async () => {
+  it('should do CRUD operations inside subcollections', async () => {
     // Create another band
     const band = new Band();
     band.id = 'tame-impala';
@@ -224,9 +224,6 @@ describe('Integration test: Transactions', () => {
       },
     ];
 
-    // Create band and albums inside transaction
-    // Be careful, savedBand is a transaction repository of a dead transaction
-    // TODO: see where the errors is not being thrown and... throw it
     await runTransaction<Band>(async tran => {
       const bandTranRepository = tran.getRepository(Band);
       const created = await bandTranRepository.create(band);
@@ -252,7 +249,7 @@ describe('Integration test: Transactions', () => {
 
     // Update albums inside transaction
 
-    band.albums.runTransaction(async tran => {
+    await band.albums.runTransaction(async tran => {
       for (const album of createdAlbums) {
         album.comment = 'Edited';
         await tran.update(album);
@@ -263,7 +260,7 @@ describe('Integration test: Transactions', () => {
     const editedAlbums = await band.albums.whereEqualTo(a => a.comment, 'Edited').find();
     expect(editedAlbums.length).toEqual(2);
 
-    band.albums.runTransaction(async tran => {
+    await band.albums.runTransaction(async tran => {
       for (const album of createdAlbums) {
         await tran.delete(album.id);
       }

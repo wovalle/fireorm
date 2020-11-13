@@ -75,7 +75,7 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
     const { runTransaction } = await import('./helpers');
 
     return runTransaction<R>(tran => {
-      const repository = tran.getRepository(this.colMetadata.entityConstructor as Constructor<T>);
+      const repository = tran.getRepository<T>(this.path);
       return executor(repository);
     });
   }
