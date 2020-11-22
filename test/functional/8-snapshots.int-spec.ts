@@ -4,7 +4,7 @@ import { Band as BandEntity } from '../fixture';
 import { getUniqueColName } from '../setup';
 
 describe('Integration test: Simple Repository', () => {
-  @Collection(getUniqueColName('band-simple-repository'))
+  @Collection(getUniqueColName('band-snapshot-repository'))
   class Band extends BandEntity {
     extra?: { website: string };
   }
