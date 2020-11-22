@@ -355,10 +355,9 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   }
 
   /**
-   * Execute the query and applies all the filters (if specified)
+   * Execute the query and watch for changes on that query
    *
-   * @returns {Promise<T[]>} List of documents that matched the filters
-   * (if specified)
+   * @returns {function} An unsubscribe function that can be called to cancel the snapshot listener
    * @memberof AbstractFirestoreRepository
    */
   watch(callback: (snapshot: QuerySnapshot) => void): Promise<T[]> {
