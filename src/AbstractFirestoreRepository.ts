@@ -355,6 +355,17 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   }
 
   /**
+   * Execute the query and applies all the filters (if specified)
+   *
+   * @returns {Promise<T[]>} List of documents that matched the filters
+   * (if specified)
+   * @memberof AbstractFirestoreRepository
+   */
+  watch(callback: (snapshot: QuerySnapshot) => void): Promise<T[]> {
+    return new QueryBuilder<T>(this).watch(callback);
+  }
+
+  /**
    * Uses class-validator to validate an entity using decorators set in the collection class
    *
    * @param item class or object representing an entity

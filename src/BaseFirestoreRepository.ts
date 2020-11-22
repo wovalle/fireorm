@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import { Query, WhereFilterOp } from '@google-cloud/firestore';
+import { Query, QuerySnapshot, WhereFilterOp } from '@google-cloud/firestore';
 
 import {
   IRepository,
@@ -91,8 +91,9 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
     queries: Array<IFireOrmQueryLine>,
     limitVal?: number,
     orderByObj?: IOrderByParams,
-    single?: boolean
-  ): Promise<T[]> {
+    single?: boolean,
+    onUpdate?: (documents: any) => void
+  ): Promise<any> {
     let query = queries.reduce<Query>((acc, cur) => {
       const op = cur.operator as WhereFilterOp;
       return acc.where(cur.prop, op, cur.val);
@@ -108,6 +109,11 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
       query = query.limit(limitVal);
     }
 
+    if (onUpdate) {
+      return query.onSnapshot((snapshot: QuerySnapshot) => {
+        return onUpdate(this.extractTFromColSnap(snapshot))
+      });
+    }
     return query.get().then(this.extractTFromColSnap);
   }
 }
