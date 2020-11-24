@@ -1,4 +1,3 @@
-import { DocumentData } from '@google-cloud/firestore';
 import { getRepository, Collection } from '../../src';
 import { Band as BandEntity } from '../fixture';
 import { getUniqueColName } from '../setup';
@@ -15,7 +14,7 @@ describe('Integration test: Simple Repository', () => {
 
     // Create snapshot listener
     let executionIndex = 1
-    function handleBandsUpdate(bands: DocumentData): void {
+    const handleBandsUpdate = (bands) => {
       if (!bands.length) {
         return
       }
