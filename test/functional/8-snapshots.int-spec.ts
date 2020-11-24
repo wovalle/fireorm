@@ -1,4 +1,4 @@
-import { QueryDocumentSnapshot, QuerySnapshot } from '@google-cloud/firestore';
+import { DocumentData } from '@google-cloud/firestore';
 import { getRepository, Collection } from '../../src';
 import { Band as BandEntity } from '../fixture';
 import { getUniqueColName } from '../setup';
@@ -15,27 +15,27 @@ describe('Integration test: Simple Repository', () => {
 
     // Create snapshot listener
     let executionIndex = 1
-    const handleBandsUpdate: any = (docs: Array<any>) => {
-      if (!docs.length) {
+    function handleBandsUpdate(bands: DocumentData): void {
+      if (!bands.length) {
         return
       }
       if (executionIndex == 1) {
-        expect(docs.length).toEqual(1);
+        expect(bands.length).toEqual(1);
       }
       else if (executionIndex == 2) {
-        expect(docs.length).toEqual(2);
+        expect(bands.length).toEqual(2);
       }
       else if (executionIndex == 3) {
-        expect(docs.length).toEqual(2);
-        docs.forEach((doc) => {
-          if (doc.id == 'dream-theatre') {
-            expect(doc.name).toEqual('Dream Theatre');
+        expect(bands.length).toEqual(2);
+        bands.forEach((band) => {
+          if (band.id == 'dream-theatre') {
+            expect(band.name).toEqual('Dream Theatre');
           }
         })
       }
       executionIndex++;
     }
-    const byWebsiteSnapshot = await bandRepository
+    const bandSnapshotUnsubscribe: () => void = await bandRepository
       .whereEqualTo(a => a.extra.website, 'www.dreamtheater.net')
       .watch(handleBandsUpdate);
 
@@ -66,7 +66,7 @@ describe('Integration test: Simple Repository', () => {
     const updatedDtInDb = await bandRepository.findById(dt.id);
 
     // Unsubscribe from snapshot
-    byWebsiteSnapshot();
+    bandSnapshotUnsubscribe();
     
   });
 });

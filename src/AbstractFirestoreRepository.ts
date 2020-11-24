@@ -357,10 +357,10 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   /**
    * Execute the query and watch for changes on that query
    *
-   * @returns {function} An unsubscribe function that can be called to cancel the snapshot listener
+   * @returns {Function} An unsubscribe function that can be called to cancel the snapshot listener
    * @memberof AbstractFirestoreRepository
    */
-  watch(callback: (snapshot: QuerySnapshot) => void): Promise<T[]> {
+  watch(callback: (snapshot: QuerySnapshot) => void): () => void {
     return new QueryBuilder<T>(this).watch(callback);
   }
 
