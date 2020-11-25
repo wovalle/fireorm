@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import { CollectionReference, WhereFilterOp } from '@google-cloud/firestore';
+import { CollectionReference, DocumentReference, WhereFilterOp } from '@google-cloud/firestore';
 
 import { IRepository, IFireOrmQueryLine, IOrderByParams, IEntity, Constructor } from './types';
 
@@ -77,6 +77,10 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
     await this.firestoreColRef.doc(id).delete();
   }
 
+  getReference(id: string): DocumentReference {
+    return this.firestoreColRef.doc(id);
+  }
+
   async runTransaction<R>(executor: (tran: TransactionRepository<T>) => Promise<R>) {
     // Importing here to prevent circular dependency
     const { runTransaction } = await import('./helpers');
@@ -101,6 +105,7 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
   async execute(
     queries: Array<IFireOrmQueryLine>,
     limitVal?: number,
+    offsetVal?: number,
     orderByObj?: IOrderByParams,
     single?: boolean
   ): Promise<T[]> {
@@ -117,6 +122,10 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
       query = query.limit(1);
     } else if (limitVal) {
       query = query.limit(limitVal);
+    }
+
+    if (offsetVal) {
+      query.offset(offsetVal);
     }
 
     return query.get().then(this.extractTFromColSnap);

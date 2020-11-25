@@ -1,5 +1,5 @@
 import { plainToClass } from 'class-transformer';
-import { DocumentSnapshot, QuerySnapshot } from '@google-cloud/firestore';
+import { DocumentSnapshot, QuerySnapshot, DocumentReference } from '@google-cloud/firestore';
 import { ValidationError } from './Errors/ValidationError';
 
 import {
@@ -251,6 +251,24 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   }
 
   /**
+   * Returns a new QueryBuilder with the offset of the results
+   * to return. Can only be used once per query.
+   *
+   * @param {number} offsetVal number of results to return
+   * Must be greater or equal than 0
+   * @returns {IQueryBuilder<T>} QueryBuilder A new QueryBuilder with
+   * the specified limit applied
+   * @memberof AbstractFirestoreRepository
+   */
+  offset(offsetVal: number): IQueryBuilder<T> {
+    if (offsetVal < 0) {
+      throw new Error(`offsetVal must be greater than 0. It received: ${offsetVal}`);
+    }
+
+    return new QueryBuilder<T>(this).offset(offsetVal);
+  }
+
+  /**
    * Returns a new QueryBuilder with an additional ascending order
    * specified by @param prop. Can only be used once per query.
    *
@@ -349,6 +367,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   abstract execute(
     queries: IFireOrmQueryLine[],
     limitVal?: number,
+    offsetVal?: number,
     orderByObj?: IOrderByParams,
     single?: boolean
   ): Promise<T[]>;
@@ -397,4 +416,15 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
    * @memberof AbstractFirestoreRepository
    */
   abstract delete(id: string): Promise<void>;
+
+  /**
+   * Return the firestore Document Reference
+   * Must be implemented by base repositores
+   *
+   * @abstract
+   * @param {string} id
+   * @returns {DocumentReference}
+   * @memberof AbstractFirestoreRepository
+   */
+  abstract getReference(id: string): DocumentReference;
 }

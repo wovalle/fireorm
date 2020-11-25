@@ -60,4 +60,17 @@ describe('Integration test: Using Document References', () => {
     expect(band.length).toEqual(1);
     expect(band[0].name).toEqual('Steven Wilson');
   });
+
+  it('should document reference be the same', async () => {
+    const pt = new Band();
+    pt.id = 'porcupine-tree';
+    pt.name = 'Porcupine Tree';
+    pt.formationYear = 1987;
+    pt.genres = ['psychedelic-rock', 'progressive-rock', 'progressive-metal'];
+
+    await bandRepository.create(pt);
+    const ptRef = firestore.collection(colName).doc(pt.id);
+
+    expect(bandRepository.getReference(pt.id)).toEqual(ptRef);
+  });
 });

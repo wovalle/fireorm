@@ -54,6 +54,7 @@ export interface IOrderable<T extends IEntity> {
 
 export interface ILimitable<T extends IEntity> {
   limit(limitVal: number): IQueryBuilder<T>;
+  offset(offsetVal: number): IQueryBuilder<T>;
 }
 
 export type IQueryBuilder<T extends IEntity> = IQueryable<T> & IOrderable<T> & ILimitable<T>;
@@ -62,6 +63,7 @@ export interface IQueryExecutor<T> {
   execute(
     queries: IFireOrmQueryLine[],
     limitVal?: number,
+    offsetVal?: number,
     orderByObj?: IOrderByParams,
     single?: boolean
   ): Promise<T[]>;
@@ -72,6 +74,7 @@ export interface IBaseRepository<T extends IEntity> {
   create(item: PartialBy<T, 'id'>): Promise<T>;
   update(item: PartialWithRequiredBy<T, 'id'>): Promise<PartialWithRequiredBy<T, 'id'>>;
   delete(id: string): Promise<void>;
+  getReference(id: string): DocumentReference;
 }
 
 export type IRepository<T extends IEntity> = IBaseRepository<T> &
