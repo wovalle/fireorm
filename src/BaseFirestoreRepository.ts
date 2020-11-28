@@ -92,7 +92,7 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
     limitVal?: number,
     orderByObj?: IOrderByParams,
     single?: boolean,
-    onUpdate?: (documents: any) => void
+    onUpdate?: (documents: T[]) => void
   ): Promise<any> {
     let query = queries.reduce<Query>((acc, cur) => {
       const op = cur.operator as WhereFilterOp;

@@ -181,7 +181,7 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
 >>>>>>> f2dab6c... feat(query): add types to watch query
   }
 
-  watch(callback: (documents: QuerySnapshot) => void): () => void {
+  watch(callback: (documents: T[]) => void): () => void {
     return this.executor.execute(
       this.queries,
       this.limitVal,

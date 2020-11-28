@@ -14,7 +14,7 @@ describe('Integration test: Simple Repository', () => {
 
     // Create snapshot listener
     let executionIndex = 1
-    const handleBandsUpdate = (bands) => {
+    const handleBandsUpdate = (bands: Band[]) => {
       if (!bands.length) {
         return
       }
