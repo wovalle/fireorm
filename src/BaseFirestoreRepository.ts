@@ -7,7 +7,6 @@ import {
   IFireOrmQueryLine,
   IOrderByParams,
   IEntity,
-  Constructor,
   PartialBy,
   ITransactionRepository,
 } from './types';

@@ -30,7 +30,6 @@ describe('BaseFirestoreRepository', () => {
     bandRepository = new BandRepository('bands');
   });
 
-  // TODO: revisit tests
   describe('constructor', () => {
     it('should correctly initialize a repository with custom path', async () => {
       const bandRepositoryWithPath = new BandRepository('bands');

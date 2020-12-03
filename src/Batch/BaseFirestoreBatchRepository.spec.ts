@@ -35,7 +35,7 @@ describe('BaseFirestoreBatchRepository', () => {
     initialize(firestore);
 
     batch = new FirestoreBatchUnit(firestore);
-    bandBatchRepository = new BaseFirestoreBatchRepository(batch, Band);
+    bandBatchRepository = new BaseFirestoreBatchRepository(Band, batch);
     bandRepository = getRepository(Band);
   });
 
@@ -127,7 +127,7 @@ describe('BaseFirestoreBatchRepository', () => {
       initialize(firestore, { validateModels: true });
 
       const validationBatch = new FirestoreBatchUnit(firestore);
-      const validationBandRepository = new BaseFirestoreBatchRepository(validationBatch, Band);
+      const validationBandRepository = new BaseFirestoreBatchRepository(Band, validationBatch);
 
       const entity = new Band();
       entity.id = 'perfect-circle';
@@ -149,7 +149,7 @@ describe('BaseFirestoreBatchRepository', () => {
       initialize(firestore, { validateModels: true });
 
       const validationBatch = new FirestoreBatchUnit(firestore);
-      const validationBandRepository = new BaseFirestoreBatchRepository(validationBatch, Band);
+      const validationBandRepository = new BaseFirestoreBatchRepository(Band, validationBatch);
 
       const entity = new Band();
       entity.id = 'perfect-circle';

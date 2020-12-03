@@ -10,8 +10,8 @@ export class BaseFirestoreBatchRepository<T extends IEntity> implements IBatchRe
   protected path: string;
 
   constructor(
-    protected batch: FirestoreBatchUnit,
-    protected pathOrConstructor: EntityConstructorOrPath<T>
+    protected pathOrConstructor: EntityConstructorOrPath<T>,
+    protected batch: FirestoreBatchUnit
   ) {
     const { getCollection, firestoreRef, config } = getMetadataStorage();
 

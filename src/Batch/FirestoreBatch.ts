@@ -1,4 +1,4 @@
-import { IEntity, Constructor, EntityConstructorOrPath, IFirestoreBatch } from '../types';
+import { IEntity, EntityConstructorOrPath, IFirestoreBatch } from '../types';
 import { BaseFirestoreBatchRepository } from './BaseFirestoreBatchRepository';
 import { FirestoreBatchSingleRepository } from './FirestoreBatchSingleRepository';
 import { Firestore } from '@google-cloud/firestore';
@@ -21,9 +21,8 @@ export class FirestoreBatch implements IFirestoreBatch {
    * @returns
    * @memberof FirestoreBatch
    */
-  getRepository<T extends IEntity>(entity: Constructor<T>) {
-    // todo: pathOrConstructor?
-    return new BaseFirestoreBatchRepository(this.batch, entity);
+  getRepository<T extends IEntity>(pathOrConstructor: EntityConstructorOrPath<T>) {
+    return new BaseFirestoreBatchRepository(pathOrConstructor, this.batch);
   }
 
   /**
@@ -37,7 +36,7 @@ export class FirestoreBatch implements IFirestoreBatch {
    * @memberof FirestoreBatch
    */
   getSingleRepository<T extends IEntity>(pathOrConstructor: EntityConstructorOrPath<T>) {
-    return new FirestoreBatchSingleRepository(this.batch, pathOrConstructor);
+    return new FirestoreBatchSingleRepository(pathOrConstructor, this.batch);
   }
 
   /**
