@@ -181,14 +181,14 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
 >>>>>>> f2dab6c... feat(query): add types to watch query
   }
 
-  watch(callback: (documents: T[]) => void): () => void {
+  watch(callback: (documents: T[]) => void) {
     return this.executor.execute(
       this.queries,
       this.limitVal,
       this.orderByObj,
       false,
       callback
-    ) as () => void;
+    ) as Promise<() => void>;
   }
 
   async findOne(): Promise<T | null> {

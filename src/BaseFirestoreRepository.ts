@@ -12,6 +12,7 @@ import {
 } from './types';
 
 import { getMetadataStorage } from './MetadataUtils';
+
 import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
 import { FirestoreBatch } from './Batch/FirestoreBatch';
 
@@ -93,7 +94,7 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
     orderByObj?: IOrderByParams,
     single?: boolean,
     onUpdate?: (documents: T[]) => void
-  ): Promise<any> {
+  ): Promise<T[] | (() => void)> {
     let query = queries.reduce<Query>((acc, cur) => {
       const op = cur.operator as WhereFilterOp;
       return acc.where(cur.prop, op, cur.val);
@@ -110,10 +111,14 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
     }
 
     if (onUpdate) {
-      return query.onSnapshot((snapshot: QuerySnapshot) => {
-        return onUpdate(this.extractTFromColSnap(snapshot))
-      });
+      return new Promise((resolve) => {
+        resolve(
+          query.onSnapshot((snapshot: QuerySnapshot) => {
+            return onUpdate(this.extractTFromColSnap(snapshot))
+          })
+        )
+      }) as Promise<() => void>;
     }
-    return query.get().then(this.extractTFromColSnap);
+    return query.get().then(this.extractTFromColSnap) as Promise<T[]>;
   }
 }

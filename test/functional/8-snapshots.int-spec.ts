@@ -34,7 +34,7 @@ describe('Integration test: Simple Repository', () => {
       }
       executionIndex++;
     }
-    const bandSnapshotUnsubscribe: () => void = await bandRepository
+    const bandSnapshotUnsubscribe = await bandRepository
       .whereEqualTo(a => a.extra.website, 'www.dreamtheater.net')
       .watch(handleBandsUpdate);
 

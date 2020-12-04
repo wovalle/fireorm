@@ -49,7 +49,7 @@ export interface IQueryable<T extends IEntity> {
   whereNotIn(prop: IWherePropParam<T>, val: IFirestoreVal[]): IQueryBuilder<T>;
   find(): Promise<T[]>;
   findOne(): Promise<T | null>;
-  watch(handler: (documents: T[]) => void): () => void;
+  watch(handler: (documents: T[]) => void): Promise<() => void>;
 }
 
 export interface IOrderable<T extends IEntity> {
@@ -70,7 +70,7 @@ export interface IQueryExecutor<T> {
     orderByObj?: IOrderByParams,
     single?: boolean,
     onUpdate?: (documents: T[]) => void
-  ): Promise<T[]> | (() => void);
+  ): Promise<T[] | (() => void)>;
 }
 
 export interface IBatchRepository<T extends IEntity> {
