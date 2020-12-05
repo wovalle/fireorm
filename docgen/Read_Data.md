@@ -52,9 +52,7 @@ All the \*Where methods have a similar api, where the first parameter is a strin
 // This example is exactly the same than the last one, but using the alternative API.
 
 // Bands formed from 1990 onwards
-await bandRepository
-  .whereGreaterOrEqualThan(band => band.formationYear, 1990)
-  .find();
+await bandRepository.whereGreaterOrEqualThan(band => band.formationYear, 1990).find();
 
 // Bands whose name is Porcupine Tree
 await bandRepository.whereEqualTo(band => band.name, 'Porcupine Tree').find();
@@ -64,6 +62,43 @@ await bandRepository
   .whereGreaterThan(band => band.formationYear, 1985)
   .whereArrayCointain(band => band.genres, 'progressive-rock')
   .find();
+```
+
+### Search by Document Reference
+
+In [#115](https://github.com/wovalle/fireorm/pull/105/) we added the ability to use firestore document references in queries. We can use the document reference as the value in any of the helpers function described above and we can see it in action [in this example](https://github.com/wovalle/fireorm/blob/d8f79090b7006675f2cb5014bb5ca7a9dfbfa8c1/src/BaseFirestoreRepository.spec.ts#L478-L492) or [this one](https://github.com/wovalle/fireorm/blob/master/test/functional/6-document-references.spec.ts).
+
+```ts
+// Fake DocumentReference
+class FirestoreDocumentReference {
+  id: string;
+  path: string;
+}
+
+@Collection()
+class BandWithReference {
+  id: string;
+  name: string;
+  formationYear: number;
+  genres: Array<string>;
+
+  @Type(() => FirestoreDocumentReference)
+  relatedBand?: FirestoreDocumentReference;
+}
+
+const pt = new Band();
+pt.id = 'porcupine-tree';
+pt.name = 'Porcupine Tree';
+pt.formationYear = 1987;
+pt.genres = ['psychedelic-rock', 'progressive-rock', 'progressive-metal'];
+
+await bandRepository.create(pt);
+
+// Filter documents by a doc reference
+const band = await bandRepository.whereEqualTo(b => b.relatedBand, ptRef).find();
+
+// Can also use the string api of the complex query
+const band = await bandRepository.whereEqualTo('relatedBand', ptRef).find();
 ```
 
 ## Order By and Limit

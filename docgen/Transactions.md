@@ -75,6 +75,49 @@ await runTransaction<Band>(async tran => {
 });
 ```
 
+## Transaction in subcollections
+
+If we create an entity inside a transactions, all of its subcollections will be automatically be a [TransactionRepository](Classes/TransactionRepository.md) that means that all of the operations done to subcollections will also be done inside transactions. Once the transaction is finished fireorm will automatically change the [TransactionRepository](Classes/TransactionRepository.md) for a normal [BaseFirestoreRepository](CORE_CONCEPTS.md#FireormRepositories) in case you need to reuse the entity.
+
+```ts
+import { runTransaction } from 'fireorm';
+import { Band, Album } from './wherever-our-models-are';
+
+const band = new Band();
+band.id = 'tame-impala';
+band.name = 'Tame Impala';
+band.formationYear = 2007;
+
+const albums = [
+  {
+    id: 'currents',
+    name: 'Currents',
+    releaseDate: new Date('2015-07-17T00:00:00.000Z'),
+  },
+  {
+    id: 'slow-rush',
+    name: 'The Slow Rush',
+    releaseDate: new Date('2020-02-14T00:00:00.000Z'),
+  },
+];
+
+await runTransaction<Band>(async tran => {
+  const bandTranRepository = tran.getRepository(Band);
+
+  // Create the band inside transaction.
+  // Band contains a subcollection of Albums in the field albums, so when the band is created it will contain an albums field with TransactionRepository<Album> type.
+  const createdBand = await bandTranRepository.create(band);
+
+  // Once the band is created, save the albums
+  for (const album of albums) {
+    await createdBand.albums.create(album);
+  }
+
+  // Outside of the transaction, albums will be a BaseFirestoreRepository<Album>
+  return createdBand;
+});
+```
+
 ## Limitations
 
-Please be aware that Firestore has many limitations when working with transactions. You can learn more [here](https://firebase.google.com/docs/firestore/manage-data/transactions).
+Please be aware that Firestore has many limitations when working with transactions. You can learn more [here](https://firebase.google.com/docs/firestore/manage-data/transactions). The most notable ones are that inside Transactions all the read operations must be done first (i.e. if you need to fetch some documents from firestore and edit it inside a transaction, you must fetch everything you need before doing creating/updating/deleting any document). Also, transactions cannot contain any `limit` or `orderBy` clauses (as defined [here](READ_DATA.md#orderbyandlimit)).
