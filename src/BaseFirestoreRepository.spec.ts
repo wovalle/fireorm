@@ -9,6 +9,7 @@ import {
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { Band } from '../test/BandCollection';
 import { Firestore } from '@google-cloud/firestore';
+import { NoMetadataError } from './Errors';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const MockFirebase = require('mock-cloud-firestore');
@@ -44,8 +45,8 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('should throw error if initialized with an invalid path', async () => {
-      expect(() => new BandRepository('invalidpath')).toThrow(
-        'There is no metadata stored for "invalidpath"'
+      expect(() => new BandRepository('invalidpath')).toThrowError(
+        new NoMetadataError('invalidpath')
       );
     });
   });
@@ -422,6 +423,32 @@ describe('BaseFirestoreRepository', () => {
     it('must filter with whereArrayContains', async () => {
       const list = await bandRepository.whereArrayContains('genres', 'progressive-rock').find();
       expect(list.length).toEqual(2);
+    });
+
+    it('must filter with whereArrayContainsAny', async () => {
+      const list = await bandRepository
+        .whereArrayContainsAny('genres', ['psychedelic-rock', 'funk-rock'])
+        .find();
+      expect(list.length).toEqual(3);
+    });
+
+    it('must filter with whereIn', async () => {
+      const list = await bandRepository.whereIn('formationYear', [1965, 1983, 1987]).find();
+      expect(list.length).toEqual(3);
+    });
+
+    it('should throw with whereArrayContainsAny and more than 10 items in val array', async () => {
+      expect(async () => {
+        await bandRepository
+          .whereArrayContainsAny('genres', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
+          .find();
+      }).rejects.toThrow(Error);
+    });
+
+    it('should throw with whereIn and more than 10 items in val array', async () => {
+      expect(async () => {
+        await bandRepository.whereIn('formationYear', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]).find();
+      }).rejects.toThrow(Error);
     });
 
     it('must filter with two or more operators', async () => {

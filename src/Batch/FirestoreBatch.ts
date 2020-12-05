@@ -17,7 +17,7 @@ export class FirestoreBatch implements IFirestoreBatch {
    * Returns a batch repository of T.
    *
    * @template T
-   * @param {Constructor<T>} entity
+   * @param {EntityConstructorOrPath<T>} entity path or constructor
    * @returns
    * @memberof FirestoreBatch
    */
@@ -31,7 +31,7 @@ export class FirestoreBatch implements IFirestoreBatch {
    * current features and will be deleted in the next major version.
    *
    * @template T
-   * @param {Constructor<T>} entity
+   * @param {EntityConstructorOrPath<T>} entity path or constructor
    * @returns
    * @memberof FirestoreBatch
    */

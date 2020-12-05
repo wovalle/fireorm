@@ -1,6 +1,7 @@
 import { OrderByDirection, DocumentReference } from '@google-cloud/firestore';
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+export type PartialWithRequiredBy<T, K extends keyof T> = Pick<T, K> & Partial<Omit<T, K>>;
 
 export type WithOptionalId<T extends { id: unknown }> = Pick<T, Exclude<keyof T, 'id'>> &
   Partial<Pick<T, 'id'>>;
@@ -14,11 +15,13 @@ export enum FirestoreOperators {
   lessThanEqual = '<=',
   greaterThanEqual = '>=',
   arrayContains = 'array-contains',
+  arrayContainsAny = 'array-contains-any',
+  in = 'in',
 }
 
 export interface IFireOrmQueryLine {
   prop: string;
-  val: IFirestoreVal;
+  val: IFirestoreVal | IFirestoreVal[];
   operator: FirestoreOperators;
 }
 
@@ -38,6 +41,8 @@ export interface IQueryable<T extends IEntity> {
   whereLessThan(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T>;
   whereLessOrEqualThan(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T>;
   whereArrayContains(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T>;
+  whereArrayContainsAny(prop: IWherePropParam<T>, val: IFirestoreVal[]): IQueryBuilder<T>;
+  whereIn(prop: IWherePropParam<T>, val: IFirestoreVal[]): IQueryBuilder<T>;
   find(): Promise<T[]>;
   findOne(): Promise<T | null>;
 }
@@ -88,7 +93,7 @@ export interface IFirestoreBatch {
 export interface IBaseRepository<T extends IEntity> {
   findById(id: string): Promise<T | null>;
   create(item: PartialBy<T, 'id'>): Promise<T>;
-  update(item: T): Promise<T>;
+  update(item: PartialWithRequiredBy<T, 'id'>): Promise<PartialWithRequiredBy<T, 'id'>>;
   delete(id: string): Promise<void>;
 }
 

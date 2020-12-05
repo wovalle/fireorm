@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import { WhereFilterOp } from '@google-cloud/firestore';
+import { Query, WhereFilterOp } from '@google-cloud/firestore';
 
 import {
   IRepository,
@@ -17,8 +17,11 @@ import { FirestoreBatch } from './Batch/FirestoreBatch';
 
 export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestoreRepository<T>
   implements IRepository<T> {
-  async findById(id: string): Promise<T> {
-    return this.firestoreColRef.doc(id).get().then(this.extractTFromDocSnap);
+  async findById(id: string) {
+    return this.firestoreColRef
+      .doc(id)
+      .get()
+      .then(d => (d.exists ? this.extractTFromDocSnap(d) : null));
   }
 
   async create(item: PartialBy<T, 'id'>): Promise<T> {
@@ -50,7 +53,7 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
     return item as T;
   }
 
-  async update(item: T): Promise<T> {
+  async update(item: T) {
     if (this.config.validateModels) {
       const errors = await this.validate(item);
 
@@ -81,10 +84,7 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
 
   createBatch() {
     const { firestoreRef } = getMetadataStorage();
-
-    const batch = new FirestoreBatch(firestoreRef);
-
-    return batch.getSingleRepository(this.path);
+    return new FirestoreBatch(firestoreRef).getSingleRepository(this.path);
   }
 
   async execute(
@@ -93,7 +93,7 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
     orderByObj?: IOrderByParams,
     single?: boolean
   ): Promise<T[]> {
-    let query = queries.reduce((acc, cur) => {
+    let query = queries.reduce<Query>((acc, cur) => {
       const op = cur.operator as WhereFilterOp;
       return acc.where(cur.prop, op, cur.val);
     }, this.firestoreColRef);

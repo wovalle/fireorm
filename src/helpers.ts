@@ -50,7 +50,7 @@ function _getRepository<T extends IEntity = IEntity>(
 
   if (repositoryType === 'custom' || (repositoryType === 'default' && repository)) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return new (repository.target as any)(entityConstructorOrPath);
+    return new (repository?.target as any)(entityConstructorOrPath);
   } else {
     return new BaseFirestoreRepository<T>(entityConstructorOrPath);
   }
@@ -97,7 +97,8 @@ export const runTransaction = async <T>(executor: (tran: FirestoreTransaction) =
     const result = await executor(new FirestoreTransaction(t, tranRefStorage));
 
     tranRefStorage.forEach(({ entity, path, propertyKey }) => {
-      entity[propertyKey] = getRepository(path);
+      const record = (entity as unknown) as Record<string, unknown>;
+      record[propertyKey] = getRepository(path);
     });
 
     return result;

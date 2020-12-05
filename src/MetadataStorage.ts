@@ -9,13 +9,21 @@ export interface CollectionMetadata {
   parentEntityConstructor?: IEntityConstructor;
   propertyKey?: string;
 }
+export interface SubCollectionMetadata extends CollectionMetadata {
+  parentEntityConstructor: IEntityConstructor;
+  propertyKey: string;
+}
 
 export interface CollectionMetadataWithSegments extends CollectionMetadata {
   segments: string[];
 }
 
+export interface SubCollectionMetadataWithSegments extends SubCollectionMetadata {
+  segments: string[];
+}
+
 export interface FullCollectionMetadata extends CollectionMetadataWithSegments {
-  subCollections: CollectionMetadataWithSegments[];
+  subCollections: SubCollectionMetadataWithSegments[];
 }
 export interface RepositoryMetadata {
   target: IEntityRepositoryConstructor;
@@ -23,7 +31,7 @@ export interface RepositoryMetadata {
 }
 
 export interface MetadataStorageConfig {
-  validateModels?: boolean;
+  validateModels: boolean;
 }
 
 export class MetadataStorage {
@@ -34,10 +42,8 @@ export class MetadataStorage {
     validateModels: false,
   };
 
-  public getCollection = (
-    pathOrConstructor: string | IEntityConstructor
-  ): FullCollectionMetadata => {
-    let collection: CollectionMetadataWithSegments = undefined;
+  public getCollection = (pathOrConstructor: string | IEntityConstructor) => {
+    let collection: CollectionMetadataWithSegments | undefined;
 
     // If is a path like users/user-id/messages/message-id/senders,
     // take all the even segments [users/messages/senders] and
@@ -50,7 +56,7 @@ export class MetadataStorage {
         throw new Error(`Invalid collection path: ${pathOrConstructor}`);
       }
 
-      const collectionSegments: string[] = segments.reduce(
+      const collectionSegments = segments.reduce<string[]>(
         (acc, cur, index) => (index % 2 === 0 ? acc.concat(cur) : acc),
         []
       );
@@ -65,8 +71,8 @@ export class MetadataStorage {
     }
 
     const subCollections = this.collections.filter(
-      s => s.parentEntityConstructor === collection.entityConstructor
-    );
+      s => s.parentEntityConstructor === collection?.entityConstructor
+    ) as SubCollectionMetadataWithSegments[];
 
     return {
       ...collection,
@@ -96,9 +102,13 @@ export class MetadataStorage {
     // Update segments for subcollections and subcollections of subcollections
     while (colsToUpdate.length) {
       const c = colsToUpdate.pop();
-      const parent = this.collections.find(p => p.entityConstructor === c.parentEntityConstructor);
 
-      c.segments = parent.segments.concat(c.name);
+      if (!c) {
+        return;
+      }
+
+      const parent = this.collections.find(p => p.entityConstructor === c.parentEntityConstructor);
+      c.segments = parent?.segments.concat(c.name) || [];
       getWhereImParent(c.entityConstructor).forEach(col => colsToUpdate.push(col));
     }
   };
@@ -127,5 +137,5 @@ export class MetadataStorage {
     return this.repositories;
   };
 
-  public firestoreRef: Firestore = null;
+  public firestoreRef: Firestore;
 }

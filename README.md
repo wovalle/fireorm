@@ -77,7 +77,7 @@ await todoRepository.delete(mySuperTodoDocument.id); // Delete todo
 
 ### Firebase Complex Data Types
 
-Firestore has support for [complex data types](https://firebase.google.com/docs/firestore/manage-data/data-types) such as GeoPoint and Reference. Full handling of complex data types is [being handled in this issue](https://github.com/wovalle/fireorm/issues/58). Temporarily, Fireorm will export [Class Transformer's @Type](https://github.com/typestack/class-transformer#working-with-nested-objects) decorator. It receives a lamda where you have to return the type you want to cast to. [See GeoPoint Example](https://github.com/wovalle/fireorm/blob/master/src/BaseFirestoreRepository.spec.ts#L338-L344).
+Firestore has support for [complex data types](https://firebase.google.com/docs/firestore/manage-data/data-types) such as GeoPoint and Reference. Full handling of complex data types is [being handled in this issue](https://github.com/wovalle/fireorm/issues/58). Temporarily, Fireorm will export [Class Transformer's @Type](https://github.com/typestack/class-transformer#working-with-nested-objects) decorator. It receives a lamda where you have to return the type you want to cast to. [See GeoPoint Example](https://github.com/wovalle/fireorm/blob/d8f79090b7006675f2cb5014bb5ca7a9dfbfa8c1/src/BaseFirestoreRepository.spec.ts#L471-L476).
 
 #### Limitations
 
@@ -155,7 +155,7 @@ Documentation is automatically deployed on each commit to master and is hosted i
 
 ## Contributing
 
-Have a bug or a feature request? Please search [the issues](https://github.com/wovalle/fireorm/issues) to prevent duplication. If you couldn't what you were looking for, [proceed to open a new one](https://github.com/wovalle/fireorm/issues/new). Pull requests are welcome!
+Have a bug or a feature request? Please search [the issues](https://github.com/wovalle/fireorm/issues) to prevent duplication. If you couldn't find what you were looking for, [proceed to open a new one](https://github.com/wovalle/fireorm/issues/new). Pull requests are welcome!
 
 ## Contributors
 
@@ -177,11 +177,15 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://www.smddzcy.com/"><img src="https://avatars3.githubusercontent.com/u/13895224?v=4" width="100px;" alt=""/><br /><sub><b>Samed Düzçay</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=smddzcy" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/stefdelec"><img src="https://avatars1.githubusercontent.com/u/12082478?v=4" width="100px;" alt=""/><br /><sub><b>stefdelec</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=stefdelec" title="Code">💻</a></td>
+    <td align="center"><a href="http://www.innvia.com"><img src="https://avatars0.githubusercontent.com/u/35846271?v=4" width="100px;" alt=""/><br /><sub><b>Łukasz Kuciel</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=LukaszKuciel" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/Fame513"><img src="https://avatars1.githubusercontent.com/u/2944505?v=4" width="100px;" alt=""/><br /><sub><b>Yaroslav Nekryach</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=Fame513" title="Code">💻</a></td>
+    <td align="center"><a href="https://www.linkedin.com/in/dmytro-nikitiuk/"><img src="https://avatars0.githubusercontent.com/u/40293865?v=4" width="100px;" alt=""/><br /><sub><b>Dmytro Nikitiuk</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=tomorroN" title="Code">💻</a></td>
   </tr>
 </table>
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!

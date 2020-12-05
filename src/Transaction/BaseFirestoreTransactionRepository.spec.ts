@@ -1,3 +1,4 @@
+import { Firestore } from '@google-cloud/firestore';
 import { BaseFirestoreRepository } from '../BaseFirestoreRepository';
 import { getFixture, Album, AlbumImage } from '../../test/fixture';
 import { initialize } from '../MetadataUtils';
@@ -17,8 +18,8 @@ type TestTransactionRepository<T extends { id: string }> = Pick<
 class BandRepository extends BaseFirestoreRepository<Band> {}
 
 describe('BaseFirestoreTransactionRepository', () => {
-  let bandRepository: TestTransactionRepository<Band> = null;
-  let firestore;
+  let bandRepository: TestTransactionRepository<Band>;
+  let firestore: Firestore;
 
   beforeEach(() => {
     const fixture = Object.assign({}, getFixture());
@@ -333,6 +334,38 @@ describe('BaseFirestoreTransactionRepository', () => {
       });
     });
 
+    it('must filter with whereArrayContainsAny', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const list = await tran
+          .whereArrayContainsAny('genres', ['psychedelic-rock', 'funk-rock'])
+          .find();
+        expect(list.length).toEqual(3);
+      });
+    });
+
+    it('must filter with whereIn', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const list = await tran.whereIn('formationYear', [1965, 1983, 1987]).find();
+        expect(list.length).toEqual(3);
+      });
+    });
+
+    it('should throw with whereArrayContainsAny and more than 10 items in val array', async () => {
+      expect(async () => {
+        await bandRepository.runTransaction(async tran => {
+          await tran.whereArrayContainsAny('genres', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]).find();
+        });
+      }).rejects.toThrow(Error);
+    });
+
+    it('should throw with whereIn and more than 10 items in val array', async () => {
+      expect(async () => {
+        await bandRepository.runTransaction(async tran => {
+          await tran.whereIn('formationYear', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]).find();
+        });
+      }).rejects.toThrow(Error);
+    });
+
     it('must filter with two or more operators', async () => {
       await bandRepository.runTransaction(async tran => {
         const list = await tran
@@ -434,11 +467,13 @@ describe('BaseFirestoreTransactionRepository', () => {
 
       await bandRepository.runTransaction(async tran => {
         await tran.create(band);
-        await band.albums.create(firstAlbum);
-        await band.albums.create(secondAlbum);
-        await band.albums.create(thirdAlbum);
+        const albumsRef = band.albums;
 
-        const albums = await band.albums.find();
+        await albumsRef.create(firstAlbum);
+        await albumsRef.create(secondAlbum);
+        await albumsRef.create(thirdAlbum);
+
+        const albums = await albumsRef.find();
         expect(albums.length).toEqual(3);
         expect(albums[0].images).toBeInstanceOf(TransactionRepository);
       });
@@ -458,9 +493,10 @@ describe('BaseFirestoreTransactionRepository', () => {
 
       await bandRepository.runTransaction(async tran => {
         await tran.create(band);
+        const albumsRef = band.albums;
 
         try {
-          await band.albums.create(firstAlbum);
+          await albumsRef.create(firstAlbum);
         } catch (error) {
           expect(error[0].constraints.length).toEqual('Name is too long');
         }
@@ -470,12 +506,15 @@ describe('BaseFirestoreTransactionRepository', () => {
     it('should be able to update subcollections', async () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
-        const album = await pt.albums.findById('fear-blank-planet');
+        const albumsRef = pt.albums;
+
+        const album = await albumsRef.findById('fear-blank-planet');
         album.comment = 'Anesthethize is top 3 IMHO';
 
-        await pt.albums.update(album);
+        await albumsRef.update(album);
 
-        const updatedAlbum = await pt.albums.findById('fear-blank-planet');
+        const updatedAlbum = await albumsRef.findById('fear-blank-planet');
+
         expect(updatedAlbum.comment).toEqual('Anesthethize is top 3 IMHO');
       });
     });
@@ -483,12 +522,13 @@ describe('BaseFirestoreTransactionRepository', () => {
     it('should be able to validate subcollections on update', async () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
-        const album = await pt.albums.findById('fear-blank-planet');
+        const albumsRef = pt.albums;
 
+        const album = await albumsRef.findById('fear-blank-planet');
         album.name = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
 
         try {
-          await pt.albums.update(album);
+          await albumsRef.update(album);
         } catch (error) {
           expect(error[0].constraints.length).toEqual('Name is too long');
         }
@@ -510,9 +550,10 @@ describe('BaseFirestoreTransactionRepository', () => {
     it('should be able to delete subcollections', async () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
-        await pt.albums.delete('fear-blank-planet');
+        const albumsRef = pt.albums;
+        await albumsRef.delete('fear-blank-planet');
 
-        const updatedBandAlbums = await pt.albums.find();
+        const updatedBandAlbums = await albumsRef.find();
         expect(updatedBandAlbums.length).toEqual(3);
       });
     });

@@ -20,13 +20,15 @@
     "orm"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && yarn build:strict",
     "build:typedoc": "typedoc --options docgen/typedoc.json",
     "build:docsify": "yarn ts-node docgen/build.ts",
     "build:doc": "yarn rimraf docs && yarn build:typedoc && yarn build:docsify && cp CNAME docs/CNAME",
+    "build:strict": "tsc -p src",
     "serve:doc": "yarn docsify serve docgen",
     "deploy:doc": "gh-pages-deploy",
     "build:watch": "tsc -w --incremental",
+    "build:strict:watch": "yarn run build:strict -- -w",
     "lint": "eslint '*/**/*.{js,ts}'",
     "lint:md": "remark README.md -o README.md",
     "release": "semantic-release",
@@ -34,7 +36,8 @@
     "test:integration": "jest -c test/jest.integration.js",
     "test:watch": "jest --watch src",
     "t": "yarn test",
-    "tw": "yarn test:watch"
+    "tw": "yarn test:watch",
+    "bw": "yarn build:watch"
   },
   "dependencies": {
     "class-transformer": "^0.2.0",

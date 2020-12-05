@@ -77,6 +77,36 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
     return this;
   }
 
+  whereArrayContainsAny(prop: IWherePropParam<T>, val: IFirestoreVal[]) {
+    if (val.length > 10) {
+      throw new Error(`
+        This query supports up to 10 values. You provided ${val.length}.
+        For details please visit: https://firebase.google.com/docs/firestore/query-data/queries#in_and_array-contains-any
+      `);
+    }
+    this.queries.push({
+      prop: this.extractWhereParam(prop),
+      val,
+      operator: FirestoreOperators.arrayContainsAny,
+    });
+    return this;
+  }
+
+  whereIn(prop: IWherePropParam<T>, val: IFirestoreVal[]) {
+    if (val.length > 10) {
+      throw new Error(`
+        This query supports up to 10 values. You provided ${val.length}.
+        For details please visit: https://firebase.google.com/docs/firestore/query-data/queries#in_and_array-contains-any
+      `);
+    }
+    this.queries.push({
+      prop: this.extractWhereParam(prop),
+      val,
+      operator: FirestoreOperators.in,
+    });
+    return this;
+  }
+
   limit(limitVal: number) {
     if (this.limitVal) {
       throw new Error(

@@ -18,22 +18,11 @@ function initializeMetadataStorage() {
 }
 
 /**
- * Used for testing to reset metadataStore to clean state
- */
-export function clearMetadataStorage() {
-  const store = getStore();
-  store.metadataStorage = null;
-}
-
-/**
  * Return exisiting metadataStorage, otherwise create if not present
  */
 export const getMetadataStorage = (): MetadataStorage => {
   const store = getStore();
-
-  if (!store.metadataStorage) {
-    initializeMetadataStorage();
-  }
+  initializeMetadataStorage();
 
   return store.metadataStorage;
 };

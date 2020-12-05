@@ -20,12 +20,15 @@ import {
   ITransactionReferenceStorage,
 } from './types';
 
+import { isDocumentReference, isGeoPoint, isObject, isTimestamp } from './TypeGuards';
+
 import { getMetadataStorage } from './MetadataUtils';
 import { MetadataStorageConfig, FullCollectionMetadata } from './MetadataStorage';
 
 import { BaseRepository } from './BaseRepository';
 import QueryBuilder from './QueryBuilder';
 import { serializeEntity } from './utils';
+import { NoMetadataError } from './Errors';
 
 export abstract class AbstractFirestoreRepository<T extends IEntity> extends BaseRepository
   implements IRepository<T> {
@@ -44,16 +47,13 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     }
 
     this.config = config;
-    this.colMetadata = getCollection(pathOrConstructor);
+    const colMetadata = getCollection(pathOrConstructor);
 
-    if (!this.colMetadata) {
-      throw new Error(
-        `There is no metadata stored for "${
-          typeof pathOrConstructor === 'string' ? pathOrConstructor : pathOrConstructor.name
-        }"`
-      );
+    if (!colMetadata) {
+      throw new NoMetadataError(pathOrConstructor);
     }
 
+    this.colMetadata = colMetadata;
     this.path = typeof pathOrConstructor === 'string' ? pathOrConstructor : this.colMetadata.name;
     this.firestoreColRef = firestoreRef.collection(this.path);
   }
@@ -61,19 +61,20 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   protected toSerializableObject = (obj: T): Record<string, unknown> =>
     serializeEntity(obj, this.colMetadata.subCollections);
 
-  protected transformFirestoreTypes = (obj: T): T => {
+  protected transformFirestoreTypes = (obj: Record<string, unknown>) => {
     Object.keys(obj).forEach(key => {
+      const val = obj[key];
       if (!obj[key]) return;
-      if (typeof obj[key] === 'object' && 'toDate' in obj[key]) {
-        obj[key] = obj[key].toDate();
-      } else if (obj[key].constructor.name === 'GeoPoint') {
-        const { latitude, longitude } = obj[key];
+      if (isTimestamp(val)) {
+        obj[key] = val.toDate();
+      } else if (isGeoPoint(val)) {
+        const { latitude, longitude } = val;
         obj[key] = { latitude, longitude };
-      } else if (obj[key].constructor.name === 'DocumentReference') {
-        const { id, path } = obj[key];
+      } else if (isDocumentReference(val)) {
+        const { id, path } = val;
         obj[key] = { id, path };
-      } else if (typeof obj[key] === 'object') {
-        this.transformFirestoreTypes(obj[key]);
+      } else if (isObject(val)) {
+        this.transformFirestoreTypes(val);
       }
     });
     return obj;
@@ -95,7 +96,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
       const { propertyKey } = subCol;
 
       // If we are inside a transaction, our subcollections should also be TransactionRepositories
-      if (tran) {
+      if (tran && tranRefStorage) {
         const firestoreTransaction = new FirestoreTransaction(tran, tranRefStorage);
         const repository = firestoreTransaction.getRepository(pathWithSubCol);
         tranRefStorage.add({ propertyKey, path: pathWithSubCol, entity });
@@ -115,13 +116,9 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     tran?: Transaction,
     tranRefStorage?: ITransactionReferenceStorage
   ): T => {
-    if (!doc.exists) {
-      return null;
-    }
-
     const entity = plainToClass(this.colMetadata.entityConstructor, {
       id: doc.id,
-      ...this.transformFirestoreTypes(doc.data() as T),
+      ...this.transformFirestoreTypes(doc.data() || {}),
     }) as T;
 
     this.initializeSubCollections(entity, tran, tranRefStorage);
@@ -134,7 +131,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     tran?: Transaction,
     tranRefStorage?: ITransactionReferenceStorage
   ): T[] => {
-    return q.docs.map(d => this.extractTFromDocSnap(d, tran, tranRefStorage));
+    return q.docs.filter(d => d.exists).map(d => this.extractTFromDocSnap(d, tran, tranRefStorage));
   };
 
   /**
@@ -225,6 +222,36 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
    */
   whereArrayContains(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T> {
     return new QueryBuilder<T>(this).whereArrayContains(prop, val);
+  }
+
+  /**
+   * Returns a new QueryBuilder with a filter specifying that the
+   * field @param prop is an array that contains one or more of the comparison values in @param val
+   *
+   * @param {IWherePropParam<T>} prop field to be filtered on, where
+   * prop could be keyof T or a lambda where T is the first parameter
+   * @param {IFirestoreVal[]} val array of values to compare in the filter (max 10 items in array)
+   * @returns {QueryBuilder<T>} A new QueryBuilder with the specified
+   * query applied.
+   * @memberof AbstractFirestoreRepository
+   */
+  whereArrayContainsAny(prop: IWherePropParam<T>, val: IFirestoreVal[]): IQueryBuilder<T> {
+    return new QueryBuilder<T>(this).whereArrayContainsAny(prop, val);
+  }
+
+  /**
+   * Returns a new QueryBuilder with a filter specifying that the
+   * field @param prop matches any of the comparison values in @param val
+   *
+   * @param {IWherePropParam<T>} prop field to be filtered on, where
+   * prop could be keyof T or a lambda where T is the first parameter
+   * @param {IFirestoreVal[]} val[] array of values to compare in the filter (max 10 items in array)
+   * @returns {QueryBuilder<T>} A new QueryBuilder with the specified
+   * query applied.
+   * @memberof AbstractFirestoreRepository
+   */
+  whereIn(prop: IWherePropParam<T>, val: IFirestoreVal[]): IQueryBuilder<T> {
+    return new QueryBuilder<T>(this).whereIn(prop, val);
   }
 
   /**
@@ -356,7 +383,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
    * @returns {Promise<T>}
    * @memberof AbstractFirestoreRepository
    */
-  abstract findById(id: string): Promise<T>;
+  abstract findById(id: string): Promise<T | null>;
 
   /**
    * Creates a document.

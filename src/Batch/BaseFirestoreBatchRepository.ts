@@ -3,6 +3,7 @@ import { IEntity, WithOptionalId, IBatchRepository, EntityConstructorOrPath } fr
 import { getMetadataStorage } from '../MetadataUtils';
 import { MetadataStorageConfig, FullCollectionMetadata } from '../MetadataStorage';
 import { FirestoreBatchUnit } from './FirestoreBatchUnit';
+import { NoMetadataError } from '../Errors';
 export class BaseFirestoreBatchRepository<T extends IEntity> implements IBatchRepository<T> {
   protected colMetadata: FullCollectionMetadata;
   protected colRef: CollectionReference;
@@ -15,7 +16,13 @@ export class BaseFirestoreBatchRepository<T extends IEntity> implements IBatchRe
   ) {
     const { getCollection, firestoreRef, config } = getMetadataStorage();
 
-    this.colMetadata = getCollection(pathOrConstructor);
+    const colMetadata = getCollection(pathOrConstructor);
+
+    if (!colMetadata) {
+      throw new NoMetadataError(pathOrConstructor);
+    }
+
+    this.colMetadata = colMetadata;
     this.path = typeof pathOrConstructor === 'string' ? pathOrConstructor : this.colMetadata.name;
     this.colRef = firestoreRef.collection(this.path);
     this.config = config;

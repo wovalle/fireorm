@@ -1,4 +1,4 @@
-import { Transaction, WhereFilterOp } from '@google-cloud/firestore';
+import { Query, Transaction, WhereFilterOp } from '@google-cloud/firestore';
 
 import {
   IEntity,
@@ -24,7 +24,7 @@ export class TransactionRepository<T extends IEntity> extends AbstractFirestoreR
   }
 
   async execute(queries: IFireOrmQueryLine[]): Promise<T[]> {
-    const query = queries.reduce((acc, cur) => {
+    const query = queries.reduce<Query>((acc, cur) => {
       const op = cur.operator as WhereFilterOp;
       return acc.where(cur.prop, op, cur.val);
     }, this.firestoreColRef);
@@ -34,11 +34,14 @@ export class TransactionRepository<T extends IEntity> extends AbstractFirestoreR
       .then(c => this.extractTFromColSnap(c, this.transaction, this.tranRefStorage));
   }
 
-  findById(id: string): Promise<T> {
+  findById(id: string) {
     const query = this.firestoreColRef.doc(id);
+
     return this.transaction
       .get(query)
-      .then(c => this.extractTFromDocSnap(c, this.transaction, this.tranRefStorage));
+      .then(c =>
+        c.exists ? this.extractTFromDocSnap(c, this.transaction, this.tranRefStorage) : null
+      );
   }
 
   async create(item: WithOptionalId<T>): Promise<T> {

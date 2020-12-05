@@ -94,6 +94,33 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "LukaszKuciel",
+      "name": "Łukasz Kuciel",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/35846271?v=4",
+      "profile": "http://www.innvia.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Fame513",
+      "name": "Yaroslav Nekryach",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/2944505?v=4",
+      "profile": "https://github.com/Fame513",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "tomorroN",
+      "name": "Dmytro Nikitiuk",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/40293865?v=4",
+      "profile": "https://www.linkedin.com/in/dmytro-nikitiuk/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

@@ -1,4 +1,4 @@
-import { extractAllGetter } from './utils';
+import { extractAllGetters } from './utils';
 
 describe('Utils', () => {
   describe('extractAllGetter', () => {
@@ -15,7 +15,7 @@ describe('Utils', () => {
 
         const b = new ClassTest();
 
-        const extracted = extractAllGetter(b);
+        const extracted = extractAllGetters((b as unknown) as Record<string, unknown>);
         expect(extracted).toEqual({ b: 'b' });
       });
 
@@ -32,7 +32,7 @@ describe('Utils', () => {
 
         const b = new ClassTest();
 
-        const extracted = extractAllGetter(b);
+        const extracted = extractAllGetters((b as unknown) as Record<string, unknown>);
         expect(extracted).toEqual({ b: 'b' });
       });
     });
@@ -52,7 +52,7 @@ describe('Utils', () => {
 
       const b = new ClassTest();
 
-      const extracted = extractAllGetter(b);
+      const extracted = extractAllGetters((b as unknown) as Record<string, unknown>);
       expect(extracted).toEqual({ b: 'b' });
     });
   });
