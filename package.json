@@ -95,7 +95,7 @@
     }
   },
   "release": {
-    "branch": "master",
+    "branches": ["master", "next"],
     "plugins": [
       "@semantic-release/npm",
       "@semantic-release/github",
