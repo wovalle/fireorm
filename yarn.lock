@@ -4095,9 +4095,9 @@ hash-stream-validation@^0.2.2:
     through2 "^2.0.0"
 
 highlight.js@^10.0.0:
-  version "10.1.1"
-  resolved "https://registry.yarnpkg.com/highlight.js/-/highlight.js-10.1.1.tgz#691a2148a8d922bf12e52a294566a0d993b94c57"
-  integrity sha512-b4L09127uVa+9vkMgPpdUQP78ickGbHEQTWeBrQFTJZ4/n2aihWOGS0ZoUqAwjVmfjhq/C76HRzkqwZhK4sBbg==
+  version "10.4.0"
+  resolved "https://registry.yarnpkg.com/highlight.js/-/highlight.js-10.4.0.tgz#ef3ce475e5dfa7a48484260b49ea242ddab823a0"
+  integrity sha512-EfrUGcQ63oLJbj0J0RI9ebX6TAITbsDBLbsjr881L/X5fMO9+oadKzEF21C7R3ULKG6Gv3uoab2HiqVJa/4+oA==
 
 hook-std@^2.0.0:
   version "2.0.0"
@@ -7912,9 +7912,9 @@ select@^1.1.2:
   integrity sha1-DnNQrN7ICxEIUoeG7B1EGNEbOW0=
 
 semantic-release@^17.0.3:
-  version "17.1.1"
-  resolved "https://registry.yarnpkg.com/semantic-release/-/semantic-release-17.1.1.tgz#d9775968e841b2b7c5020559e4481aea8520ca75"
-  integrity sha512-9H+207eynBJElrQBHySZm+sIEoJeUhPA2zU4cdlY1QSInd2lnE8GRD2ALry9EassE22c9WW+aCREwBhro5AIIg==
+  version "17.2.3"
+  resolved "https://registry.yarnpkg.com/semantic-release/-/semantic-release-17.2.3.tgz#11f10b851d4e75b1015b17515c433049b3df994c"
+  integrity sha512-MY1MlowGQrkOR7+leOD8ICkVOC6i1szbwDODdbJ0UdshtMx8Ms0bhpRQmEEliqYKEb5PLv/dqs6zKKuHT7UxTg==
   dependencies:
     "@semantic-release/commit-analyzer" "^8.0.0"
     "@semantic-release/error" "^2.2.0"
