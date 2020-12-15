@@ -1,4 +1,3 @@
-import { QuerySnapshot } from '@google-cloud/firestore';
 import { getPath } from 'ts-object-path';
 
 import {
