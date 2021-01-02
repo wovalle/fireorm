@@ -10,6 +10,7 @@ export type IFirestoreVal = string | number | Date | boolean | DocumentReference
 
 export enum FirestoreOperators {
   equal = '==',
+  notEqual = '!=',
   lessThan = '<',
   greaterThan = '>',
   lessThanEqual = '<=',
@@ -36,6 +37,7 @@ export type IWherePropParam<T> = keyof T | ((t: T) => unknown);
 
 export interface IQueryable<T extends IEntity> {
   whereEqualTo(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T>;
+  whereNotEqualTo(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T>;
   whereGreaterThan(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T>;
   whereGreaterOrEqualThan(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T>;
   whereLessThan(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T>;
