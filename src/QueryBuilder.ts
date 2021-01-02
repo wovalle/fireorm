@@ -32,6 +32,15 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
     return this;
   }
 
+  whereNotEqualTo(param: IWherePropParam<T>, val: IFirestoreVal): QueryBuilder<T> {
+    this.queries.push({
+      prop: this.extractWhereParam(param),
+      val,
+      operator: FirestoreOperators.notEqual,
+    });
+    return this;
+  }
+
   whereGreaterThan(prop: IWherePropParam<T>, val: IFirestoreVal): QueryBuilder<T> {
     this.queries.push({
       prop: this.extractWhereParam(prop),

@@ -363,6 +363,12 @@ describe('BaseFirestoreRepository', () => {
       expect(list[0].name).toEqual('Porcupine Tree');
     });
 
+    it('must filter with whereNotEqualTo', async () => {
+        const list = await bandRepository.whereNotEqualTo('name', 'Porcupine Tree').find();
+        expect(list.length).toEqual(1);
+        expect(list[0].formationYear).toEqual(1983);
+      });
+
     it('must filter with whereGreaterThan', async () => {
       const list = await bandRepository.whereGreaterThan('formationYear', 1983).find();
       expect(list.length).toEqual(1);
