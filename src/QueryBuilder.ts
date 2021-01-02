@@ -90,7 +90,7 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
     if (val.length > 10) {
       throw new Error(`
         This query supports up to 10 values. You provided ${val.length}.
-        For details please visit: https://firebase.google.com/docs/firestore/query-data/queries#in_and_array-contains-any
+        For details please visit: https://firebase.google.com/docs/firestore/query-data/queries#in_not-in_and_array-contains-any
       `);
     }
     this.queries.push({
@@ -105,13 +105,28 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
     if (val.length > 10) {
       throw new Error(`
         This query supports up to 10 values. You provided ${val.length}.
-        For details please visit: https://firebase.google.com/docs/firestore/query-data/queries#in_and_array-contains-any
+        For details please visit: https://firebase.google.com/docs/firestore/query-data/queries#in_not-in_and_array-contains-any
       `);
     }
     this.queries.push({
       prop: this.extractWhereParam(prop),
       val,
       operator: FirestoreOperators.in,
+    });
+    return this;
+  }
+
+  whereNotIn(prop: IWherePropParam<T>, val: IFirestoreVal[]): QueryBuilder<T> {
+    if (val.length > 10) {
+      throw new Error(`
+        This query supports up to 10 values. You provided ${val.length}.
+        For details please visit: https://firebase.google.com/docs/firestore/query-data/queries#in_not-in_and_array-contains-any
+      `);
+    }
+    this.queries.push({
+      prop: this.extractWhereParam(prop),
+      val,
+      operator: FirestoreOperators.notIn,
     });
     return this;
   }

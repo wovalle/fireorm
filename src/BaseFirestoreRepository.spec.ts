@@ -407,6 +407,11 @@ describe('BaseFirestoreRepository', () => {
       expect(list.length).toEqual(3);
     });
 
+    it('must filter with whereNotIn', async () => {
+        const list = await bandRepository.whereNotIn('formationYear', [1965]).find();
+        expect(list.length).toEqual(2);
+    });
+
     it('should throw with whereArrayContainsAny and more than 10 items in val array', async () => {
       expect(async () => {
         await bandRepository
@@ -419,6 +424,12 @@ describe('BaseFirestoreRepository', () => {
       expect(async () => {
         await bandRepository.whereIn('formationYear', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]).find();
       }).rejects.toThrow(Error);
+    });
+
+    it('should throw with whereNotIn and more than 10 items in val array', async () => {
+        expect(async () => {
+          await bandRepository.whereNotIn('formationYear', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]).find();
+        }).rejects.toThrow(Error);
     });
 
     it('must filter with two or more operators', async () => {
