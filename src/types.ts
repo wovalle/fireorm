@@ -18,6 +18,7 @@ export enum FirestoreOperators {
   arrayContains = 'array-contains',
   arrayContainsAny = 'array-contains-any',
   in = 'in',
+  notIn = 'not-in'
 }
 
 export interface IFireOrmQueryLine {
@@ -45,6 +46,7 @@ export interface IQueryable<T extends IEntity> {
   whereArrayContains(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T>;
   whereArrayContainsAny(prop: IWherePropParam<T>, val: IFirestoreVal[]): IQueryBuilder<T>;
   whereIn(prop: IWherePropParam<T>, val: IFirestoreVal[]): IQueryBuilder<T>;
+  whereNotIn(prop: IWherePropParam<T>, val: IFirestoreVal[]): IQueryBuilder<T>;
   find(): Promise<T[]>;
   findOne(): Promise<T | null>;
 }
