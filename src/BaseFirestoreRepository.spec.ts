@@ -364,10 +364,10 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must filter with whereNotEqualTo', async () => {
-        const list = await bandRepository.whereNotEqualTo('name', 'Porcupine Tree').find();
-        expect(list.length).toEqual(1);
-        expect(list[0].formationYear).toEqual(1983);
-      });
+      const list = await bandRepository.whereNotEqualTo('name', 'Porcupine Tree').find();
+      expect(list.length).toEqual(1);
+      expect(list[0].formationYear).toEqual(1983);
+    });
 
     it('must filter with whereGreaterThan', async () => {
       const list = await bandRepository.whereGreaterThan('formationYear', 1983).find();
@@ -408,8 +408,8 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must filter with whereNotIn', async () => {
-        const list = await bandRepository.whereNotIn('formationYear', [1965]).find();
-        expect(list.length).toEqual(2);
+      const list = await bandRepository.whereNotIn('formationYear', [1965]).find();
+      expect(list.length).toEqual(2);
     });
 
     it('should throw with whereArrayContainsAny and more than 10 items in val array', async () => {
@@ -427,9 +427,11 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('should throw with whereNotIn and more than 10 items in val array', async () => {
-        expect(async () => {
-          await bandRepository.whereNotIn('formationYear', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]).find();
-        }).rejects.toThrow(Error);
+      expect(async () => {
+        await bandRepository
+          .whereNotIn('formationYear', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
+          .find();
+      }).rejects.toThrow(Error);
     });
 
     it('must filter with two or more operators', async () => {

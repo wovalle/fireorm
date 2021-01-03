@@ -18,7 +18,7 @@ export enum FirestoreOperators {
   arrayContains = 'array-contains',
   arrayContainsAny = 'array-contains-any',
   in = 'in',
-  notIn = 'not-in'
+  notIn = 'not-in',
 }
 
 export interface IFireOrmQueryLine {
