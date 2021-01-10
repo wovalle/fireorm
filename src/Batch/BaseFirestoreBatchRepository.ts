@@ -1,33 +1,30 @@
 import { CollectionReference } from '@google-cloud/firestore';
-import { IEntity, WithOptionalId, Constructor } from '../types';
-import { getMetadataStorage, CollectionMetadata, MetadataStorageConfig } from '../MetadataStorage';
+import { IEntity, WithOptionalId, IBatchRepository, EntityConstructorOrPath } from '../types';
+import { getMetadataStorage } from '../MetadataUtils';
+import { MetadataStorageConfig, FullCollectionMetadata } from '../MetadataStorage';
 import { FirestoreBatchUnit } from './FirestoreBatchUnit';
-
-export class BaseFirestoreBatchRepository<T extends IEntity> {
-  protected colMetadata: CollectionMetadata;
-  protected subColMetadata: CollectionMetadata[];
-  protected collectionPath: string;
+import { NoMetadataError } from '../Errors';
+export class BaseFirestoreBatchRepository<T extends IEntity> implements IBatchRepository<T> {
+  protected colMetadata: FullCollectionMetadata;
   protected colRef: CollectionReference;
   protected config: MetadataStorageConfig;
+  protected path: string;
 
   constructor(
-    protected batch: FirestoreBatchUnit,
-    protected entity: Constructor<T>,
-    collectionPath?: string
+    protected pathOrConstructor: EntityConstructorOrPath<T>,
+    protected batch: FirestoreBatchUnit
   ) {
-    const {
-      getCollection,
-      getSubCollection,
-      getSubCollectionsFromParent,
-      firestoreRef,
-      config,
-    } = getMetadataStorage();
+    const { getCollection, firestoreRef, config } = getMetadataStorage();
 
-    this.colMetadata = getSubCollection(entity) || getCollection(entity);
-    this.subColMetadata = getSubCollectionsFromParent(this.colMetadata.entity);
+    const colMetadata = getCollection(pathOrConstructor);
 
-    this.collectionPath = collectionPath || this.colMetadata.name;
-    this.colRef = firestoreRef.collection(this.collectionPath);
+    if (!colMetadata) {
+      throw new NoMetadataError(pathOrConstructor);
+    }
+
+    this.colMetadata = colMetadata;
+    this.path = typeof pathOrConstructor === 'string' ? pathOrConstructor : this.colMetadata.name;
+    this.colRef = firestoreRef.collection(this.path);
     this.config = config;
   }
 
@@ -37,14 +34,7 @@ export class BaseFirestoreBatchRepository<T extends IEntity> {
       item.id = doc.id;
     }
 
-    this.batch.add(
-      'create',
-      item as T,
-      doc,
-      this.colMetadata.entity,
-      this.subColMetadata,
-      this.config.validateModels
-    );
+    this.batch.add('create', item as T, doc, this.colMetadata, this.config.validateModels);
   };
 
   update = (item: T) => {
@@ -52,8 +42,7 @@ export class BaseFirestoreBatchRepository<T extends IEntity> {
       'update',
       item,
       this.colRef.doc(item.id),
-      this.colMetadata.entity,
-      this.subColMetadata,
+      this.colMetadata,
       this.config.validateModels
     );
   };
@@ -63,8 +52,7 @@ export class BaseFirestoreBatchRepository<T extends IEntity> {
       'delete',
       item,
       this.colRef.doc(item.id),
-      this.colMetadata.entity,
-      this.subColMetadata,
+      this.colMetadata,
       this.config.validateModels
     );
   };

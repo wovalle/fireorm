@@ -77,7 +77,7 @@ await todoRepository.delete(mySuperTodoDocument.id); // Delete todo
 
 ### Firebase Complex Data Types
 
-Firestore has support for [complex data types](https://firebase.google.com/docs/firestore/manage-data/data-types) such as GeoPoint and Reference. Full handling of complex data types is [being handled in this issue](https://github.com/wovalle/fireorm/issues/58). Temporarily, Fireorm will export [Class Transformer's @Type](https://github.com/typestack/class-transformer#working-with-nested-objects) decorator. It receives a lamda where you have to return the type you want to cast to. [See GeoPoint Example](https://github.com/wovalle/fireorm/blob/master/src/BaseFirestoreRepository.spec.ts#L445-L450).
+Firestore has support for [complex data types](https://firebase.google.com/docs/firestore/manage-data/data-types) such as GeoPoint and Reference. Full handling of complex data types is [being handled in this issue](https://github.com/wovalle/fireorm/issues/58). Temporarily, Fireorm will export [Class Transformer's @Type](https://github.com/typestack/class-transformer#working-with-nested-objects) decorator. It receives a lamda where you have to return the type you want to cast to. [See GeoPoint Example](https://github.com/wovalle/fireorm/blob/d8f79090b7006675f2cb5014bb5ca7a9dfbfa8c1/src/BaseFirestoreRepository.spec.ts#L471-L476).
 
 #### Limitations
 
@@ -185,6 +185,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!

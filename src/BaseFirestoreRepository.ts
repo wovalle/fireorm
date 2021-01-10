@@ -1,37 +1,32 @@
 import 'reflect-metadata';
 
-import { CollectionReference, WhereFilterOp } from '@google-cloud/firestore';
+import { Query, WhereFilterOp } from '@google-cloud/firestore';
 
-import { IRepository, IFireOrmQueryLine, IOrderByParams, IEntity, Constructor } from './types';
+import {
+  IRepository,
+  IFireOrmQueryLine,
+  IOrderByParams,
+  IEntity,
+  PartialBy,
+  ITransactionRepository,
+} from './types';
 
-import { getMetadataStorage } from './MetadataStorage';
+import { getMetadataStorage } from './MetadataUtils';
 import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
-import { TransactionRepository } from './Transaction/BaseFirestoreTransactionRepository';
 import { FirestoreBatch } from './Batch/FirestoreBatch';
 
 export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestoreRepository<T>
   implements IRepository<T> {
-  private readonly firestoreColRef: CollectionReference;
-
-  constructor(colName: string, collectionPath?: string) {
-    super(colName, collectionPath);
-
-    const { firestoreRef } = getMetadataStorage();
-
-    if (!firestoreRef) {
-      throw new Error('Firestore must be initialized first');
-    }
-
-    this.firestoreColRef = firestoreRef.collection(collectionPath || colName);
+  async findById(id: string) {
+    return this.firestoreColRef
+      .doc(id)
+      .get()
+      .then(d => (d.exists ? this.extractTFromDocSnap(d) : null));
   }
 
-  async findById(id: string): Promise<T> {
-    return this.firestoreColRef.doc(id).get().then(this.extractTFromDocSnap);
-  }
-
-  async create(item: T): Promise<T> {
+  async create(item: PartialBy<T, 'id'>): Promise<T> {
     if (this.config.validateModels) {
-      const errors = await this.validate(item);
+      const errors = await this.validate(item as T);
 
       if (errors.length) {
         throw errors;
@@ -51,14 +46,14 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
       item.id = doc.id;
     }
 
-    await doc.set(this.toSerializableObject(item));
+    await doc.set(this.toSerializableObject(item as T));
 
-    this.initializeSubCollections(item);
+    this.initializeSubCollections(item as T);
 
-    return item;
+    return item as T;
   }
 
-  async update(item: T): Promise<T> {
+  async update(item: T) {
     if (this.config.validateModels) {
       const errors = await this.validate(item);
 
@@ -77,25 +72,19 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
     await this.firestoreColRef.doc(id).delete();
   }
 
-  async runTransaction<R>(executor: (tran: TransactionRepository<T>) => Promise<R>) {
+  async runTransaction<R>(executor: (tran: ITransactionRepository<T>) => Promise<R>) {
     // Importing here to prevent circular dependency
     const { runTransaction } = await import('./helpers');
 
     return runTransaction<R>(tran => {
-      const repository = tran.getRepository(this.colMetadata.entity as Constructor<T>);
+      const repository = tran.getRepository<T>(this.path);
       return executor(repository);
     });
   }
 
   createBatch() {
     const { firestoreRef } = getMetadataStorage();
-
-    const batch = new FirestoreBatch(firestoreRef);
-
-    return batch.getSingleRepository(
-      this.colMetadata.entity as Constructor<T>,
-      this.collectionPath
-    );
+    return new FirestoreBatch(firestoreRef).getSingleRepository(this.path);
   }
 
   async execute(
@@ -104,7 +93,7 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
     orderByObj?: IOrderByParams,
     single?: boolean
   ): Promise<T[]> {
-    let query = queries.reduce((acc, cur) => {
+    let query = queries.reduce<Query>((acc, cur) => {
       const op = cur.operator as WhereFilterOp;
       return acc.where(cur.prop, op, cur.val);
     }, this.firestoreColRef);

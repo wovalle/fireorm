@@ -1,14 +1,13 @@
 import { Collection, SubCollection } from '../src/Decorators';
-import { Album as AlbumEntity, Coordinates, FirestoreDocumentReference } from './fixture';
+import {
+  Album as AlbumEntity,
+  AlbumImage as AlbumImageEntity,
+  Coordinates,
+  FirestoreDocumentReference,
+} from './fixture';
 import { ISubCollection } from '../src/types';
 import { Type } from '../src';
 import { IsEmail, IsOptional, Length } from 'class-validator';
-
-@Collection()
-class AlbumImage {
-  id: string;
-  url: string;
-}
 
 // Why I do this? Because by using the instance of Album
 // located in fixture.ts, you have the risk to reuse the
@@ -17,14 +16,14 @@ class AlbumImage {
 // with each other (happened with getRepository)
 //
 // Hours lost debugging this: 2
-@Collection()
-class Album extends AlbumEntity {
-  @Length(1, 50, {
-    message: 'Name is too long',
-  })
+
+class AlbumImage extends AlbumImageEntity {}
+
+export class Album extends AlbumEntity {
+  @Length(1, 50, { message: 'Name is too long' })
   name: string;
 
-  @SubCollection(AlbumImage)
+  @SubCollection(AlbumImage, 'images')
   images?: ISubCollection<AlbumImage>;
 }
 
@@ -36,12 +35,7 @@ export class Band {
   lastShow: Date;
 
   @IsOptional()
-  @IsEmail(
-    {},
-    {
-      message: 'Invalid email!',
-    }
-  )
+  @IsEmail({}, { message: 'Invalid email!' })
   contactEmail?: string;
 
   // Todo create fireorm bypass decorator
@@ -49,7 +43,7 @@ export class Band {
   lastShowCoordinates: Coordinates;
   genres: Array<string>;
 
-  @SubCollection(Album)
+  @SubCollection(Album, 'albums')
   albums?: ISubCollection<Album>;
 
   @Type(() => FirestoreDocumentReference)

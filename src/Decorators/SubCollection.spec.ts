@@ -1,19 +1,24 @@
 import { SubCollection } from './SubCollection';
-import { initialize, clearMetadataStorage, getStore } from '../MetadataStorage';
 import { ISubCollection } from '../types';
+import { Collection } from './Collection';
+
+const setCollection = jest.fn();
+jest.mock('../MetadataUtils', () => ({
+  getMetadataStorage: () => ({
+    setCollection,
+  }),
+}));
 
 describe('SubCollectionDecorator', () => {
-  const store = getStore();
-
   beforeEach(() => {
-    clearMetadataStorage();
-    initialize(null);
+    jest.resetAllMocks();
   });
 
   it('should register collections', () => {
     class SubEntity {
       public id: string;
     }
+    @Collection()
     class Entity {
       id: string;
 
@@ -21,17 +26,20 @@ describe('SubCollectionDecorator', () => {
       subentity: ISubCollection<SubEntity>;
     }
 
-    expect(store.metadataStorage.subCollections.length).toEqual(1);
-    expect(store.metadataStorage.subCollections[0].name).toEqual('subs');
-    expect(store.metadataStorage.subCollections[0].parentEntity).toEqual(Entity);
-    expect(store.metadataStorage.subCollections[0].entity).toEqual(SubEntity);
-    expect(store.metadataStorage.subCollections[0].propertyKey).toEqual('subentity');
+    expect(setCollection).toHaveBeenCalledWith({
+      name: 'subs',
+      entityConstructor: SubEntity,
+      parentEntityConstructor: Entity,
+      propertyKey: 'subentity',
+    });
   });
 
   it('should register collections with default name', () => {
     class SubEntity {
       public id: string;
     }
+
+    @Collection()
     class Entity {
       id: string;
 
@@ -39,10 +47,11 @@ describe('SubCollectionDecorator', () => {
       subentity: ISubCollection<SubEntity>;
     }
 
-    expect(store.metadataStorage.subCollections.length).toEqual(1);
-    expect(store.metadataStorage.subCollections[0].name).toEqual('subentities');
-    expect(store.metadataStorage.subCollections[0].parentEntity).toEqual(Entity);
-    expect(store.metadataStorage.subCollections[0].entity).toEqual(SubEntity);
-    expect(store.metadataStorage.subCollections[0].propertyKey).toEqual('subentity');
+    expect(setCollection).toHaveBeenCalledWith({
+      name: 'SubEntities',
+      entityConstructor: SubEntity,
+      parentEntityConstructor: Entity,
+      propertyKey: 'subentity',
+    });
   });
 });

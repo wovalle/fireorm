@@ -1,11 +1,15 @@
-import { initialize, getStore, clearMetadataStorage } from '../MetadataStorage';
 import { Collection } from './Collection';
 
+const setCollection = jest.fn();
+jest.mock('../MetadataUtils', () => ({
+  getMetadataStorage: () => ({
+    setCollection,
+  }),
+}));
+
 describe('CollectionDecorator', () => {
-  const store = getStore();
   beforeEach(() => {
-    clearMetadataStorage();
-    initialize(null);
+    jest.resetAllMocks();
   });
 
   it('should register collections', () => {
@@ -14,10 +18,10 @@ describe('CollectionDecorator', () => {
       id: string;
     }
 
-    const collection = store.metadataStorage.getCollection('foo');
-    expect(store.metadataStorage.collections.length).toEqual(1);
-    expect(collection.name).toEqual('foo');
-    expect(collection.entity).toEqual(Entity);
+    expect(setCollection).toHaveBeenCalledWith({
+      name: 'foo',
+      entityConstructor: Entity,
+    });
   });
 
   it('should register collections with default name', () => {
@@ -26,22 +30,9 @@ describe('CollectionDecorator', () => {
       id: string;
     }
 
-    const collection = store.metadataStorage.getCollection('Entities');
-    expect(store.metadataStorage.collections.length).toEqual(1);
-    expect(collection.name).toEqual('Entities');
-    expect(collection.entity).toEqual(Entity);
-  });
-
-  it('should register collections once', () => {
-    @Collection()
-    @Collection()
-    class Entity {
-      id: string;
-    }
-
-    const collection = store.metadataStorage.getCollection('Entities');
-    expect(store.metadataStorage.collections.length).toEqual(1);
-    expect(collection.name).toEqual('Entities');
-    expect(collection.entity).toEqual(Entity);
+    expect(setCollection).toHaveBeenCalledWith({
+      name: 'Entities',
+      entityConstructor: Entity,
+    });
   });
 });

@@ -1,5 +1,10 @@
 import { plainToClass } from 'class-transformer';
-import { DocumentSnapshot, QuerySnapshot } from '@google-cloud/firestore';
+import {
+  DocumentSnapshot,
+  QuerySnapshot,
+  CollectionReference,
+  Transaction,
+} from '@google-cloud/firestore';
 import { ValidationError } from './Errors/ValidationError';
 
 import {
@@ -12,104 +17,121 @@ import {
   IRepository,
   PartialBy,
   IEntityConstructor,
+  ITransactionReferenceStorage,
 } from './types';
 
-import { getMetadataStorage, CollectionMetadata, MetadataStorageConfig } from './MetadataStorage';
+import { isDocumentReference, isGeoPoint, isObject, isTimestamp } from './TypeGuards';
+
+import { getMetadataStorage } from './MetadataUtils';
+import { MetadataStorageConfig, FullCollectionMetadata } from './MetadataStorage';
 
 import { BaseRepository } from './BaseRepository';
 import QueryBuilder from './QueryBuilder';
 import { serializeEntity } from './utils';
+import { NoMetadataError } from './Errors';
 
 export abstract class AbstractFirestoreRepository<T extends IEntity> extends BaseRepository
   implements IRepository<T> {
-  protected readonly subColMetadata: CollectionMetadata[];
-  protected readonly colMetadata: CollectionMetadata;
-  protected readonly colName: string;
+  protected readonly colMetadata: FullCollectionMetadata;
+  protected readonly path: string;
   protected readonly config: MetadataStorageConfig;
-  protected readonly collectionPath: string;
+  protected readonly firestoreColRef: CollectionReference;
 
-  constructor(nameOrConstructor: string | IEntityConstructor, collectionPath?: string) {
+  constructor(pathOrConstructor: string | IEntityConstructor) {
     super();
 
-    const {
-      getCollection,
-      getSubCollection,
-      getSubCollectionsFromParent,
-      config,
-    } = getMetadataStorage();
+    const { getCollection, config, firestoreRef } = getMetadataStorage();
 
-    //TODO: add tests to ensure that we can initialize this with name or constructor
-
-    this.colMetadata = getSubCollection(nameOrConstructor) || getCollection(nameOrConstructor);
-
-    if (!this.colMetadata) {
-      throw new Error(
-        `There is no metadata stored for "${
-          typeof nameOrConstructor === 'string' ? nameOrConstructor : nameOrConstructor.name
-        }"`
-      );
+    if (!firestoreRef) {
+      throw new Error('Firestore must be initialized first');
     }
 
-    this.colName = this.colMetadata.name;
     this.config = config;
-    this.collectionPath = collectionPath || this.colName;
-    this.subColMetadata = getSubCollectionsFromParent(this.colMetadata.entity);
+    const colMetadata = getCollection(pathOrConstructor);
+
+    if (!colMetadata) {
+      throw new NoMetadataError(pathOrConstructor);
+    }
+
+    this.colMetadata = colMetadata;
+    this.path = typeof pathOrConstructor === 'string' ? pathOrConstructor : this.colMetadata.name;
+    this.firestoreColRef = firestoreRef.collection(this.path);
   }
 
   protected toSerializableObject = (obj: T): Record<string, unknown> =>
-    serializeEntity(obj, this.subColMetadata);
+    serializeEntity(obj, this.colMetadata.subCollections);
 
-  protected transformFirestoreTypes = (obj: T): T => {
+  protected transformFirestoreTypes = (obj: Record<string, unknown>) => {
     Object.keys(obj).forEach(key => {
+      const val = obj[key];
       if (!obj[key]) return;
-      if (typeof obj[key] === 'object' && 'toDate' in obj[key]) {
-        obj[key] = obj[key].toDate();
-      } else if (obj[key].constructor.name === 'GeoPoint') {
-        const { latitude, longitude } = obj[key];
+      if (isTimestamp(val)) {
+        obj[key] = val.toDate();
+      } else if (isGeoPoint(val)) {
+        const { latitude, longitude } = val;
         obj[key] = { latitude, longitude };
-      } else if (obj[key].constructor.name === 'DocumentReference') {
-        const { id, path } = obj[key];
+      } else if (isDocumentReference(val)) {
+        const { id, path } = val;
         obj[key] = { id, path };
-      } else if (typeof obj[key] === 'object') {
-        this.transformFirestoreTypes(obj[key]);
+      } else if (isObject(val)) {
+        this.transformFirestoreTypes(val);
       }
     });
     return obj;
   };
 
-  protected initializeSubCollections = (entity: T) => {
+  protected initializeSubCollections = (
+    entity: T,
+    tran?: Transaction,
+    tranRefStorage?: ITransactionReferenceStorage
+  ) => {
     // Requiring here to prevent circular dependency
-
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { getRepository } = require('./helpers');
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { FirestoreTransaction } = require('./Transaction/FirestoreTransaction');
 
-    this.subColMetadata.forEach(subCol => {
-      Object.assign(entity, {
-        [subCol.propertyKey]: getRepository(
-          subCol.entity,
-          `${this.collectionPath}/${entity.id}/${subCol.name}`
-        ),
-      });
+    this.colMetadata.subCollections.forEach(subCol => {
+      const pathWithSubCol = `${this.path}/${entity.id}/${subCol.name}`;
+      const { propertyKey } = subCol;
+
+      // If we are inside a transaction, our subcollections should also be TransactionRepositories
+      if (tran && tranRefStorage) {
+        const firestoreTransaction = new FirestoreTransaction(tran, tranRefStorage);
+        const repository = firestoreTransaction.getRepository(pathWithSubCol);
+        tranRefStorage.add({ propertyKey, path: pathWithSubCol, entity });
+        Object.assign(entity, {
+          [propertyKey]: repository,
+        });
+      } else {
+        Object.assign(entity, {
+          [propertyKey]: getRepository(pathWithSubCol),
+        });
+      }
     });
   };
 
-  protected extractTFromDocSnap = (doc: DocumentSnapshot): T => {
-    if (!doc.exists) {
-      return null;
-    }
-
-    const entity = plainToClass(this.colMetadata.entity, {
+  protected extractTFromDocSnap = (
+    doc: DocumentSnapshot,
+    tran?: Transaction,
+    tranRefStorage?: ITransactionReferenceStorage
+  ): T => {
+    const entity = plainToClass(this.colMetadata.entityConstructor, {
       id: doc.id,
-      ...this.transformFirestoreTypes(doc.data() as T),
+      ...this.transformFirestoreTypes(doc.data() || {}),
     }) as T;
 
-    this.initializeSubCollections(entity);
+    this.initializeSubCollections(entity, tran, tranRefStorage);
 
     return entity;
   };
 
-  protected extractTFromColSnap = (q: QuerySnapshot): T[] => {
-    return q.docs.map(this.extractTFromDocSnap);
+  protected extractTFromColSnap = (
+    q: QuerySnapshot,
+    tran?: Transaction,
+    tranRefStorage?: ITransactionReferenceStorage
+  ): T[] => {
+    return q.docs.filter(d => d.exists).map(d => this.extractTFromDocSnap(d, tran, tranRefStorage));
   };
 
   /**
@@ -311,8 +333,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   async validate(item: T): Promise<ValidationError[]> {
     try {
       const classValidator = await import('class-validator');
-      const { getSubCollection, getCollection } = getMetadataStorage();
-      const { entity: Entity } = getSubCollection(this.colName) || getCollection(this.colName);
+      const { entityConstructor: Entity } = this.colMetadata;
 
       /**
        * Instantiate plain objects into an entity class
@@ -354,7 +375,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   ): Promise<T[]>;
 
   /**
-   * Retreive a document with the specified id.
+   * Retrieve a document with the specified id.
    * Must be implemented by base repositores
    *
    * @abstract
@@ -362,7 +383,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
    * @returns {Promise<T>}
    * @memberof AbstractFirestoreRepository
    */
-  abstract findById(id: string): Promise<T>;
+  abstract findById(id: string): Promise<T | null>;
 
   /**
    * Creates a document.

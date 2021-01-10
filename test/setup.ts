@@ -25,21 +25,31 @@ jest.setTimeout(10000); // 10 seconds
 
 beforeEach(() => {
   initialize(firestore);
+  expect.hasAssertions();
 });
 
 afterAll(async () => {
   console.info('Deleting collections', uniqueCollections);
   const batch = firestore.batch();
 
-  for (const uc of uniqueCollections) {
-    const docs = await firestore.collection(uc).listDocuments();
+  if (process.env.FIRESTORE_DELETE_ALL_COLLECTIONS) {
+    const cols = await firestore.listCollections();
+    for (const col of cols.map(c => c.id)) {
+      const docs = await firestore.collection(col).listDocuments();
+      docs.forEach(d => batch.delete(d));
+    }
+  } else {
+    for (const uc of uniqueCollections) {
+      const docs = await firestore.collection(uc).listDocuments();
 
-    for (const doc of docs) {
-      const albums = await doc.collection('albums').listDocuments();
-      albums.forEach(a => batch.delete(a));
-      batch.delete(doc);
+      for (const doc of docs) {
+        const albums = await doc.collection('albums').listDocuments();
+        albums.forEach(a => batch.delete(a));
+        batch.delete(doc);
+      }
     }
   }
+
   await batch.commit();
 });
 

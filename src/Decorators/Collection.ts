@@ -1,12 +1,13 @@
-import { getMetadataStorage } from '../MetadataStorage';
+import { getMetadataStorage } from '../MetadataUtils';
 import { plural } from 'pluralize';
-import { IEntityConstructor } from '../types';
+import type { IEntityConstructor } from '../types';
 
 export function Collection(entityName?: string) {
-  return function (entity: IEntityConstructor) {
+  return function (entityConstructor: IEntityConstructor) {
+    const name = entityName || plural(entityConstructor.name);
     getMetadataStorage().setCollection({
-      name: entityName || plural(entity.name),
-      entity,
+      name,
+      entityConstructor,
     });
   };
 }

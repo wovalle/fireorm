@@ -67,6 +67,29 @@ export interface IQueryExecutor<T> {
   ): Promise<T[]>;
 }
 
+export interface IBatchRepository<T extends IEntity> {
+  create(item: WithOptionalId<T>): void;
+  update(item: T): void;
+  delete(item: T): void;
+}
+
+export interface ISingleBatchRepository<T extends IEntity> extends IBatchRepository<T> {
+  commit(): Promise<unknown>;
+}
+
+export interface IFirestoreBatchSingleRepository<T extends IEntity> extends IBatchRepository<T> {
+  commit(): Promise<void>;
+}
+
+export interface IFirestoreBatch {
+  getRepository<T extends IEntity>(entity: Constructor<T>): IBatchRepository<T>;
+  getSingleRepository<T extends IEntity>(
+    pathOrConstructor: EntityConstructorOrPath<T>
+  ): IFirestoreBatchSingleRepository<T>;
+
+  commit(): Promise<unknown>;
+}
+
 export interface IBaseRepository<T extends IEntity> {
   findById(id: string): Promise<T | null>;
   create(item: PartialBy<T, 'id'>): Promise<T>;
@@ -78,12 +101,32 @@ export type IRepository<T extends IEntity> = IBaseRepository<T> &
   IQueryBuilder<T> &
   IQueryExecutor<T>;
 
-export type ISubCollection<T extends IEntity> = IRepository<T>;
+export type ITransactionRepository<T extends IEntity> = IRepository<T>;
+
+export interface ITransactionReference<T = IEntity> {
+  entity: T;
+  propertyKey: string;
+  path: string;
+}
+
+export type ITransactionReferenceStorage = Set<ITransactionReference>;
+
+// TODO: shouldn't this be in IRepository?
+export type ISubCollection<T extends IEntity> = IRepository<T> & {
+  createBatch: () => IFirestoreBatchSingleRepository<T>;
+  runTransaction<R = void>(executor: (tran: ITransactionRepository<T>) => Promise<R>): Promise<R>;
+};
 
 export interface IEntity {
   id: string;
 }
 
 export type Constructor<T> = { new (): T };
+export type EntityConstructorOrPathConstructor<T extends IEntity> = { new (): T };
 export type IEntityConstructor = Constructor<IEntity>;
 export type IEntityRepositoryConstructor = Constructor<IRepository<IEntity>>;
+export type EntityConstructorOrPath<T> = Constructor<T> | string;
+
+export interface IFirestoreTransaction<T extends IEntity = IEntity> {
+  getRepository(entityOrConstructor: EntityConstructorOrPath<T>): IRepository<T>;
+}

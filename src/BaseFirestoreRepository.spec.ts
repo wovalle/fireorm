@@ -1,8 +1,15 @@
-import { initialize } from './MetadataStorage';
-import { getFixture, Album, Coordinates, FirestoreDocumentReference } from '../test/fixture';
+import { initialize } from './MetadataUtils';
+import {
+  getFixture,
+  Album,
+  Coordinates,
+  FirestoreDocumentReference,
+  AlbumImage,
+} from '../test/fixture';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { Band } from '../test/BandCollection';
 import { Firestore } from '@google-cloud/firestore';
+import { NoMetadataError } from './Errors';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const MockFirebase = require('mock-cloud-firestore');
@@ -22,6 +29,26 @@ describe('BaseFirestoreRepository', () => {
     initialize(firestore);
 
     bandRepository = new BandRepository('bands');
+  });
+
+  describe('constructor', () => {
+    it('should correctly initialize a repository with custom path', async () => {
+      const bandRepositoryWithPath = new BandRepository('bands');
+      const band = await bandRepositoryWithPath.findById('porcupine-tree');
+      expect(band.name).toEqual('Porcupine Tree');
+    });
+
+    it('should correctly initialize a repository with an entity', async () => {
+      const bandRepositoryWithPath = new BandRepository(Band);
+      const band = await bandRepositoryWithPath.findById('porcupine-tree');
+      expect(band.name).toEqual('Porcupine Tree');
+    });
+
+    it('should throw error if initialized with an invalid path', async () => {
+      expect(() => new BandRepository('invalidpath')).toThrowError(
+        new NoMetadataError('invalidpath')
+      );
+    });
   });
 
   describe('limit', () => {
@@ -48,9 +75,8 @@ describe('BaseFirestoreRepository', () => {
 
     it('must limit subcollections', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
-      const albumsSubColl = pt.albums;
-      const albumsLimited = await albumsSubColl.limit(2).find();
-      expect(albumsLimited.length).toEqual(2);
+      const albums = await pt.albums.limit(2).find();
+      expect(albums.length).toEqual(2);
     });
 
     it('must throw an exception if limit call more than once', async () => {
@@ -61,7 +87,7 @@ describe('BaseFirestoreRepository', () => {
     it.todo('must throw if the limit is less than 0');
   });
 
-  describe('Ordering', () => {
+  describe('ordering', () => {
     describe('orderByAscending', () => {
       it('must order repository objects', async () => {
         const bands = await bandRepository.orderByAscending('formationYear').find();
@@ -262,6 +288,16 @@ describe('BaseFirestoreRepository', () => {
       const foundBand = await bandRepository.findById(band.id);
 
       expect(band.id).toEqual(foundBand.id);
+    });
+
+    it('throw error when trying to create objects with duplicated id', async () => {
+      expect.assertions(1);
+      const entity = new Band();
+      entity.id = 'pink-floyd';
+
+      await expect(bandRepository.create(entity)).rejects.toThrowError(
+        'A document with id pink-floyd already exists.'
+      );
     });
   });
 
@@ -464,8 +500,11 @@ describe('BaseFirestoreRepository', () => {
   describe('miscellaneous', () => {
     it('should correctly parse dates', async () => {
       const pt = await bandRepository.findById('porcupine-tree');
+      const { releaseDate } = await pt.albums.findById('deadwing');
       expect(pt.lastShow).toBeInstanceOf(Date);
       expect(pt.lastShow.toISOString()).toEqual('2010-10-14T00:00:00.000Z');
+      expect(releaseDate).toBeInstanceOf(Date);
+      expect(releaseDate.toISOString()).toEqual('2005-03-25T00:00:00.000Z');
     });
 
     it('should correctly parse geopoints', async () => {
@@ -503,7 +542,7 @@ describe('BaseFirestoreRepository', () => {
       expect(updated.name).toEqual('Árbol de Puercoespín');
     });
 
-    it('should return TransactionRepository', async () => {
+    it('runTransaction should return TransactionRepository', async () => {
       await bandRepository.runTransaction(async tran => {
         expect(tran.constructor.name).toEqual('TransactionRepository');
       });
@@ -536,29 +575,19 @@ describe('BaseFirestoreRepository', () => {
       await batch.commit();
 
       const batchedBands = await bandRepository.whereEqualTo('formationYear', 2099).find();
-
       expect(batchedBands.map(b => b.name)).toEqual(['Entity1', 'Entity2', 'Entity3']);
     });
   });
 
   describe('must handle subcollections', () => {
-    it('should initialize subcollections', async () => {
-      const pt = await bandRepository.findById('porcupine-tree');
-      expect(pt.name).toEqual('Porcupine Tree');
-      expect(pt.albums).toBeInstanceOf(BaseFirestoreRepository);
-    });
-
     it('should initialize nested subcollections', async () => {
       const pt = await bandRepository.findById('red-hot-chili-peppers');
+      expect(pt.name).toEqual('Red Hot Chili Peppers');
+      expect(pt.albums).toBeInstanceOf(BaseFirestoreRepository);
+
       const album = await pt.albums.findById('stadium-arcadium');
-
+      expect(album.name).toEqual('Stadium Arcadium');
       expect(album.images).toBeInstanceOf(BaseFirestoreRepository);
-    });
-
-    it('should be able to execute operations in the subcollection', async () => {
-      const band = await bandRepository.findById('red-hot-chili-peppers');
-      const bestAlbum = await band.albums.findById('stadium-arcadium');
-      expect(bestAlbum.id).toEqual('stadium-arcadium');
     });
 
     it('should be able to create subcollections', async () => {
@@ -679,13 +708,47 @@ describe('BaseFirestoreRepository', () => {
       expect(updatedBandAlbums.length).toEqual(3);
     });
 
-    describe('miscellaneous', () => {
-      it('should correctly parse dates', async () => {
-        const pt = await bandRepository.findById('porcupine-tree');
-        const { releaseDate } = await pt.albums.findById('deadwing');
-        expect(releaseDate).toBeInstanceOf(Date);
-        expect(releaseDate.toISOString()).toEqual('2005-03-25T00:00:00.000Z');
-      });
+    it('should be able to update subcollections of subcollections', async () => {
+      const band = new Band();
+      band.id = '30-seconds-to-mars';
+      band.name = '30 Seconds To Mars';
+      band.formationYear = 1998;
+      band.genres = ['alternative-rock'];
+
+      await bandRepository.create(band);
+
+      const firstAlbum = new Album();
+      firstAlbum.id = '30-seconds-to-mars';
+      firstAlbum.name = '30 Seconds to Mars (Album)';
+      firstAlbum.releaseDate = new Date('2002-07-22');
+
+      const album = await band.albums.create(firstAlbum);
+
+      const image1 = new AlbumImage();
+      image1.id = 'image1';
+      image1.url = 'http://image1.com';
+
+      const image2 = new AlbumImage();
+      image2.id = 'image2';
+      image2.url = 'http://image2.com';
+
+      await album.images.create(image1);
+      await album.images.create(image2);
+
+      const images = await album.images.find();
+      expect(images.length).toEqual(2);
+
+      const foundBand = await bandRepository.findById('30-seconds-to-mars');
+      expect(foundBand.name).toEqual('30 Seconds To Mars');
+
+      const foundAlbums = await foundBand.albums.find();
+
+      expect(foundAlbums.length).toEqual(1);
+      expect(foundAlbums[0].name).toEqual('30 Seconds to Mars (Album)');
+
+      const foundImages = await foundAlbums[0].images.find();
+      expect(foundImages.length).toEqual(2);
+      expect(foundImages[0].id).toEqual('image1');
     });
   });
 

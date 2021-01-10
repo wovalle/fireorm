@@ -58,6 +58,39 @@ albumBatchRepository.create(album2);
 await batch.commit();
 ```
 
+## Batches in subcollections
+
+Fireorm exports a [createBatch](Classes/BaseFirestoreRepository.md#CreateBatch) method that can be used to create batches with one or multiple repositories. It receives a lamda function where the first parameter corresponds to a [FirestoreBatch](Classes/FirestoreBatch.md) class. This class exposes a `getRepository` method that receives an [Model class](CORE_CONCEPTS.md#FireormModels) and returns a [BatchRepository](Classes/BatchRepository.md) of the given entity and can be used to create, update and delete documents. Once all operations are defined, we have to call the `commit` method of our BatchRepository to commit all the operations.
+
+```typescript
+import Band from './wherever-our-models-are';
+import Album from './wherever-our-models-are';
+
+const bandRepository = getRepository(Band);
+const band = bandRepository.findById('opeth');
+
+// Initialize subcollection documents
+const firstAlbum = new Album();
+firstAlbum.id: 'blackwater-park';
+firstAlbum.name: 'Blackwater Park';
+firstAlbum.releaseDate: new Date('2001-12-03T00:00:00.000Z');
+
+const secondAlbum = new Album();
+secondAlbum.id: 'deliverance';
+secondAlbum.name: 'Deliverance';
+secondAlbum.releaseDate: new Date('2002-11-12T00:00:00.000Z');
+
+// Create a batch for the subcollection
+const albumsBatch = band.albums.createBatch();
+
+// Add the subcollection entities
+albumsBatch.create(firstAlbum);
+albumsBatch.create(secondAlbum);
+
+// Commit transaction
+await albumsBatch.commit();
+```
+
 ## Limitations
 
 Please be aware that Firestore has many limitations when working with BatchedWrites. You can learn more [here](https://firebase.google.com/docs/firestore/manage-data/transactions).

@@ -1,8 +1,9 @@
 import { Firestore } from '@google-cloud/firestore';
 import { BaseFirestoreRepository } from '../BaseFirestoreRepository';
-import { getFixture, Album } from '../../test/fixture';
-import { initialize } from '../MetadataStorage';
+import { getFixture, Album, AlbumImage } from '../../test/fixture';
+import { initialize } from '../MetadataUtils';
 import { Band } from '../../test/BandCollection';
+import { TransactionRepository } from './BaseFirestoreTransactionRepository';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const MockFirebase = require('mock-cloud-firestore');
@@ -33,7 +34,7 @@ describe('BaseFirestoreTransactionRepository', () => {
   describe('limit', () => {
     it('must throw when using limit', async () => {
       await bandRepository.runTransaction(async tran => {
-        expect(() => tran.limit()).toThrow();
+        expect(() => tran.limit(1)).toThrow();
       });
     });
   });
@@ -41,13 +42,13 @@ describe('BaseFirestoreTransactionRepository', () => {
   describe('orderBy*', () => {
     it('must throw when using orderByAscending', async () => {
       await bandRepository.runTransaction(async tran => {
-        expect(() => tran.orderByAscending()).toThrow();
+        expect(() => tran.orderByAscending(a => a.id)).toThrow();
       });
     });
 
     it('must throw when using orderByDescending', async () => {
       await bandRepository.runTransaction(async tran => {
-        expect(() => tran.orderByDescending()).toThrow();
+        expect(() => tran.orderByDescending(a => a.id)).toThrow();
       });
     });
   });
@@ -381,42 +382,68 @@ describe('BaseFirestoreTransactionRepository', () => {
     it('should correctly parse dates', async () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
+        const { releaseDate } = await pt.albums.findById('deadwing');
+        expect(releaseDate).toBeInstanceOf(Date);
+        expect(releaseDate.toISOString()).toEqual('2005-03-25T00:00:00.000Z');
         expect(pt.lastShow).toBeInstanceOf(Date);
         expect(pt.lastShow.toISOString()).toEqual('2010-10-14T00:00:00.000Z');
       });
     });
   });
 
-  describe('must handle subcollections', () => {
-    it('should initialize subcollections', async () => {
+  describe('references', () => {
+    const band = new Band();
+    it('should initialize transactionRepositories', async () => {
       await bandRepository.runTransaction(async tran => {
-        const pt = await tran.findById('porcupine-tree');
-        expect(pt.name).toEqual('Porcupine Tree');
-        expect(pt.albums).toBeInstanceOf(BaseFirestoreRepository);
+        band.id = '30-seconds-to-mars';
+        band.name = '30 Seconds To Mars';
+        band.formationYear = 1998;
+        band.genres = ['alternative-rock'];
+
+        await tran.create(band);
+
+        const firstAlbum = new Album();
+        firstAlbum.id = '30-seconds-to-mars';
+        firstAlbum.name = '30 Seconds to Mars (Album)';
+        firstAlbum.releaseDate = new Date('2002-07-22');
+
+        const album = await band.albums.create(firstAlbum);
+
+        const image1 = new AlbumImage();
+        image1.id = 'image1';
+        image1.url = 'http://image1.com';
+
+        const image2 = new AlbumImage();
+        image2.id = 'image2';
+        image2.url = 'http://image2.com';
+
+        await album.images.create(image1);
+        await album.images.create(image2);
+
+        expect(band.albums.constructor.name).toEqual('TransactionRepository');
+        expect(album.images.constructor.name).toEqual('TransactionRepository');
       });
     });
 
+    it('should revert transaction repositories to normal repositories', () => {
+      expect(band.albums.constructor.name).toEqual('BaseFirestoreRepository');
+    });
+  });
+
+  describe('must handle subcollections', () => {
     it('should initialize nested subcollections', async () => {
       await bandRepository.runTransaction(async tran => {
-        const pt = await tran.findById('red-hot-chili-peppers');
-        const albumsRef = pt.albums;
-
-        const album = await albumsRef.findById('stadium-arcadium');
-        expect(album.images).toBeInstanceOf(BaseFirestoreRepository);
-      });
-    });
-
-    it('should be able to execute operations in the subcollection', async () => {
-      await bandRepository.runTransaction(async tran => {
         const band = await tran.findById('red-hot-chili-peppers');
-        const albumsRef = band.albums;
+        expect(band.name).toEqual('Red Hot Chili Peppers');
+        expect(band.albums).toBeInstanceOf(TransactionRepository);
 
-        const bestAlbum = await albumsRef.findById('stadium-arcadium');
-        expect(bestAlbum.id).toEqual('stadium-arcadium');
+        const album = await band.albums.findById('stadium-arcadium');
+        expect(album.name).toEqual('Stadium Arcadium');
+        expect(album.images).toBeInstanceOf(TransactionRepository);
       });
     });
 
-    it('should be able to create subcollections', async () => {
+    it('should be able to create subcollections and initialize them', async () => {
       const band = new Band();
       band.id = '30-seconds-to-mars';
       band.name = '30 Seconds To Mars';
@@ -448,27 +475,7 @@ describe('BaseFirestoreTransactionRepository', () => {
 
         const albums = await albumsRef.find();
         expect(albums.length).toEqual(3);
-      });
-    });
-
-    it('should initialize nested subcollections on create', async () => {
-      const band = new Band();
-      band.id = '30-seconds-to-mars';
-      band.name = '30 Seconds To Mars';
-      band.formationYear = 1998;
-      band.genres = ['alternative-rock'];
-
-      const firstAlbum = new Album();
-      firstAlbum.id = '30-seconds-to-mars';
-      firstAlbum.name = '30 Seconds to Mars';
-      firstAlbum.releaseDate = new Date('2002-07-22');
-
-      await bandRepository.runTransaction(async tran => {
-        await tran.create(band);
-        const albumsRef = band.albums;
-        const album = await albumsRef.create(firstAlbum);
-
-        expect(album.images).toBeInstanceOf(BaseFirestoreRepository);
+        expect(albums[0].images).toBeInstanceOf(TransactionRepository);
       });
     });
 
@@ -551,18 +558,49 @@ describe('BaseFirestoreTransactionRepository', () => {
       });
     });
 
-    describe('miscellaneous', () => {
-      it('should correctly parse dates', async () => {
-        await bandRepository.runTransaction(async tran => {
-          const pt = await tran.findById('porcupine-tree');
-          const albumsRef = pt.albums;
+    it('should be able to update subcollections of subcollections', async () => {
+      await bandRepository.runTransaction(async tran => {
+        const band = new Band();
+        band.id = '30-seconds-to-mars';
+        band.name = '30 Seconds To Mars';
+        band.formationYear = 1998;
+        band.genres = ['alternative-rock'];
 
-          const album = await albumsRef.findById('fear-blank-planet');
-          const { releaseDate } = album;
+        await tran.create(band);
 
-          expect(releaseDate).toBeInstanceOf(Date);
-          expect(releaseDate.toISOString()).toEqual('2007-04-16T00:00:00.000Z');
-        });
+        const firstAlbum = new Album();
+        firstAlbum.id = '30-seconds-to-mars';
+        firstAlbum.name = '30 Seconds to Mars (Album)';
+        firstAlbum.releaseDate = new Date('2002-07-22');
+
+        const album = await band.albums.create(firstAlbum);
+
+        const image1 = new AlbumImage();
+        image1.id = 'image1';
+        image1.url = 'http://image1.com';
+
+        const image2 = new AlbumImage();
+        image2.id = 'image2';
+        image2.url = 'http://image2.com';
+
+        await album.images.create(image1);
+        await album.images.create(image2);
+
+        const images = await album.images.find();
+        expect(images.length).toEqual(2);
+      });
+
+      await bandRepository.runTransaction(async tran => {
+        const band = await tran.findById('30-seconds-to-mars');
+        expect(band.name).toEqual('30 Seconds To Mars');
+        const albums = await band.albums.find();
+
+        expect(albums.length).toEqual(1);
+        expect(albums[0].name).toEqual('30 Seconds to Mars (Album)');
+
+        const images = await albums[0].images.find();
+        expect(images.length).toEqual(2);
+        expect(images[0].id).toEqual('image1');
       });
     });
   });

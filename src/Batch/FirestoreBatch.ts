@@ -1,11 +1,11 @@
-import { IEntity, Constructor } from '../types';
+import { IEntity, EntityConstructorOrPath, IFirestoreBatch } from '../types';
 import { BaseFirestoreBatchRepository } from './BaseFirestoreBatchRepository';
 import { FirestoreBatchSingleRepository } from './FirestoreBatchSingleRepository';
 import { Firestore } from '@google-cloud/firestore';
 import { FirestoreBatchUnit } from './FirestoreBatchUnit';
 
 // TODO: handle status where batch was already committed.
-export class FirestoreBatch {
+export class FirestoreBatch implements IFirestoreBatch {
   private batch: FirestoreBatchUnit;
 
   constructor(protected firestoreRef: Firestore) {
@@ -17,13 +17,12 @@ export class FirestoreBatch {
    * Returns a batch repository of T.
    *
    * @template T
-   * @param {Constructor<T>} entity
-   * @param {String} [collectionPath]
+   * @param {EntityConstructorOrPath<T>} entity path or constructor
    * @returns
    * @memberof FirestoreBatch
    */
-  getRepository<T extends IEntity>(entity: Constructor<T>, collectionPath?: string) {
-    return new BaseFirestoreBatchRepository(this.batch, entity, collectionPath);
+  getRepository<T extends IEntity>(pathOrConstructor: EntityConstructorOrPath<T>) {
+    return new BaseFirestoreBatchRepository(pathOrConstructor, this.batch);
   }
 
   /**
@@ -32,13 +31,12 @@ export class FirestoreBatch {
    * current features and will be deleted in the next major version.
    *
    * @template T
-   * @param {Constructor<T>} entity
-   * @param {String} [collectionPath]
+   * @param {EntityConstructorOrPath<T>} entity path or constructor
    * @returns
    * @memberof FirestoreBatch
    */
-  getSingleRepository<T extends IEntity>(entity: Constructor<T>, collectionPath?: string) {
-    return new FirestoreBatchSingleRepository(this.batch, entity, collectionPath);
+  getSingleRepository<T extends IEntity>(pathOrConstructor: EntityConstructorOrPath<T>) {
+    return new FirestoreBatchSingleRepository(pathOrConstructor, this.batch);
   }
 
   /**

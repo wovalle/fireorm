@@ -1,4 +1,4 @@
-import { CollectionMetadata } from './MetadataStorage';
+import { SubCollectionMetadata } from './MetadataStorage';
 import { IEntity } from '.';
 
 /**
@@ -6,7 +6,7 @@ import { IEntity } from '.';
  * @param {T} Entity object
  * @returns {Object} with only data properties
  */
-export function extractAllGetter<T>(obj: T): Record<string, unknown> {
+export function extractAllGetters(obj: Record<string, unknown>) {
   const prototype = Object.getPrototypeOf(obj);
   const fromInstanceObj = Object.keys(obj);
   const fromInstance = Object.getOwnPropertyNames(obj);
@@ -25,8 +25,8 @@ export function extractAllGetter<T>(obj: T): Record<string, unknown> {
     })
     .filter(d => d !== undefined);
 
-  return getters.reduce((accumulator, currentValue) => {
-    if (obj[currentValue]) {
+  return getters.reduce<Record<string, unknown>>((accumulator, currentValue) => {
+    if (typeof currentValue === 'string' && obj[currentValue]) {
       accumulator[currentValue] = obj[currentValue];
     }
     return accumulator;
@@ -38,15 +38,15 @@ export function extractAllGetter<T>(obj: T): Record<string, unknown> {
  *
  * @template T
  * @param {T} Entity object
- * @param {CollectionMetadata[]} subColMetadata Subcollection
+ * @param {SubCollectionMetadata[]} subColMetadata Subcollection
  * metadata to remove runtime-created fields
  * @returns {Object} Serialiable object
  */
 export function serializeEntity<T extends IEntity>(
-  obj: T,
-  subColMetadata: CollectionMetadata[]
+  obj: Partial<T>,
+  subColMetadata: SubCollectionMetadata[]
 ): Record<string, unknown> {
-  const objectGetters = extractAllGetter(obj as Record<string, unknown>);
+  const objectGetters = extractAllGetters(obj as Record<string, unknown>);
 
   const serializableObj = { ...obj, ...objectGetters };
 
@@ -54,4 +54,20 @@ export function serializeEntity<T extends IEntity>(
     delete serializableObj[scm.propertyKey];
   });
   return serializableObj;
+}
+
+/**
+ * Returns true if arrays are equal
+ *
+ * @export
+ * @param {Array<unknown>} arr1
+ * @param {Array<unknown>} arr2
+ * @returns {boolean}
+ */
+export function arraysAreEqual(arr1: unknown[], arr2: unknown[]): boolean {
+  if (arr1.length !== arr2.length) {
+    return false;
+  }
+
+  return arr1.every((a, i) => a === arr2[i]);
 }

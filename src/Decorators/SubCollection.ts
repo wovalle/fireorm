@@ -1,13 +1,13 @@
-import { getMetadataStorage } from '../MetadataStorage';
+import { getMetadataStorage } from '../MetadataUtils';
 import { plural } from 'pluralize';
 import { IEntityConstructor, IEntity } from '../types';
 
-export function SubCollection(entity: IEntityConstructor, entityName?: string) {
-  return function (target: IEntity, propertyKey: string) {
-    getMetadataStorage().setSubCollection({
-      entity,
-      name: entityName || plural(propertyKey),
-      parentEntity: target.constructor as IEntityConstructor,
+export function SubCollection(entityConstructor: IEntityConstructor, entityName?: string) {
+  return function (parentEntity: IEntity, propertyKey: string) {
+    getMetadataStorage().setCollection({
+      entityConstructor,
+      name: entityName || plural(entityConstructor.name),
+      parentEntityConstructor: parentEntity.constructor as IEntityConstructor,
       propertyKey,
     });
   };

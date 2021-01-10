@@ -83,6 +83,10 @@ export const getInitialData = () => {
               id: 'album-artwork',
               url: 'http://lorempixel.com/100/100',
             },
+            {
+              id: 'album-cover',
+              url: 'http://lorempixel.com/100/100',
+            },
           ],
         },
       ],
@@ -191,15 +195,17 @@ const getCollectionBoilerplate = (entity: string, hash: Record<string, unknown>)
 export const getBandFixture = () => {
   const initialData = getInitialData();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const objectifyList = (arr: Array<IEntity>, cb) =>
-    arr.reduce((acc, cur) => ({ ...acc, [cur.id]: cb(cur) }), {});
+  const objectifyList = (arr: Array<IEntity>, cb?) =>
+    arr.reduce((acc, cur) => ({ ...acc, [cur.id]: cb ? cb(cur) : cur }), {});
 
   return objectifyList(initialData, ({ albums, ...rest }) => ({
     ...rest,
     ...getCollectionBoilerplate(
       'albums',
-      objectifyList(albums, a => a)
+      objectifyList(albums, ({ images, ...album }) => ({
+        ...album,
+        ...getCollectionBoilerplate('images', objectifyList(images)),
+      }))
     ),
   }));
 };

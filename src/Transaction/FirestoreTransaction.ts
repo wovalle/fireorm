@@ -1,18 +1,26 @@
 import { Transaction } from '@google-cloud/firestore';
 import { TransactionRepository } from './BaseFirestoreTransactionRepository';
-import { getMetadataStorage } from '../MetadataStorage';
-import { IEntity, Constructor } from '../types';
+import { getMetadataStorage } from '../MetadataUtils';
+import {
+  IEntity,
+  EntityConstructorOrPath,
+  IFirestoreTransaction,
+  ITransactionReferenceStorage,
+} from '../types';
 
 const metadataStorage = getMetadataStorage();
 
-export class FirestoreTransaction {
-  constructor(private transaction: Transaction) {}
+export class FirestoreTransaction implements IFirestoreTransaction {
+  constructor(
+    private transaction: Transaction,
+    private tranRefStorage: ITransactionReferenceStorage
+  ) {}
 
-  getRepository<T extends IEntity>(entity: Constructor<T>) {
+  getRepository<T extends IEntity = IEntity>(entityOrConstructor: EntityConstructorOrPath<T>) {
     if (!metadataStorage.firestoreRef) {
       throw new Error('Firestore must be initialized first');
     }
 
-    return new TransactionRepository<T>(this.transaction, entity);
+    return new TransactionRepository<T>(entityOrConstructor, this.transaction, this.tranRefStorage);
   }
 }

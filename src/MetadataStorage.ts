@@ -1,73 +1,120 @@
 import { Firestore } from '@google-cloud/firestore';
 import { BaseRepository } from './BaseRepository';
-import { IEntityConstructor, IEntityRepositoryConstructor } from './types';
-
-export interface IMetadataStore {
-  metadataStorage: MetadataStorage | null;
-}
-
-export function getStore(): IMetadataStore {
-  return global as never;
-}
+import { IEntityConstructor, Constructor, IEntity, IEntityRepositoryConstructor } from './types';
+import { arraysAreEqual } from './utils';
 
 export interface CollectionMetadata {
   name: string;
-  entity: IEntityConstructor;
-  parentEntity?: IEntityConstructor;
+  entityConstructor: IEntityConstructor;
+  parentEntityConstructor?: IEntityConstructor;
   propertyKey?: string;
 }
+export interface SubCollectionMetadata extends CollectionMetadata {
+  parentEntityConstructor: IEntityConstructor;
+  propertyKey: string;
+}
 
+export interface CollectionMetadataWithSegments extends CollectionMetadata {
+  segments: string[];
+}
+
+export interface SubCollectionMetadataWithSegments extends SubCollectionMetadata {
+  segments: string[];
+}
+
+export interface FullCollectionMetadata extends CollectionMetadataWithSegments {
+  subCollections: SubCollectionMetadataWithSegments[];
+}
 export interface RepositoryMetadata {
   target: IEntityRepositoryConstructor;
   entity: IEntityConstructor;
 }
 
 export interface MetadataStorageConfig {
-  validateModels?: boolean;
+  validateModels: boolean;
 }
 
 export class MetadataStorage {
-  readonly collections: Array<CollectionMetadata> = [];
-  readonly subCollections: Array<CollectionMetadata> = [];
-  readonly repositories: Map<unknown, RepositoryMetadata> = new Map();
+  readonly collections: Array<CollectionMetadataWithSegments> = [];
+  protected readonly repositories: Map<IEntityConstructor, RepositoryMetadata> = new Map();
 
   public config: MetadataStorageConfig = {
     validateModels: false,
   };
 
-  public getCollection = (param: string | IEntityConstructor) => {
-    if (typeof param === 'string') {
-      return this.collections.find(c => c.name === param);
+  public getCollection = (pathOrConstructor: string | IEntityConstructor) => {
+    let collection: CollectionMetadataWithSegments | undefined;
+
+    // If is a path like users/user-id/messages/message-id/senders,
+    // take all the even segments [users/messages/senders] and
+    // look for an entity with those segments
+    if (typeof pathOrConstructor === 'string') {
+      const segments = pathOrConstructor.split('/');
+
+      // Return null if incomplete segment
+      if (segments.length % 2 === 0) {
+        throw new Error(`Invalid collection path: ${pathOrConstructor}`);
+      }
+
+      const collectionSegments = segments.reduce<string[]>(
+        (acc, cur, index) => (index % 2 === 0 ? acc.concat(cur) : acc),
+        []
+      );
+
+      collection = this.collections.find(c => arraysAreEqual(c.segments, collectionSegments));
+    } else {
+      collection = this.collections.find(c => c.entityConstructor === pathOrConstructor);
     }
-    return this.collections.find(c => c.entity === param);
+
+    if (!collection) {
+      return null;
+    }
+
+    const subCollections = this.collections.filter(
+      s => s.parentEntityConstructor === collection?.entityConstructor
+    ) as SubCollectionMetadataWithSegments[];
+
+    return {
+      ...collection,
+      subCollections,
+    };
   };
 
   public setCollection = (col: CollectionMetadata) => {
-    const existing = this.getCollection(col.entity);
-    if (!existing) {
-      this.collections.push(col);
+    const existing = this.getCollection(col.entityConstructor);
+
+    if (existing) {
+      throw new Error(`Collection with name ${existing.name} has already been registered`);
     }
-  };
 
-  public getSubCollectionsFromParent = (parentEntity: IEntityConstructor) => {
-    return this.subCollections.filter(s => s.parentEntity === parentEntity);
-  };
+    const colToAdd = {
+      ...col,
+      segments: [col.name],
+    };
 
-  public getSubCollection = (
-    param: string | IEntityConstructor
-  ): CollectionMetadata | undefined => {
-    if (typeof param === 'string') {
-      return this.subCollections.find(c => c.name === param);
+    this.collections.push(colToAdd);
+
+    const getWhereImParent = (p: Constructor<IEntity>) =>
+      this.collections.filter(c => c.parentEntityConstructor === p);
+
+    const colsToUpdate = getWhereImParent(col.entityConstructor);
+
+    // Update segments for subcollections and subcollections of subcollections
+    while (colsToUpdate.length) {
+      const c = colsToUpdate.pop();
+
+      if (!c) {
+        return;
+      }
+
+      const parent = this.collections.find(p => p.entityConstructor === c.parentEntityConstructor);
+      c.segments = parent?.segments.concat(c.name) || [];
+      getWhereImParent(c.entityConstructor).forEach(col => colsToUpdate.push(col));
     }
-    return this.subCollections.find(c => c.entity === param);
-  };
-
-  public setSubCollection = (subCol: CollectionMetadata) => {
-    this.subCollections.push(subCol);
   };
 
   public getRepository = (param: IEntityConstructor) => {
-    return this.repositories.get(param);
+    return this.repositories.get(param) || null;
   };
 
   public setRepository = (repo: RepositoryMetadata) => {
@@ -86,49 +133,9 @@ export class MetadataStorage {
     this.repositories.set(repo.entity, repo);
   };
 
-  public firestoreRef: Firestore | null = null;
+  public getRepositories = () => {
+    return this.repositories;
+  };
+
+  public firestoreRef: Firestore;
 }
-
-function initializeMetadataStorage(): void {
-  const store = getStore();
-
-  if (!store.metadataStorage) {
-    store.metadataStorage = new MetadataStorage();
-  }
-}
-
-/**
- * Used for testing to reset metadataStore to clean state
- */
-export function clearMetadataStorage(): void {
-  const store = getStore();
-  store.metadataStorage = null;
-}
-
-/**
- * Return exisiting metadataStorage, otherwise create if not present
- */
-export const getMetadataStorage = (): MetadataStorage => {
-  const store = getStore();
-
-  if (!store.metadataStorage) {
-    initializeMetadataStorage();
-  }
-
-  return store.metadataStorage as MetadataStorage;
-};
-
-export const initialize = (
-  firestore: Firestore,
-  config: MetadataStorageConfig = { validateModels: false }
-): void => {
-  const metadataStorage = getMetadataStorage();
-
-  metadataStorage.firestoreRef = firestore;
-  metadataStorage.config = config;
-};
-
-/**
- * @deprecated Use initialize. This will be removed in a future version.
- */
-export const Initialize = initialize;

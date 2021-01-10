@@ -1,7 +1,8 @@
 module.exports = {
+  roots: ['<rootDir>/functional'],
   preset: 'ts-jest',
   testEnvironment: 'node',
   setupFiles: ['dotenv/config'],
   setupFilesAfterEnv: ['./setup.ts'],
-  testRegex: '/test/functional/.*.int-spec.ts?$',
+  verbose: true,
 };

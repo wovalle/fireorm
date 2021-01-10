@@ -1,47 +1,47 @@
-import { CollectionReference, Transaction, WhereFilterOp } from '@google-cloud/firestore';
+import { Query, Transaction, WhereFilterOp } from '@google-cloud/firestore';
 
 import {
   IEntity,
   IFireOrmQueryLine,
   WithOptionalId,
   IQueryBuilder,
-  IRepository,
-  Constructor,
+  ITransactionRepository,
+  EntityConstructorOrPath,
+  ITransactionReferenceStorage,
 } from '../types';
 
 import { AbstractFirestoreRepository } from '../AbstractFirestoreRepository';
-import { getMetadataStorage } from '../MetadataStorage';
-
 export class TransactionRepository<T extends IEntity> extends AbstractFirestoreRepository<T>
-  implements IRepository<T> {
-  private firestoreColRef: CollectionReference;
-  private transaction: Transaction;
-
-  constructor(transaction: Transaction, entity: Constructor<T>) {
-    super(entity);
+  implements ITransactionRepository<T> {
+  constructor(
+    pathOrConstructor: EntityConstructorOrPath<T>,
+    private transaction: Transaction,
+    private tranRefStorage: ITransactionReferenceStorage
+  ) {
+    super(pathOrConstructor);
     this.transaction = transaction;
-
-    const { firestoreRef } = getMetadataStorage();
-
-    if (!firestoreRef) {
-      throw new Error('Firestore must be initialized first');
-    }
-
-    this.firestoreColRef = firestoreRef.collection(this.collectionPath || this.colName);
+    this.tranRefStorage = tranRefStorage;
   }
 
-  execute(queries: IFireOrmQueryLine[]): Promise<T[]> {
-    const query = queries.reduce((acc, cur) => {
+  async execute(queries: IFireOrmQueryLine[]): Promise<T[]> {
+    const query = queries.reduce<Query>((acc, cur) => {
       const op = cur.operator as WhereFilterOp;
       return acc.where(cur.prop, op, cur.val);
     }, this.firestoreColRef);
 
-    return this.transaction.get(query).then(this.extractTFromColSnap);
+    return this.transaction
+      .get(query)
+      .then(c => this.extractTFromColSnap(c, this.transaction, this.tranRefStorage));
   }
 
-  findById(id: string): Promise<T> {
+  findById(id: string) {
     const query = this.firestoreColRef.doc(id);
-    return this.transaction.get(query).then(this.extractTFromDocSnap);
+
+    return this.transaction
+      .get(query)
+      .then(c =>
+        c.exists ? this.extractTFromDocSnap(c, this.transaction, this.tranRefStorage) : null
+      );
   }
 
   async create(item: WithOptionalId<T>): Promise<T> {
@@ -60,8 +60,7 @@ export class TransactionRepository<T extends IEntity> extends AbstractFirestoreR
     }
 
     this.transaction.set(doc, this.toSerializableObject(item as T));
-
-    this.initializeSubCollections(item as T);
+    this.initializeSubCollections(item as T, this.transaction, this.tranRefStorage);
 
     return item as T;
   }

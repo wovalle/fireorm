@@ -1,4 +1,4 @@
-import { getMetadataStorage } from '../MetadataStorage';
+import { getMetadataStorage } from '../MetadataUtils';
 import { Constructor, IRepository, IEntity } from '../types';
 import { BaseRepository } from '../BaseRepository';
 
