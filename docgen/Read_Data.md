@@ -42,7 +42,7 @@ await bandRepository.whereEqualTo('name', 'Porcupine Tree').find();
 // Bands formed after 1985 and that play Progressive Rock
 await bandRepository
   .whereGreaterThan('formationYear', 1985)
-  .whereArrayCointain('genres', 'progressive-rock')
+  .whereArrayContains('genres', 'progressive-rock')
   .find();
 ```
 
@@ -60,7 +60,7 @@ await bandRepository.whereEqualTo(band => band.name, 'Porcupine Tree').find();
 // Bands formed after 1985 and that play Progressive Rock
 await bandRepository
   .whereGreaterThan(band => band.formationYear, 1985)
-  .whereArrayCointain(band => band.genres, 'progressive-rock')
+  .whereArrayContains(band => band.genres, 'progressive-rock')
   .find();
 ```
 
@@ -122,7 +122,7 @@ await bandRepository
 // Top 3 bands formed after 1985 and that play Progressive Rock
 await bandRepository
   .whereGreaterThan(band => band.formationYear, 1985)
-  .whereArrayCointain(band => band.genres, 'progressive-rock')
+  .whereArrayContains(band => band.genres, 'progressive-rock')
   .limit(3)
   .find();
 ```
