@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>fireorm - ORM for Firestore</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta
+      name="description"
+      content="Fireorm is an object-relational mapper (ORM) that enables javascript/typescript developers to use Google Firestore"
+    />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta property="og:url" content="https://fireorm.js.org" />
+    <meta property="og:title" content="Fireorm: ORM for Firestore" />
+    <meta
+      property="og:description"
+      content="Fireorm is an object-relational mapper (ORM) that enables javascript/typescript developers to use Google Firestore"
+    />
+    <meta name="twitter:title" content="Fireorm: ORM for Firestore" />
+    <meta
+      name="twitter:description"
+      content="Fireorm is an object-relational mapper (ORM) that enables javascript/typescript developers to use Google Firestore"
+    />
+    <meta
+      name="keywords"
+      content="fireorm, orm, google firestore, firebase firestore, orm for firestore, object-relational mapper for firestore"
+    />
+    <meta
+      name="google-site-verification"
+      content="rNOyKPlEr5GjTyoc6fAPbmDrH3lFClwt8nfYYfiWuTE"
+    />
+    <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css" />
+
+    <style>
+      :root {
+        --theme-color: #ff5722;
+        --theme-color-dark: #e64a19;
+        --text-color-base: #212121;
+        --text-color-secondary: #757575;
+        --text-color-tertiary: #81818e;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <script>
+      window.$docsify = {
+        name: 'fireorm 🔥',
+        nameLink: '/',
+        repo: 'https://github.com/wovalle/fireorm',
+        loadSidebar: 'sidebar.md',
+        ga: 'UA-133856278-1',
+        homepage:
+          'https://raw.githubusercontent.com/wovalle/fireorm/master/README.md',
+        maxLevel: 3,
+        subMaxLevel: 2,
+        auto2top: true,
+        copyCode: {
+          buttonText: 'Copy',
+        },
+        plugins: [
+          function(hook, vm) {
+            hook.beforeEach(function(html) {
+              const generatedRoutes = [
+                'globals',
+                'classes',
+                'enums',
+                'interfaces',
+              ];
+
+              if (generatedRoutes.some(r => vm.route.file.includes(r))) {
+                return html;
+              }
+
+              if (/githubusercontent\.com/.test(vm.route.file)) {
+                url = vm.route.file
+                  .replace('raw.githubusercontent.com', 'github.com')
+                  .replace(/\/master/, '/blob/master');
+              } else {
+                url =
+                  'https://github.com/wovalle/fireorm/blob/master/docs/' +
+                  vm.route.file;
+              }
+              var editHtml = '[:memo: Edit Document](' + url + ')\n';
+              return editHtml + html;
+            });
+          },
+        ],
+      };
+    </script>
+
+    <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
+    <script src="//unpkg.com/prismjs/components/prism-typescript.min.js"></script>
+    <script src="//unpkg.com/docsify/lib/plugins/ga.min.js"></script>
+    <script src="//unpkg.com/docsify-copy-code@2"></script>
+    <script src="//unpkg.com/docsify-pagination/dist/docsify-pagination.min.js"></script>
+  </body>
+</html>
