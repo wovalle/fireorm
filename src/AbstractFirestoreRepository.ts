@@ -151,6 +151,21 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
 
   /**
    * Returns a new QueryBuilder with a filter specifying that the
+   * value in @param prop must not be equal to @param val.
+   *
+   * @param {IWherePropParam<T>} prop field to be filtered on, where
+   * prop could be keyof T or a lambda where T is the first parameter
+   * @param {IFirestoreVal} val value to compare in the filter
+   * @returns {QueryBuilder<T>} A new QueryBuilder with the specified
+   * query applied.
+   * @memberof AbstractFirestoreRepository
+   */
+  whereNotEqualTo(prop: IWherePropParam<T>, val: IFirestoreVal): IQueryBuilder<T> {
+    return new QueryBuilder<T>(this).whereNotEqualTo(prop, val);
+  }
+
+  /**
+   * Returns a new QueryBuilder with a filter specifying that the
    * value in @param prop must be greater than @param val.
    *
    * @param {IWherePropParam<T>} prop field to be filtered on, where
@@ -252,6 +267,21 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
    */
   whereIn(prop: IWherePropParam<T>, val: IFirestoreVal[]): IQueryBuilder<T> {
     return new QueryBuilder<T>(this).whereIn(prop, val);
+  }
+
+  /**
+   * Returns a new QueryBuilder with a filter specifying that the
+   * field @param prop matches none of the comparison values in @param val
+   *
+   * @param {IWherePropParam<T>} prop field to be filtered on, where
+   * prop could be keyof T or a lambda where T is the first parameter
+   * @param {IFirestoreVal[]} val[] array of values to compare in the filter (max 10 items in array)
+   * @returns {QueryBuilder<T>} A new QueryBuilder with the specified
+   * query applied.
+   * @memberof AbstractFirestoreRepository
+   */
+  whereNotIn(prop: IWherePropParam<T>, val: IFirestoreVal[]): IQueryBuilder<T> {
+    return new QueryBuilder<T>(this).whereNotIn(prop, val);
   }
 
   /**
