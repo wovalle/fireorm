@@ -1,6 +1,6 @@
 # SubCollections
 
-In the [core concepts](CORE_CONCEPTS.md) we learned that in Firestore we store data in _[Documents](https://firebase.google.com/docs/firestore/data-model#documents)_ and they are organized into \_[Collections](https://firebase.google.com/docs/firestore/data-model#collections). But in Firestore you can also add collections inside documents, they are called [Subcollections](https://firebase.google.com/docs/firestore/data-model#subcollections).
+In the [core concepts](CORE_CONCEPTS.md) we learned that in Firestore we store data in _[Documents](https://firebase.google.com/docs/firestore/data-model#documents)_ and they are organized into [Collections](https://firebase.google.com/docs/firestore/data-model#collections). But in Firestore you can also add collections inside documents, they are called [Subcollections](https://firebase.google.com/docs/firestore/data-model#subcollections).
 
 To represent a SubCollection in our code, we'll make use of fireorm's [SubCollection](Globals.md#SubCollection) decorator.
 For example, let’s create an Albums model and add it as a Subcollection of Band
@@ -15,7 +15,7 @@ class Album {
 }
 
 @Collection()
-export class Band {
+class Band {
   id: string;
   name: string;
   formationYear: number;
@@ -35,3 +35,40 @@ By default, fireorm will name the SubCollections with the plural form of the mod
 ```typescript
 @SubCollection(Album, 'TheAlbums')
 ```
+
+## Nested SubCollections
+
+Fireorm has support for nested subcollections (subcollections inside subcollections). To represent a nested subcollection we only have to use the [SubCollection](Globals.md#SubCollection) decorator inside a model that is itself a subcollection of another model.
+
+```typescript
+import { Collection, SubCollection, ISubCollection } from 'fireorm';
+
+class Image {
+  id: string;
+  url: string;
+}
+
+class Album {
+  id: string;
+  name: string;
+  year: number;
+
+  @SubCollection(Image)
+  images?: ISubCollection<Image>;
+}
+
+@Collection()
+class Band {
+  id: string;
+  name: string;
+  formationYear: number;
+  genres: Array<string>;
+
+  @SubCollection(Album)
+  albums?: ISubCollection<Album>;
+}
+```
+
+In this example we have a **Band** model that has a field called `albums` that represents the **Albums** subcollection that itself has a field called `images` that represents the **Images** subcollection (Band -> Album -> Image).
+
+Please note that firestore supports [up to 100](https://firebase.google.com/docs/firestore/data-model#subcollections) nested subcollections.
