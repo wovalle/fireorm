@@ -118,6 +118,19 @@ This repo uses [Conventional Commits](https://www.conventionalcommits.org/) as t
 
 This repo uses [Sematic Release](https://github.com/semantic-release/semantic-release) to automatically release new versions as soon as they land on master.
 
+Commits must follow [Angular's Git Commit Guidelines](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#-git-commit-guidelines).
+
+Supported commit types (taken from [here](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#type)):
+
+- **feat:** A new feature
+- **fix:** A bug fix
+- **docs:** Documentation only changes
+- **style:** Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
+- **refactor:** A code change that neither fixes a bug nor adds a feature
+- **perf:** A code change that improves performance
+- **test:** Adding missing or correcting existing tests
+- **chore:** Changes to the build process or auxiliary tools and libraries such as documentation generation
+
 <details>
   <summary>Manual Release</summary>
   If, by any reason, a manual release must be done, these are the instructions:
