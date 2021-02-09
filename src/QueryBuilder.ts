@@ -191,7 +191,7 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
       this.limitVal,
       this.orderByObj,
       true
-    );
+    ) as T[];
 
     return queryResult.length ? queryResult[0] : null;
   }
