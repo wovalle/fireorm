@@ -171,13 +171,8 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
     return this;
   }
 
-<<<<<<< HEAD
-  find() {
-    return this.executor.execute(this.queries, this.limitVal, this.orderByObj);
-=======
   find(): Promise<T[]> {
     return this.executor.execute(this.queries, this.limitVal, this.orderByObj) as Promise<T[]>;
->>>>>>> f2dab6c... feat(query): add types to watch query
   }
 
   watch(callback: (documents: T[]) => void) {
