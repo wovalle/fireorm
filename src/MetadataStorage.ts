@@ -1,8 +1,8 @@
-import {Firestore} from '@google-cloud/firestore';
-import {ValidatorOptions} from 'class-validator';
-import {BaseRepository} from './BaseRepository';
-import {IEntityConstructor, Constructor, IEntity, IEntityRepositoryConstructor} from './types';
-import {arraysAreEqual} from './utils';
+import { Firestore } from '@google-cloud/firestore';
+import { ValidatorOptions } from 'class-validator';
+import { BaseRepository } from './BaseRepository';
+import { IEntityConstructor, Constructor, IEntity, IEntityRepositoryConstructor } from './types';
+import { arraysAreEqual } from './utils';
 
 export interface CollectionMetadata {
   name: string;

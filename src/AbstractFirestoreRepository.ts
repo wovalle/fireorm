@@ -1,11 +1,11 @@
-import {plainToClass} from 'class-transformer';
+import { plainToClass } from 'class-transformer';
 import {
   DocumentSnapshot,
   QuerySnapshot,
   CollectionReference,
   Transaction,
 } from '@google-cloud/firestore';
-import {ValidationError} from './Errors/ValidationError';
+import { ValidationError } from './Errors/ValidationError';
 
 import {
   IEntity,
@@ -20,15 +20,15 @@ import {
   ITransactionReferenceStorage,
 } from './types';
 
-import {isDocumentReference, isGeoPoint, isObject, isTimestamp} from './TypeGuards';
+import { isDocumentReference, isGeoPoint, isObject, isTimestamp } from './TypeGuards';
 
-import {getMetadataStorage} from './MetadataUtils';
-import {MetadataStorageConfig, FullCollectionMetadata} from './MetadataStorage';
+import { getMetadataStorage } from './MetadataUtils';
+import { MetadataStorageConfig, FullCollectionMetadata } from './MetadataStorage';
 
-import {BaseRepository} from './BaseRepository';
+import { BaseRepository } from './BaseRepository';
 import QueryBuilder from './QueryBuilder';
-import {serializeEntity} from './utils';
-import {NoMetadataError} from './Errors';
+import { serializeEntity } from './utils';
+import { NoMetadataError } from './Errors';
 
 export abstract class AbstractFirestoreRepository<T extends IEntity> extends BaseRepository
   implements IRepository<T> {
@@ -40,7 +40,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   constructor(pathOrConstructor: string | IEntityConstructor) {
     super();
 
-    const {getCollection, config, firestoreRef} = getMetadataStorage();
+    const { getCollection, config, firestoreRef } = getMetadataStorage();
 
     if (!firestoreRef) {
       throw new Error('Firestore must be initialized first');
@@ -68,11 +68,11 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
       if (isTimestamp(val)) {
         obj[key] = val.toDate();
       } else if (isGeoPoint(val)) {
-        const {latitude, longitude} = val;
-        obj[key] = {latitude, longitude};
+        const { latitude, longitude } = val;
+        obj[key] = { latitude, longitude };
       } else if (isDocumentReference(val)) {
-        const {id, path} = val;
-        obj[key] = {id, path};
+        const { id, path } = val;
+        obj[key] = { id, path };
       } else if (isObject(val)) {
         this.transformFirestoreTypes(val);
       }
@@ -87,19 +87,19 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   ) => {
     // Requiring here to prevent circular dependency
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const {getRepository} = require('./helpers');
+    const { getRepository } = require('./helpers');
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const {FirestoreTransaction} = require('./Transaction/FirestoreTransaction');
+    const { FirestoreTransaction } = require('./Transaction/FirestoreTransaction');
 
     this.colMetadata.subCollections.forEach(subCol => {
       const pathWithSubCol = `${this.path}/${entity.id}/${subCol.name}`;
-      const {propertyKey} = subCol;
+      const { propertyKey } = subCol;
 
       // If we are inside a transaction, our subcollections should also be TransactionRepositories
       if (tran && tranRefStorage) {
         const firestoreTransaction = new FirestoreTransaction(tran, tranRefStorage);
         const repository = firestoreTransaction.getRepository(pathWithSubCol);
-        tranRefStorage.add({propertyKey, path: pathWithSubCol, entity});
+        tranRefStorage.add({ propertyKey, path: pathWithSubCol, entity });
         Object.assign(entity, {
           [propertyKey]: repository,
         });
@@ -363,7 +363,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   async validate(item: T): Promise<ValidationError[]> {
     try {
       const classValidator = await import('class-validator');
-      const {entityConstructor: Entity} = this.colMetadata;
+      const { entityConstructor: Entity } = this.colMetadata;
 
       /**
        * Instantiate plain objects into an entity class
