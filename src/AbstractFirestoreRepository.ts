@@ -370,10 +370,6 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
        */
       const entity = item instanceof Entity ? item : Object.assign(new Entity(), item);
 
-      /** 
-       * Retrieve validator options from 
-       */
-
       return classValidator.validate(entity, this.config.validatorOptions);
     } catch (error) {
       if (error.code === 'MODULE_NOT_FOUND') {

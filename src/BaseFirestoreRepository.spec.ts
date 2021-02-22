@@ -15,7 +15,7 @@ import { NoMetadataError } from './Errors';
 const MockFirebase = require('mock-cloud-firestore');
 
 describe('BaseFirestoreRepository', () => {
-  class BandRepository extends BaseFirestoreRepository<Band> {}
+  class BandRepository extends BaseFirestoreRepository<Band> { }
   let bandRepository: BaseFirestoreRepository<Band> = null;
   let firestore: Firestore = null;
 
@@ -219,6 +219,40 @@ describe('BaseFirestoreRepository', () => {
       const band = await bandRepository.create(entity);
 
       expect(band.contactEmail).toEqual('Not an email');
+    });
+
+
+    it('must not validate forbidden non-whitelisted properties if the validatorOptions: {}', async () => {
+      initialize(firestore, { validateModels: false, validatorOptions: {} });
+
+      bandRepository = new BandRepository('bands');
+
+      let entity = new Band();
+      entity = {
+        ...entity,
+        unknownPoperty: 'unknown property'
+      } as unknown as Band;
+      const band = await bandRepository.create(entity);
+
+      expect((band as any).unknownPoperty).toEqual('unknown property');
+    });
+
+    it('must not validate forbidden non-whitelisted properties if the validatorOptions: { whitelist: true, forbidNonWhitelisted: true }', async () => {
+      initialize(firestore, { validateModels: false, validatorOptions: { whitelist: true, forbidNonWhitelisted: true } });
+
+      bandRepository = new BandRepository('bands');
+
+      let entity = new Band();
+      entity = {
+        ...entity,
+        unknownPoperty: 'unknown property'
+      } as unknown as Band;
+
+      try {
+        await bandRepository.create(entity);
+      } catch (error) {
+        expect(error[0].constraints.whitelistValidation).toEqual('property unknownProperty should not exist');
+      }
     });
 
     it('must fail validation if an invalid class is given', async () => {
