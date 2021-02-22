@@ -34,7 +34,7 @@ export class BaseFirestoreBatchRepository<T extends IEntity> implements IBatchRe
       item.id = doc.id;
     }
 
-    this.batch.add('create', item as T, doc, this.colMetadata, this.config.validateModels, this.config.validatorOptions ?? {});
+    this.batch.add('create', item as T, doc, this.colMetadata, this.config.validateModels, this.config.validatorOptions);
   };
 
   update = (item: T) => {
