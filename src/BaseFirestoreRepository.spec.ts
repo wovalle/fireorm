@@ -15,7 +15,7 @@ import { NoMetadataError } from './Errors';
 const MockFirebase = require('mock-cloud-firestore');
 
 describe('BaseFirestoreRepository', () => {
-  class BandRepository extends BaseFirestoreRepository<Band> { }
+  class BandRepository extends BaseFirestoreRepository<Band> {}
   let bandRepository: BaseFirestoreRepository<Band> = null;
   let firestore: Firestore = null;
 
