@@ -1,5 +1,5 @@
-import { Firestore } from '@google-cloud/firestore';
-import { MetadataStorage, MetadataStorageConfig } from './MetadataStorage';
+import {Firestore} from '@google-cloud/firestore';
+import {MetadataStorage, MetadataStorageConfig} from './MetadataStorage';
 
 export interface IMetadataStore {
   metadataStorage: MetadataStorage;
@@ -29,11 +29,11 @@ export const getMetadataStorage = (): MetadataStorage => {
 
 export const initialize = (
   firestore: Firestore,
-  config: MetadataStorageConfig = { validateModels: false }
+  config: MetadataStorageConfig = {validateModels: false, validatorOptions: {}}
 ): void => {
   initializeMetadataStorage();
 
-  const { metadataStorage } = getStore();
+  const {metadataStorage} = getStore();
 
   metadataStorage.firestoreRef = firestore;
   metadataStorage.config = config;
