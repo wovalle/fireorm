@@ -94,7 +94,7 @@ describe('BaseFirestoreTransactionRepository', () => {
     });
 
     it('must not validate if the validate config property is false', async () => {
-      initialize(firestore, { validateModels: false });
+      initialize(firestore, { validateModels: false, validatorOptions: {} });
 
       await bandRepository.runTransaction(async tran => {
         const entity = new Band();
@@ -201,7 +201,7 @@ describe('BaseFirestoreTransactionRepository', () => {
     });
 
     it('must not validate if the validate config property is false', async () => {
-      initialize(firestore, { validateModels: false });
+      initialize(firestore, { validateModels: false, validatorOptions: {} });
 
       await bandRepository.runTransaction(async tran => {
         const band = await tran.findById('porcupine-tree');

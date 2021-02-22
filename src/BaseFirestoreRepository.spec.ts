@@ -210,7 +210,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must not validate if the validateModels: false', async () => {
-      initialize(firestore, { validateModels: false });
+      initialize(firestore, { validateModels: false, validatorOptions: {} });
 
       bandRepository = new BandRepository('bands');
 
@@ -222,7 +222,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must fail validation if an invalid class is given', async () => {
-      initialize(firestore, { validateModels: true });
+      initialize(firestore, { validateModels: true, validatorOptions: {} });
 
       const entity = new Band();
 
@@ -236,7 +236,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must fail validation if an invalid object is given', async () => {
-      initialize(firestore, { validateModels: true });
+      initialize(firestore, { validateModels: true, validatorOptions: {} });
 
       const entity: Partial<Band> = {
         contactEmail: 'Not an email',
@@ -314,7 +314,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must not validate if the validate config property is false', async () => {
-      initialize(firestore, { validateModels: false });
+      initialize(firestore, { validateModels: false, validatorOptions: {} });
 
       bandRepository = new BandRepository('bands');
 
@@ -328,7 +328,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must fail validation if an invalid class is given', async () => {
-      initialize(firestore, { validateModels: true });
+      initialize(firestore, { validateModels: true, validatorOptions: {} });
 
       const band = await bandRepository.findById('porcupine-tree');
 
@@ -342,7 +342,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must fail validation if an invalid object is given', async () => {
-      initialize(firestore, { validateModels: true });
+      initialize(firestore, { validateModels: true, validatorOptions: {} });
 
       const band = await bandRepository.findById('porcupine-tree');
       band.contactEmail = 'Not an Email';
@@ -661,7 +661,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('should be able to validate subcollections on create', async () => {
-      initialize(firestore, { validateModels: true });
+      initialize(firestore, { validateModels: true, validatorOptions: {} });
 
       const band = new Band();
       band.id = '30-seconds-to-mars';
@@ -695,7 +695,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('should be able to validate subcollections on update', async () => {
-      initialize(firestore, { validateModels: true });
+      initialize(firestore, { validateModels: true, validatorOptions: {} });
 
       const pt = await bandRepository.findById('porcupine-tree');
       const album = await pt.albums.findById('fear-blank-planet');

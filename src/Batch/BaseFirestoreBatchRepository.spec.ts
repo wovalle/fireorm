@@ -124,7 +124,7 @@ describe('BaseFirestoreBatchRepository', () => {
 
   describe('should run validations', () => {
     it('should run validations', async () => {
-      initialize(firestore, { validateModels: true });
+      initialize(firestore, { validateModels: true, validatorOptions: {} });
 
       const validationBatch = new FirestoreBatchUnit(firestore);
       const validationBandRepository = new BaseFirestoreBatchRepository(Band, validationBatch);
@@ -146,7 +146,7 @@ describe('BaseFirestoreBatchRepository', () => {
     });
 
     it('should not run validations on delete', async () => {
-      initialize(firestore, { validateModels: true });
+      initialize(firestore, { validateModels: true, validatorOptions: {} });
 
       const validationBatch = new FirestoreBatchUnit(firestore);
       const validationBandRepository = new BaseFirestoreBatchRepository(Band, validationBatch);
