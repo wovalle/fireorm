@@ -210,7 +210,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must not validate if the validateModels: false', async () => {
-      initialize(firestore, { validateModels: false, validatorOptions: {} });
+      initialize(firestore, { validateModels: false });
 
       bandRepository = new BandRepository('bands');
 
@@ -230,22 +230,22 @@ describe('BaseFirestoreRepository', () => {
       let entity = new Band();
       entity = {
         ...entity,
-        unknownPoperty: 'unknown property'
+        unknownProperty: 'unknown property'
       } as unknown as Band;
       const band = await bandRepository.create(entity);
 
-      expect((band as any).unknownPoperty).toEqual('unknown property');
+      expect((band as any).unknownProperty).toEqual('unknown property');
     });
 
     it('must not validate forbidden non-whitelisted properties if the validatorOptions: { whitelist: true, forbidNonWhitelisted: true }', async () => {
-      initialize(firestore, { validateModels: false, validatorOptions: { whitelist: true, forbidNonWhitelisted: true } });
+      initialize(firestore, { validateModels: true, validatorOptions: { whitelist: true, forbidNonWhitelisted: true } });
 
       bandRepository = new BandRepository('bands');
 
       let entity = new Band();
       entity = {
         ...entity,
-        unknownPoperty: 'unknown property'
+        unknownProperty: 'unknown property'
       } as unknown as Band;
 
       try {
@@ -256,7 +256,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must fail validation if an invalid class is given', async () => {
-      initialize(firestore, { validateModels: true, validatorOptions: {} });
+      initialize(firestore, { validateModels: true });
 
       const entity = new Band();
 
@@ -270,7 +270,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must fail validation if an invalid object is given', async () => {
-      initialize(firestore, { validateModels: true, validatorOptions: {} });
+      initialize(firestore, { validateModels: true });
 
       const entity: Partial<Band> = {
         contactEmail: 'Not an email',
@@ -348,7 +348,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must not validate if the validate config property is false', async () => {
-      initialize(firestore, { validateModels: false, validatorOptions: {} });
+      initialize(firestore, { validateModels: false });
 
       bandRepository = new BandRepository('bands');
 
@@ -362,7 +362,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must fail validation if an invalid class is given', async () => {
-      initialize(firestore, { validateModels: true, validatorOptions: {} });
+      initialize(firestore, { validateModels: true });
 
       const band = await bandRepository.findById('porcupine-tree');
 
@@ -376,7 +376,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must fail validation if an invalid object is given', async () => {
-      initialize(firestore, { validateModels: true, validatorOptions: {} });
+      initialize(firestore, { validateModels: true });
 
       const band = await bandRepository.findById('porcupine-tree');
       band.contactEmail = 'Not an Email';
@@ -695,7 +695,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('should be able to validate subcollections on create', async () => {
-      initialize(firestore, { validateModels: true, validatorOptions: {} });
+      initialize(firestore, { validateModels: true });
 
       const band = new Band();
       band.id = '30-seconds-to-mars';
@@ -729,7 +729,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('should be able to validate subcollections on update', async () => {
-      initialize(firestore, { validateModels: true, validatorOptions: {} });
+      initialize(firestore, { validateModels: true });
 
       const pt = await bandRepository.findById('porcupine-tree');
       const album = await pt.albums.findById('fear-blank-planet');

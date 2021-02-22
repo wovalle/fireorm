@@ -124,7 +124,7 @@ describe('BaseFirestoreBatchRepository', () => {
 
   describe('should run validations', () => {
     it('should run validations', async () => {
-      initialize(firestore, { validateModels: true, validatorOptions: {} });
+      initialize(firestore, { validateModels: true });
 
       const validationBatch = new FirestoreBatchUnit(firestore);
       const validationBandRepository = new BaseFirestoreBatchRepository(Band, validationBatch);
@@ -146,7 +146,7 @@ describe('BaseFirestoreBatchRepository', () => {
     });
 
     it('should not run validations on delete', async () => {
-      initialize(firestore, { validateModels: true, validatorOptions: {} });
+      initialize(firestore, { validateModels: true });
 
       const validationBatch = new FirestoreBatchUnit(firestore);
       const validationBandRepository = new BaseFirestoreBatchRepository(Band, validationBatch);
@@ -167,7 +167,7 @@ describe('BaseFirestoreBatchRepository', () => {
     });
 
     it('must not validate forbidden non-whitelisted properties if the validatorOptions: {}', async () => {
-      initialize(firestore, { validateModels: false, validatorOptions: {} });
+      initialize(firestore, { validateModels: true, validatorOptions: {} });
 
       const validationBatch = new FirestoreBatchUnit(firestore);
       const validationBandRepository = new BaseFirestoreBatchRepository(Band, validationBatch);
@@ -183,7 +183,7 @@ describe('BaseFirestoreBatchRepository', () => {
     });
 
     it('must validate forbidden non-whitelisted properties if the validatorOptions: {whitelist: true, forbidNonWhitelisted: true}', async () => {
-      initialize(firestore, { validateModels: false, validatorOptions: { whitelist: true, forbidNonWhitelisted: true } });
+      initialize(firestore, { validateModels: true, validatorOptions: { whitelist: true, forbidNonWhitelisted: true } });
 
       const validationBatch = new FirestoreBatchUnit(firestore);
       const validationBandRepository = new BaseFirestoreBatchRepository(Band, validationBatch);
@@ -191,11 +191,11 @@ describe('BaseFirestoreBatchRepository', () => {
       let entity = new Band();
       entity = {
         ...entity,
-        unknownPoperty: 'unknown property'
+        unknownProperty: 'unknown property'
       } as unknown as Band;
       
       validationBandRepository.create(entity);
-      
+
       try {
         await validationBatch.commit();
       } catch (error) {

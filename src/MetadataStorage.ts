@@ -33,7 +33,7 @@ export interface RepositoryMetadata {
 
 export interface MetadataStorageConfig {
   validateModels: boolean;
-  validatorOptions: ValidatorOptions;
+  validatorOptions?: ValidatorOptions;
 }
 
 export class MetadataStorage {
