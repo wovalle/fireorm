@@ -223,7 +223,7 @@ describe('BaseFirestoreRepository', () => {
 
 
     it('must not validate forbidden non-whitelisted properties if the validatorOptions: {}', async () => {
-      initialize(firestore, { validateModels: false, validatorOptions: {} });
+      initialize(firestore, { validateModels: true, validatorOptions: {} });
 
       bandRepository = new BandRepository('bands');
 
@@ -237,7 +237,7 @@ describe('BaseFirestoreRepository', () => {
       expect((band as any).unknownProperty).toEqual('unknown property');
     });
 
-    it('must not validate forbidden non-whitelisted properties if the validatorOptions: { whitelist: true, forbidNonWhitelisted: true }', async () => {
+    it('must validate forbidden non-whitelisted properties if the validatorOptions: { whitelist: true, forbidNonWhitelisted: true }', async () => {
       initialize(firestore, { validateModels: true, validatorOptions: { whitelist: true, forbidNonWhitelisted: true } });
 
       bandRepository = new BandRepository('bands');
