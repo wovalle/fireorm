@@ -547,6 +547,22 @@ describe('BaseFirestoreRepository', () => {
       // firestore mock doesn't set this property, it should be bands/opeth
       expect(foundBand.relatedBand.path).toEqual(undefined);
     });
+
+    it('should correctly filter by null values', async () => {
+      const entity = new Band();
+      entity.id = 'rush';
+      entity.name = 'Rush';
+      entity.formationYear = null;
+      entity.genres = ['progressive-rock', 'hard-rock', 'heavy-metal'];
+
+      await bandRepository.create(entity);
+
+      const bandsWithNullFormationYear = await bandRepository
+        .whereEqualTo(a => a.formationYear, null)
+        .findOne();
+
+      expect(bandsWithNullFormationYear.id).toEqual(entity.id);
+    });
   });
 
   describe('transactions', () => {
