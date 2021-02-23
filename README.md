@@ -194,6 +194,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/Fame513"><img src="https://avatars1.githubusercontent.com/u/2944505?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Yaroslav Nekryach</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=Fame513" title="Code">💻</a></td>
     <td align="center"><a href="https://www.linkedin.com/in/dmytro-nikitiuk/"><img src="https://avatars0.githubusercontent.com/u/40293865?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Dmytro Nikitiuk</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=tomorroN" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/JingWangTW"><img src="https://avatars0.githubusercontent.com/u/20182367?v=4?s=100" width="100px;" alt=""/><br /><sub><b>JingWangTW</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=JingWangTW" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/rinkstiekema"><img src="https://avatars.githubusercontent.com/u/5337711?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Rink Stiekema</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=rinkstiekema" title="Code">💻</a></td>
   </tr>
 </table>
 
