@@ -171,17 +171,27 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
     return this;
   }
 
-  find() {
-    return this.executor.execute(this.queries, this.limitVal, this.orderByObj);
+  find(): Promise<T[]> {
+    return this.executor.execute(this.queries, this.limitVal, this.orderByObj) as Promise<T[]>;
   }
 
-  async findOne() {
+  watch(callback: (documents: T[]) => void) {
+    return this.executor.execute(
+      this.queries,
+      this.limitVal,
+      this.orderByObj,
+      false,
+      callback
+    ) as Promise<() => void>;
+  }
+
+  async findOne(): Promise<T | null> {
     const queryResult = await this.executor.execute(
       this.queries,
       this.limitVal,
       this.orderByObj,
       true
-    );
+    ) as T[];
 
     return queryResult.length ? queryResult[0] : null;
   }

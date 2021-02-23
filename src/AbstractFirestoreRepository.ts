@@ -355,6 +355,16 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   }
 
   /**
+   * Execute the query and watch for changes on that query
+   *
+   * @returns {Function} An unsubscribe function that can be called to cancel the snapshot listener
+   * @memberof AbstractFirestoreRepository
+   */
+  watch(callback: (documents: T[]) => void): Promise<() => void> {
+    return new QueryBuilder<T>(this).watch(callback);
+  }
+
+  /**
    * Uses class-validator to validate an entity using decorators set in the collection class
    *
    * @param item class or object representing an entity
@@ -401,8 +411,9 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     queries: IFireOrmQueryLine[],
     limitVal?: number,
     orderByObj?: IOrderByParams,
-    single?: boolean
-  ): Promise<T[]>;
+    single?: boolean,
+    onUpdate?: (documents: T[]) => void
+  ): Promise<T[] | (() => void)>;
 
   /**
    * Retrieve a document with the specified id.

@@ -23,7 +23,7 @@ export class TransactionRepository<T extends IEntity> extends AbstractFirestoreR
     this.tranRefStorage = tranRefStorage;
   }
 
-  async execute(queries: IFireOrmQueryLine[]): Promise<T[]> {
+  async execute(queries: IFireOrmQueryLine[]): Promise<T[] | (() => void)> {
     const query = queries.reduce<Query>((acc, cur) => {
       const op = cur.operator as WhereFilterOp;
       return acc.where(cur.prop, op, cur.val);
