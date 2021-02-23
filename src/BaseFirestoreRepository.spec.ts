@@ -224,16 +224,14 @@ describe('BaseFirestoreRepository', () => {
     it('must not validate forbidden non-whitelisted properties if the validatorOptions: {}', async () => {
       initialize(firestore, { validateModels: true, validatorOptions: {} });
 
-      bandRepository = new BandRepository('bands');
+      type BandWithCustomProp = Band & { custom: string };
 
-      let entity = new Band();
-      entity = ({
-        ...entity,
-        unknownProperty: 'unknown property',
-      } as unknown) as Band;
-      const band = await bandRepository.create(entity);
+      const entity = new Band();
+      Object.assign(entity, { custom: 'unknown property' });
 
-      expect((band as any).unknownProperty).toEqual('unknown property');
+      const band = ((await bandRepository.create(entity)) as unknown) as BandWithCustomProp;
+
+      expect(band.custom).toEqual('unknown property');
     });
 
     it('must validate forbidden non-whitelisted properties if the validatorOptions: { whitelist: true, forbidNonWhitelisted: true }', async () => {
@@ -241,20 +239,16 @@ describe('BaseFirestoreRepository', () => {
         validateModels: true,
         validatorOptions: { whitelist: true, forbidNonWhitelisted: true },
       });
+      type BandWithCustomProp = Band & { custom: string };
 
-      bandRepository = new BandRepository('bands');
-
-      let entity = new Band();
-      entity = ({
-        ...entity,
-        unknownProperty: 'unknown property',
-      } as unknown) as Band;
+      const entity = new Band();
+      Object.assign(entity, { custom: 'unknown property' });
 
       try {
         await bandRepository.create(entity);
       } catch (error) {
         expect(error[0].constraints.whitelistValidation).toEqual(
-          'property unknownProperty should not exist'
+          'property custom should not exist'
         );
       }
     });
