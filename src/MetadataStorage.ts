@@ -42,7 +42,7 @@ export class MetadataStorage {
 
   public config: MetadataStorageConfig = {
     validateModels: false,
-    validatorOptions: {}
+    validatorOptions: {},
   };
 
   public getCollection = (pathOrConstructor: string | IEntityConstructor) => {

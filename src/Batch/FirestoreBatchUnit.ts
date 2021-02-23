@@ -11,7 +11,7 @@ type BatchOperation<T extends IEntity> = {
   ref: DocumentReference;
   collectionMetadata: FullCollectionMetadata;
   validateModels: boolean;
-  validatorOptions?: ValidatorOptions
+  validatorOptions?: ValidatorOptions;
 };
 
 export class FirestoreBatchUnit {
@@ -34,7 +34,7 @@ export class FirestoreBatchUnit {
       ref,
       collectionMetadata,
       validateModels,
-      validatorOptions
+      validatorOptions,
     });
   }
 
@@ -52,7 +52,11 @@ export class FirestoreBatchUnit {
 
     for (const op of this.operations) {
       if (op.validateModels && ['create', 'update'].includes(op.type)) {
-        const errors = await this.validate(op.item, op.collectionMetadata.entityConstructor, op.validatorOptions);
+        const errors = await this.validate(
+          op.item,
+          op.collectionMetadata.entityConstructor,
+          op.validatorOptions
+        );
 
         if (errors.length) {
           throw errors;
@@ -81,7 +85,11 @@ export class FirestoreBatchUnit {
     return result;
   };
 
-  async validate(item: IEntity, Entity: Constructor<IEntity>, validatorOptions?: ValidatorOptions): Promise<ValidationError[]> {
+  async validate(
+    item: IEntity,
+    Entity: Constructor<IEntity>,
+    validatorOptions?: ValidatorOptions
+  ): Promise<ValidationError[]> {
     try {
       const classValidator = await import('class-validator');
 
