@@ -1,4 +1,5 @@
 import { OrderByDirection, DocumentReference } from '@google-cloud/firestore';
+import type { SnapshotConfig } from './MetadataStorage';
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 export type PartialWithRequiredBy<T, K extends keyof T> = Pick<T, K> & Partial<Omit<T, K>>;
@@ -49,7 +50,7 @@ export interface IQueryable<T extends IEntity> {
   whereNotIn(prop: IWherePropParam<T>, val: IFirestoreVal[]): IQueryBuilder<T>;
   find(): Promise<T[]>;
   findOne(): Promise<T | null>;
-  watch(handler: (documents: T[]) => void): Promise<() => void>;
+  watch(handler: (documents: T[]) => void, config?: SnapshotConfig): Promise<() => void>;
 }
 
 export interface IOrderable<T extends IEntity> {
@@ -69,7 +70,10 @@ export interface IQueryExecutor<T> {
     limitVal?: number,
     orderByObj?: IOrderByParams,
     single?: boolean,
-    onUpdate?: (documents: T[]) => void
+    snapshot?: {
+      onUpdate: (documents: T[]) => void;
+      config?: SnapshotConfig;
+    }
   ): Promise<T[] | (() => void)>;
 }
 

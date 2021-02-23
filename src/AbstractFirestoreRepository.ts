@@ -23,7 +23,11 @@ import {
 import { isDocumentReference, isGeoPoint, isObject, isTimestamp } from './TypeGuards';
 
 import { getMetadataStorage } from './MetadataUtils';
-import { MetadataStorageConfig, FullCollectionMetadata } from './MetadataStorage';
+import type {
+  MetadataStorageConfig,
+  FullCollectionMetadata,
+  SnapshotConfig,
+} from './MetadataStorage';
 
 import { BaseRepository } from './BaseRepository';
 import QueryBuilder from './QueryBuilder';
@@ -360,8 +364,8 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
    * @returns {Function} An unsubscribe function that can be called to cancel the snapshot listener
    * @memberof AbstractFirestoreRepository
    */
-  watch(callback: (documents: T[]) => void): Promise<() => void> {
-    return new QueryBuilder<T>(this).watch(callback);
+  watch(callback: (documents: T[]) => void, config?: SnapshotConfig): Promise<() => void> {
+    return new QueryBuilder<T>(this).watch(callback, config);
   }
 
   /**
@@ -384,7 +388,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     } catch (error) {
       if (error.code === 'MODULE_NOT_FOUND') {
         throw new Error(
-          'It looks like class-validator is not installed. Please run `npm i -S class-validator` to fix this error, or initialize FireORM with `validateModels: false` to disable validation.'
+          'It looks like class-validator is not installed. Please run `npm i -S class-validator` to fix this error, or initialize Fireorm with `validateModels: false` to disable validation.'
         );
       }
 
@@ -412,7 +416,10 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     limitVal?: number,
     orderByObj?: IOrderByParams,
     single?: boolean,
-    onUpdate?: (documents: T[]) => void
+    snapshot?: {
+      onUpdate: (documents: T[]) => void;
+      config?: SnapshotConfig;
+    }
   ): Promise<T[] | (() => void)>;
 
   /**

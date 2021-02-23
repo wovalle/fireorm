@@ -90,7 +90,7 @@ export class FirestoreBatchUnit {
     } catch (error) {
       if (error.code === 'MODULE_NOT_FOUND') {
         throw new Error(
-          'It looks like class-validator is not installed. Please run `npm i -S class-validator` to fix this error, or initialize FireORM with `validateModels: false` to disable validation.'
+          'It looks like class-validator is not installed. Please run `npm i -S class-validator` to fix this error, or initialize Fireorm with `validateModels: false` to disable validation.'
         );
       }
 
