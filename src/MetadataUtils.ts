@@ -29,7 +29,7 @@ export const getMetadataStorage = (): MetadataStorage => {
 
 export const initialize = (
   firestore: Firestore,
-  config: MetadataStorageConfig = { validateModels: false }
+  config: MetadataStorageConfig = { validateModels: false, validatorOptions: {} }
 ): void => {
   initializeMetadataStorage();
 

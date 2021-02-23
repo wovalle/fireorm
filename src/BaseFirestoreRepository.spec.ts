@@ -221,6 +221,38 @@ describe('BaseFirestoreRepository', () => {
       expect(band.contactEmail).toEqual('Not an email');
     });
 
+    it('must not validate forbidden non-whitelisted properties if the validatorOptions: {}', async () => {
+      initialize(firestore, { validateModels: true, validatorOptions: {} });
+
+      type BandWithCustomProp = Band & { custom: string };
+
+      const entity = new Band();
+      Object.assign(entity, { custom: 'unknown property' });
+
+      const band = ((await bandRepository.create(entity)) as unknown) as BandWithCustomProp;
+
+      expect(band.custom).toEqual('unknown property');
+    });
+
+    it('must validate forbidden non-whitelisted properties if the validatorOptions: { whitelist: true, forbidNonWhitelisted: true }', async () => {
+      initialize(firestore, {
+        validateModels: true,
+        validatorOptions: { whitelist: true, forbidNonWhitelisted: true },
+      });
+      type BandWithCustomProp = Band & { custom: string };
+
+      const entity = new Band();
+      Object.assign(entity, { custom: 'unknown property' });
+
+      try {
+        await bandRepository.create(entity);
+      } catch (error) {
+        expect(error[0].constraints.whitelistValidation).toEqual(
+          'property custom should not exist'
+        );
+      }
+    });
+
     it('must fail validation if an invalid class is given', async () => {
       initialize(firestore, { validateModels: true });
 
@@ -546,6 +578,22 @@ describe('BaseFirestoreRepository', () => {
       expect(foundBand.relatedBand.id).toEqual('opeth');
       // firestore mock doesn't set this property, it should be bands/opeth
       expect(foundBand.relatedBand.path).toEqual(undefined);
+    });
+
+    it('should correctly filter by null values', async () => {
+      const entity = new Band();
+      entity.id = 'rush';
+      entity.name = 'Rush';
+      entity.formationYear = null;
+      entity.genres = ['progressive-rock', 'hard-rock', 'heavy-metal'];
+
+      await bandRepository.create(entity);
+
+      const bandsWithNullFormationYear = await bandRepository
+        .whereEqualTo(a => a.formationYear, null)
+        .findOne();
+
+      expect(bandsWithNullFormationYear.id).toEqual(entity.id);
     });
   });
 

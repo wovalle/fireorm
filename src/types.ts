@@ -6,7 +6,7 @@ export type PartialWithRequiredBy<T, K extends keyof T> = Pick<T, K> & Partial<O
 export type WithOptionalId<T extends { id: unknown }> = Pick<T, Exclude<keyof T, 'id'>> &
   Partial<Pick<T, 'id'>>;
 
-export type IFirestoreVal = string | number | Date | boolean | DocumentReference;
+export type IFirestoreVal = string | number | Date | boolean | DocumentReference | null;
 
 export enum FirestoreOperators {
   equal = '==',

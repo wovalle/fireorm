@@ -165,6 +165,48 @@ describe('BaseFirestoreBatchRepository', () => {
       validationBandRepository.delete(entity);
       expect(validationBatch.commit).not.toThrow();
     });
+
+    it('must not validate forbidden non-whitelisted properties if the validatorOptions: {}', async () => {
+      initialize(firestore, { validateModels: true, validatorOptions: {} });
+
+      const validationBatch = new FirestoreBatchUnit(firestore);
+      const validationBandRepository = new BaseFirestoreBatchRepository(Band, validationBatch);
+
+      let entity = new Band();
+      entity = ({
+        ...entity,
+        unknownProperty: 'unknown property',
+      } as unknown) as Band;
+
+      validationBandRepository.create(entity);
+      expect(validationBatch.commit).not.toThrow();
+    });
+
+    it('must validate forbidden non-whitelisted properties if the validatorOptions: {whitelist: true, forbidNonWhitelisted: true}', async () => {
+      initialize(firestore, {
+        validateModels: true,
+        validatorOptions: { whitelist: true, forbidNonWhitelisted: true },
+      });
+
+      const validationBatch = new FirestoreBatchUnit(firestore);
+      const validationBandRepository = new BaseFirestoreBatchRepository(Band, validationBatch);
+
+      let entity = new Band();
+      entity = ({
+        ...entity,
+        unknownProperty: 'unknown property',
+      } as unknown) as Band;
+
+      validationBandRepository.create(entity);
+
+      try {
+        await validationBatch.commit();
+      } catch (error) {
+        expect(error[0].constraints.whitelistValidation).toEqual(
+          'property unknownProperty should not exist'
+        );
+      }
+    });
   });
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
