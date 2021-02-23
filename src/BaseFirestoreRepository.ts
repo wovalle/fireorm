@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import { Query, WhereFilterOp } from '@google-cloud/firestore';
+import { Query, QuerySnapshot, WhereFilterOp } from '@google-cloud/firestore';
 
 import {
   IRepository,
@@ -12,8 +12,10 @@ import {
 } from './types';
 
 import { getMetadataStorage } from './MetadataUtils';
+
 import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
 import { FirestoreBatch } from './Batch/FirestoreBatch';
+import type { SnapshotConfig } from './MetadataStorage';
 
 export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestoreRepository<T>
   implements IRepository<T> {
@@ -91,8 +93,12 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
     queries: Array<IFireOrmQueryLine>,
     limitVal?: number,
     orderByObj?: IOrderByParams,
-    single?: boolean
-  ): Promise<T[]> {
+    single?: boolean,
+    snapshot?: {
+      onUpdate: (documents: T[]) => void;
+      config?: SnapshotConfig;
+    }
+  ): Promise<T[] | (() => void)> {
     let query = queries.reduce<Query>((acc, cur) => {
       const op = cur.operator as WhereFilterOp;
       return acc.where(cur.prop, op, cur.val);
@@ -106,6 +112,19 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
       query = query.limit(1);
     } else if (limitVal) {
       query = query.limit(limitVal);
+    }
+
+    const ignoreEmptyUpdates =
+      snapshot?.config?.ignoreEmptyUpdates || this.config.ignoreEmptyUpdates;
+
+    if (snapshot?.onUpdate) {
+      return query.onSnapshot((snap: QuerySnapshot) => {
+        if (ignoreEmptyUpdates && snap.empty) {
+          return;
+        }
+
+        return snapshot.onUpdate(this.extractTFromColSnap(snap));
+      });
     }
 
     return query.get().then(this.extractTFromColSnap);

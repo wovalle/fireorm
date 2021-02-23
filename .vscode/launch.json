@@ -18,11 +18,16 @@
       "type": "node",
       "request": "launch",
       "name": "Launch current integration test w/ jest",
-      "runtimeArgs": ["--inspect-brk", "${workspaceRoot}/node_modules/.bin/jest", "--runInBand"],
+      "runtimeArgs": [
+        "--inspect-brk",
+        "${workspaceRoot}/node_modules/.bin/jest",
+        "--runInBand",
+        "--testTimeout=60000"
+      ],
       "args": [
         "-c",
         "test/jest.integration.js",
-        "test/functional/4-transactions.spec.ts",
+        "test/functional/8-snapshots.spec.ts",
         "--verbose"
       ],
       "console": "integratedTerminal",

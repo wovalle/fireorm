@@ -1,8 +1,8 @@
 # Validation
 
-FireORM supports [class-validator](https://github.com/typestack/class-validator) validation decorators in any collection.
+Fireorm supports [class-validator](https://github.com/typestack/class-validator) validation decorators in any collection.
 
-As `class-validator` requires a single install per project, FireORM opts not to depend on it explicitly (doing so may result in conflicting versions). It is up to you to install it with `npm i -S class-validator`.
+As `class-validator` requires a single install per project, Fireorm opts not to depend on it explicitly (doing so may result in conflicting versions). It is up to you to install it with `npm i -S class-validator`.
 
 Once installed correctly, you can write your collections like so:
 
@@ -21,10 +21,12 @@ Use this in the same way that you would your other collections and it will valid
 
 ## Disabling validation
 
-Model validation is not enabled by default. It can be enable by initializing FireORM with the `validateModels: true` option.
+Model validation is not enabled by default. It can be enable by initializing Fireorm with the `validateModels: true` option.
 
 ```typescript
+import { initialize } from 'fireorm';
+
 initialize(firestore, {
-  validateModels: true
-})
+  validateModels: true,
+});
 ```

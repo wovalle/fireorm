@@ -30,9 +30,14 @@ export interface RepositoryMetadata {
   entity: IEntityConstructor;
 }
 
-export interface MetadataStorageConfig {
+export interface SnapshotConfig {
+  ignoreEmptyUpdates: boolean;
+}
+export interface ValidationConfig {
   validateModels: boolean;
 }
+
+export type MetadataStorageConfig = SnapshotConfig & ValidationConfig;
 
 export class MetadataStorage {
   readonly collections: Array<CollectionMetadataWithSegments> = [];
@@ -40,6 +45,7 @@ export class MetadataStorage {
 
   public config: MetadataStorageConfig = {
     validateModels: false,
+    ignoreEmptyUpdates: false,
   };
 
   public getCollection = (pathOrConstructor: string | IEntityConstructor) => {

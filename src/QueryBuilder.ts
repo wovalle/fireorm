@@ -1,4 +1,5 @@
 import { getPath } from 'ts-object-path';
+import type { SnapshotConfig } from './MetadataStorage';
 
 import {
   IQueryBuilder,
@@ -171,17 +172,24 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
     return this;
   }
 
-  find() {
-    return this.executor.execute(this.queries, this.limitVal, this.orderByObj);
+  find(): Promise<T[]> {
+    return this.executor.execute(this.queries, this.limitVal, this.orderByObj) as Promise<T[]>;
   }
 
-  async findOne() {
-    const queryResult = await this.executor.execute(
+  watch(onUpdate: (documents: T[]) => void, config?: SnapshotConfig) {
+    return this.executor.execute(this.queries, this.limitVal, this.orderByObj, false, {
+      onUpdate,
+      config,
+    }) as Promise<() => void>;
+  }
+
+  async findOne(): Promise<T | null> {
+    const queryResult = (await this.executor.execute(
       this.queries,
       this.limitVal,
       this.orderByObj,
       true
-    );
+    )) as T[];
 
     return queryResult.length ? queryResult[0] : null;
   }

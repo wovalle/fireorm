@@ -23,7 +23,11 @@ import {
 import { isDocumentReference, isGeoPoint, isObject, isTimestamp } from './TypeGuards';
 
 import { getMetadataStorage } from './MetadataUtils';
-import { MetadataStorageConfig, FullCollectionMetadata } from './MetadataStorage';
+import type {
+  MetadataStorageConfig,
+  FullCollectionMetadata,
+  SnapshotConfig,
+} from './MetadataStorage';
 
 import { BaseRepository } from './BaseRepository';
 import QueryBuilder from './QueryBuilder';
@@ -355,6 +359,16 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   }
 
   /**
+   * Execute the query and watch for changes on that query
+   *
+   * @returns {Function} An unsubscribe function that can be called to cancel the snapshot listener
+   * @memberof AbstractFirestoreRepository
+   */
+  watch(callback: (documents: T[]) => void, config?: SnapshotConfig): Promise<() => void> {
+    return new QueryBuilder<T>(this).watch(callback, config);
+  }
+
+  /**
    * Uses class-validator to validate an entity using decorators set in the collection class
    *
    * @param item class or object representing an entity
@@ -374,7 +388,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     } catch (error) {
       if (error.code === 'MODULE_NOT_FOUND') {
         throw new Error(
-          'It looks like class-validator is not installed. Please run `npm i -S class-validator` to fix this error, or initialize FireORM with `validateModels: false` to disable validation.'
+          'It looks like class-validator is not installed. Please run `npm i -S class-validator` to fix this error, or initialize Fireorm with `validateModels: false` to disable validation.'
         );
       }
 
@@ -401,8 +415,12 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     queries: IFireOrmQueryLine[],
     limitVal?: number,
     orderByObj?: IOrderByParams,
-    single?: boolean
-  ): Promise<T[]>;
+    single?: boolean,
+    snapshot?: {
+      onUpdate: (documents: T[]) => void;
+      config?: SnapshotConfig;
+    }
+  ): Promise<T[] | (() => void)>;
 
   /**
    * Retrieve a document with the specified id.
