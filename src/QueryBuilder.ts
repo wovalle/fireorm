@@ -186,12 +186,12 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
   }
 
   async findOne(): Promise<T | null> {
-    const queryResult = await this.executor.execute(
+    const queryResult = (await this.executor.execute(
       this.queries,
       this.limitVal,
       this.orderByObj,
       true
-    ) as T[];
+    )) as T[];
 
     return queryResult.length ? queryResult[0] : null;
   }

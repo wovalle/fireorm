@@ -111,12 +111,12 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
     }
 
     if (onUpdate) {
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         resolve(
           query.onSnapshot((snapshot: QuerySnapshot) => {
-            return onUpdate(this.extractTFromColSnap(snapshot))
+            return onUpdate(this.extractTFromColSnap(snapshot));
           })
-        )
+        );
       });
     }
     return query.get().then(this.extractTFromColSnap);

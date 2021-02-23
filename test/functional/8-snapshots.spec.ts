@@ -9,31 +9,30 @@ describe('Integration test: Simple Repository', () => {
   }
 
   test('should do crud operations', async () => {
-
     const bandRepository = getRepository(Band);
 
     // Create snapshot listener
-    let executionIndex = 1
+    let executionIndex = 1;
     const handleBandsUpdate = (bands: Band[]) => {
       if (!bands.length) {
-        return
+        return;
       }
       if (executionIndex == 1) {
         expect(bands.length).toEqual(1);
-      }
-      else if (executionIndex == 2) {
+      } else if (executionIndex == 2) {
         expect(bands.length).toEqual(2);
-      }
-      else if (executionIndex == 3) {
+      } else if (executionIndex == 3) {
         expect(bands.length).toEqual(2);
-        bands.forEach((band) => {
+
+        bands.forEach(band => {
           if (band.id == 'dream-theatre') {
             expect(band.name).toEqual('Dream Theatre');
           }
-        })
+        });
       }
       executionIndex++;
-    }
+    };
+
     const bandSnapshotUnsubscribe = await bandRepository
       .whereEqualTo(a => a.extra.website, 'www.dreamtheater.net')
       .watch(handleBandsUpdate);
@@ -47,9 +46,11 @@ describe('Integration test: Simple Repository', () => {
     dt.extra = {
       website: 'www.dreamtheater.net',
     };
-    const savedBand = await bandRepository.create(dt);
 
-    // Create a band without an id  (execution 2)
+    // First execution
+    await bandRepository.create(dt);
+
+    // Create a band without an id (second execution)
     const devinT = new Band();
     devinT.name = 'Devin Townsend Project';
     devinT.formationYear = 2009;
@@ -57,15 +58,16 @@ describe('Integration test: Simple Repository', () => {
     devinT.extra = {
       website: 'www.dreamtheater.net',
     };
-    const savedBandWithoutId = await bandRepository.create(devinT);
 
-    // Update a band (execution 3)
+    // Third Execution
+    await bandRepository.create(devinT);
+
+    // Update a band (fourth execution)
     dt.name = 'Dream Theater';
-    const updatedDt = await bandRepository.update(dt);
-    const updatedDtInDb = await bandRepository.findById(dt.id);
+    await bandRepository.update(dt);
+    await bandRepository.findById(dt.id);
 
     // Unsubscribe from snapshot
     bandSnapshotUnsubscribe();
-    
   });
 });
