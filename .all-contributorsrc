@@ -130,6 +130,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "rinkstiekema",
+      "name": "Rink Stiekema",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5337711?v=4",
+      "profile": "https://github.com/rinkstiekema",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
