@@ -27,10 +27,7 @@
       name="keywords"
       content="fireorm, orm, google firestore, firebase firestore, orm for firestore, object-relational mapper for firestore"
     />
-    <meta
-      name="google-site-verification"
-      content="rNOyKPlEr5GjTyoc6fAPbmDrH3lFClwt8nfYYfiWuTE"
-    />
+    <meta name="google-site-verification" content="rNOyKPlEr5GjTyoc6fAPbmDrH3lFClwt8nfYYfiWuTE" />
     <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css" />
 
     <style>
@@ -53,8 +50,7 @@
         repo: 'https://github.com/wovalle/fireorm',
         loadSidebar: 'sidebar.md',
         ga: 'UA-133856278-1',
-        homepage:
-          'https://raw.githubusercontent.com/wovalle/fireorm/master/README.md',
+        homepage: 'https://raw.githubusercontent.com/wovalle/fireorm/master/README.md',
         maxLevel: 3,
         subMaxLevel: 2,
         auto2top: true,
@@ -62,14 +58,9 @@
           buttonText: 'Copy',
         },
         plugins: [
-          function(hook, vm) {
-            hook.beforeEach(function(html) {
-              const generatedRoutes = [
-                'globals',
-                'classes',
-                'enums',
-                'interfaces',
-              ];
+          function (hook, vm) {
+            hook.beforeEach(function (html) {
+              const generatedRoutes = ['globals', 'classes', 'enums', 'interfaces'];
 
               if (generatedRoutes.some(r => vm.route.file.includes(r))) {
                 return html;
@@ -80,9 +71,7 @@
                   .replace('raw.githubusercontent.com', 'github.com')
                   .replace(/\/master/, '/blob/master');
               } else {
-                url =
-                  'https://github.com/wovalle/fireorm/blob/master/docs/' +
-                  vm.route.file;
+                url = 'https://github.com/wovalle/fireorm/blob/master/docs/' + vm.route.file;
               }
               var editHtml = '[:memo: Edit Document](' + url + ')\n';
               return editHtml + html;

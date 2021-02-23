@@ -25,6 +25,6 @@ Model validation is not enabled by default. It can be enable by initializing Fir
 
 ```typescript
 initialize(firestore, {
-  validateModels: true
-})
+  validateModels: true,
+});
 ```

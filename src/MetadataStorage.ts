@@ -1,4 +1,5 @@
 import { Firestore } from '@google-cloud/firestore';
+import { ValidatorOptions } from 'class-validator';
 import { BaseRepository } from './BaseRepository';
 import { IEntityConstructor, Constructor, IEntity, IEntityRepositoryConstructor } from './types';
 import { arraysAreEqual } from './utils';
@@ -32,6 +33,7 @@ export interface RepositoryMetadata {
 
 export interface MetadataStorageConfig {
   validateModels: boolean;
+  validatorOptions?: ValidatorOptions;
 }
 
 export class MetadataStorage {
@@ -40,6 +42,7 @@ export class MetadataStorage {
 
   public config: MetadataStorageConfig = {
     validateModels: false,
+    validatorOptions: {},
   };
 
   public getCollection = (pathOrConstructor: string | IEntityConstructor) => {

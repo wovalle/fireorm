@@ -221,6 +221,44 @@ describe('BaseFirestoreRepository', () => {
       expect(band.contactEmail).toEqual('Not an email');
     });
 
+    it('must not validate forbidden non-whitelisted properties if the validatorOptions: {}', async () => {
+      initialize(firestore, { validateModels: true, validatorOptions: {} });
+
+      bandRepository = new BandRepository('bands');
+
+      let entity = new Band();
+      entity = ({
+        ...entity,
+        unknownProperty: 'unknown property',
+      } as unknown) as Band;
+      const band = await bandRepository.create(entity);
+
+      expect((band as any).unknownProperty).toEqual('unknown property');
+    });
+
+    it('must validate forbidden non-whitelisted properties if the validatorOptions: { whitelist: true, forbidNonWhitelisted: true }', async () => {
+      initialize(firestore, {
+        validateModels: true,
+        validatorOptions: { whitelist: true, forbidNonWhitelisted: true },
+      });
+
+      bandRepository = new BandRepository('bands');
+
+      let entity = new Band();
+      entity = ({
+        ...entity,
+        unknownProperty: 'unknown property',
+      } as unknown) as Band;
+
+      try {
+        await bandRepository.create(entity);
+      } catch (error) {
+        expect(error[0].constraints.whitelistValidation).toEqual(
+          'property unknownProperty should not exist'
+        );
+      }
+    });
+
     it('must fail validation if an invalid class is given', async () => {
       initialize(firestore, { validateModels: true });
 
