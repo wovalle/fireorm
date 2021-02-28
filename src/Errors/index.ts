@@ -9,3 +9,11 @@ export class NoMetadataError extends Error {
     );
   }
 }
+
+export class DuplicatedReference extends Error {
+  constructor(propertyKey: string, entityName: string) {
+    super(
+      `Reference in field ${propertyKey} in ${entityName} collection has already been registered`
+    );
+  }
+}

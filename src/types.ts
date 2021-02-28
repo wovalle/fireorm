@@ -99,6 +99,7 @@ export interface IBaseRepository<T extends IEntity> {
   create(item: PartialBy<T, 'id'>): Promise<T>;
   update(item: PartialWithRequiredBy<T, 'id'>): Promise<PartialWithRequiredBy<T, 'id'>>;
   delete(id: string): Promise<void>;
+  getPath(item: T): string | null;
 }
 
 export type IRepository<T extends IEntity> = IBaseRepository<T> &
@@ -121,8 +122,14 @@ export type ISubCollection<T extends IEntity> = IRepository<T> & {
   runTransaction<R = void>(executor: (tran: ITransactionRepository<T>) => Promise<R>): Promise<R>;
 };
 
+export type IEntityReference<T extends IEntity> = T | string;
+
 export interface IEntity {
   id: string;
+
+  // Internal fireorm fields, will be removed when serializing
+  readonly __fireorm_internal_path?: string;
+  readonly __fireorm_internal_saved?: boolean;
 }
 
 export type Constructor<T> = { new (): T };

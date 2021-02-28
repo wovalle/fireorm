@@ -1,5 +1,6 @@
-import { SubCollectionMetadata } from './MetadataStorage';
+import { FullCollectionMetadata } from './MetadataStorage';
 import { IEntity } from '.';
+import { Firestore } from '@google-cloud/firestore';
 
 /**
  * Extract getters and object in form of data properties
@@ -38,22 +39,46 @@ export function extractAllGetters(obj: Record<string, unknown>) {
  *
  * @template T
  * @param {T} Entity object
- * @param {SubCollectionMetadata[]} subColMetadata Subcollection
+ * @param {FullCollectionMetadata} colMetadata Collection metadata
  * metadata to remove runtime-created fields
  * @returns {Object} Serialiable object
  */
 export function serializeEntity<T extends IEntity>(
   obj: Partial<T>,
-  subColMetadata: SubCollectionMetadata[]
+  colMetadata: FullCollectionMetadata,
+  firestore?: Firestore // TODO: detach from this
 ): Record<string, unknown> {
+  // Remove All getters
   const objectGetters = extractAllGetters(obj as Record<string, unknown>);
 
-  const serializableObj = { ...obj, ...objectGetters };
+  const serialized = { ...obj, ...objectGetters } as Record<string, unknown>;
 
-  subColMetadata.forEach(scm => {
-    delete serializableObj[scm.propertyKey];
+  // Remove all subcollections
+  colMetadata.subCollections.forEach(scm => {
+    delete serialized[scm.propertyKey];
   });
-  return serializableObj;
+
+  // Update all T with their respective path
+  colMetadata.references.forEach(r => {
+    if (typeof serialized[r.propertyKey] === 'object') {
+      const path = (serialized[r.propertyKey] as T).__fireorm_internal_path;
+      serialized[r.propertyKey] = path ? firestore?.doc(path) : null;
+    } else if (typeof serialized[r.propertyKey] === 'string') {
+      serialized[r.propertyKey] = firestore?.doc(serialized[r.propertyKey] as string);
+    } else {
+      // TODO: handle this, apart from undefined, what else has to be handled?
+      console.error('weird reference', typeof serialized[r.propertyKey]);
+    }
+  });
+
+  // Remove all internal fields
+  Object.keys(serialized).forEach(k => {
+    if (k.includes('__fireorm_internal')) {
+      delete serialized[k];
+    }
+  });
+
+  return serialized;
 }
 
 /**

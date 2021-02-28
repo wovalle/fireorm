@@ -1,12 +1,6 @@
-import { Collection, SubCollection } from '../src/Decorators';
-import {
-  Album as AlbumEntity,
-  AlbumImage as AlbumImageEntity,
-  Coordinates,
-  FirestoreDocumentReference,
-} from './fixture';
-import { ISubCollection } from '../src/types';
-import { Type } from '../src';
+import { Album as AlbumEntity, AlbumImage as AlbumImageEntity, Coordinates } from './fixture';
+import { IEntityReference, ISubCollection } from '../src/types';
+import { Type, Collection, SubCollection, Reference } from '../src';
 import { IsEmail, IsOptional, Length } from 'class-validator';
 
 // Why I do this? Because by using the instance of Album
@@ -46,8 +40,8 @@ export class Band {
   @SubCollection(Album, 'albums')
   albums?: ISubCollection<Album>;
 
-  @Type(() => FirestoreDocumentReference)
-  relatedBand?: FirestoreDocumentReference;
+  @Reference(Band)
+  relatedBand?: IEntityReference<Band>;
 
   getLastShowYear() {
     return this.lastShow.getFullYear();

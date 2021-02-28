@@ -55,7 +55,8 @@ export class FirestoreBatchUnit {
         }
       }
 
-      const serialized = serializeEntity(op.item, op.collectionMetadata.subCollections);
+      // todo pass a wrapReference function that takes a path an return a firestore batch docref type
+      const serialized = serializeEntity(op.item, op.collectionMetadata);
 
       switch (op.type) {
         case 'create':

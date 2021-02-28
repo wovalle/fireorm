@@ -4,6 +4,7 @@ import {
   QuerySnapshot,
   CollectionReference,
   Transaction,
+  Firestore,
 } from '@google-cloud/firestore';
 import { ValidationError } from './Errors/ValidationError';
 
@@ -30,12 +31,19 @@ import QueryBuilder from './QueryBuilder';
 import { serializeEntity } from './utils';
 import { NoMetadataError } from './Errors';
 
+// Does this has to be done here?
+interface MutableIEntity extends IEntity {
+  __fireorm_internal_path?: string;
+  __fireorm_internal_saved?: boolean;
+}
+
 export abstract class AbstractFirestoreRepository<T extends IEntity> extends BaseRepository
   implements IRepository<T> {
   protected readonly colMetadata: FullCollectionMetadata;
   protected readonly path: string;
   protected readonly config: MetadataStorageConfig;
   protected readonly firestoreColRef: CollectionReference;
+  protected readonly firestoreRef: Firestore;
 
   constructor(pathOrConstructor: string | IEntityConstructor) {
     super();
@@ -56,10 +64,17 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     this.colMetadata = colMetadata;
     this.path = typeof pathOrConstructor === 'string' ? pathOrConstructor : this.colMetadata.name;
     this.firestoreColRef = firestoreRef.collection(this.path);
+    this.firestoreRef = firestoreRef;
   }
 
   protected toSerializableObject = (obj: T): Record<string, unknown> =>
-    serializeEntity(obj, this.colMetadata.subCollections);
+    serializeEntity(obj, this.colMetadata, this.firestoreRef);
+
+  protected initPath = (obj: MutableIEntity): T => {
+    obj.__fireorm_internal_path = `${this.path}/${obj.id}`;
+    obj.__fireorm_internal_saved = true;
+    return obj as T;
+  };
 
   protected transformFirestoreTypes = (obj: Record<string, unknown>) => {
     Object.keys(obj).forEach(key => {
@@ -121,6 +136,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
       ...this.transformFirestoreTypes(doc.data() || {}),
     }) as T;
 
+    this.initPath(entity);
     this.initializeSubCollections(entity, tran, tranRefStorage);
 
     return entity;
@@ -352,6 +368,18 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
    */
   findOne(): Promise<T | null> {
     return new QueryBuilder<T>(this).findOne();
+  }
+
+  /**
+   * Returns the firestore path/ref for the given item
+   *
+   * @returns {string | null} If entity is saved in firestore
+   * this will return the firestore path, null otherwise.
+   *
+   * @memberof AbstractFirestoreRepository
+   */
+  getPath(item: T): string | null {
+    return item.__fireorm_internal_path || null;
   }
 
   /**
