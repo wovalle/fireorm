@@ -364,8 +364,8 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
    * custom query applied.
    * @memberof AbstractFirestoreRepository
    */
-  customQuery(func: ICustomQuery<T>) {
-    return new QueryBuilder<T>(this).customQuery(func)
+  customQuery(func: ICustomQuery<T>): IQueryBuilder<T> {
+    return new QueryBuilder<T>(this).customQuery(func);
   }
 
   /**

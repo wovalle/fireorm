@@ -50,6 +50,7 @@ export interface IQueryable<T extends IEntity> {
   whereNotIn(prop: IWherePropParam<T>, val: IFirestoreVal[]): IQueryBuilder<T>;
   find(): Promise<T[]>;
   findOne(): Promise<T | null>;
+  customQuery(func: ICustomQuery<T>): IQueryBuilder<T>;
 }
 
 export interface IOrderable<T extends IEntity> {
