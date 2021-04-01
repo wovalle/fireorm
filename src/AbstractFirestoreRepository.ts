@@ -356,6 +356,19 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   }
 
   /**
+   * Returns a new QueryBuilder with an custom query
+   * specified by @param func. Can only be used once per query.
+   *
+   * @param {ICustomQuery<T>} func function to run in a new query
+   * @returns {QueryBuilder<T>} A new QueryBuilder with the specified
+   * custom query applied.
+   * @memberof AbstractFirestoreRepository
+   */
+  customQuery(func: ICustomQuery<T>) {
+    return new QueryBuilder<T>(this).customQuery(func)
+  }
+
+  /**
    * Uses class-validator to validate an entity using decorators set in the collection class
    *
    * @param item class or object representing an entity

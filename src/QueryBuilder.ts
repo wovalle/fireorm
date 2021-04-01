@@ -187,7 +187,10 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
     if (this.customQueryFunction) {
       throw new Error('Only one custom query can be used per query expression');
     }
+
     this.customQueryFunction = func;
+
+    return this;
   }
 
   async findOne() {
