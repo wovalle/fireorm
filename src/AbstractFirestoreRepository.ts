@@ -18,6 +18,7 @@ import {
   PartialBy,
   IEntityConstructor,
   ITransactionReferenceStorage,
+  ICustomQuery,
 } from './types';
 
 import { isDocumentReference, isGeoPoint, isObject, isTimestamp } from './TypeGuards';
@@ -401,7 +402,8 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     queries: IFireOrmQueryLine[],
     limitVal?: number,
     orderByObj?: IOrderByParams,
-    single?: boolean
+    single?: boolean,
+    customQuery?: ICustomQuery<T>
   ): Promise<T[]>;
 
   /**
