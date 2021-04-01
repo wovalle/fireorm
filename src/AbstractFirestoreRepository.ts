@@ -26,7 +26,7 @@ import { getMetadataStorage } from './MetadataUtils';
 import { MetadataStorageConfig, FullCollectionMetadata } from './MetadataStorage';
 
 import { BaseRepository } from './BaseRepository';
-import QueryBuilder from './QueryBuilder';
+import { QueryBuilder } from './QueryBuilder';
 import { serializeEntity } from './utils';
 import { NoMetadataError } from './Errors';
 
