@@ -1,4 +1,6 @@
-import { extractAllGetters } from './utils';
+import { Serialize } from './Decorators/Serialize';
+import { IEntity } from './types';
+import { extractAllGetters, serializeEntity } from './utils';
 
 describe('Utils', () => {
   describe('extractAllGetter', () => {
@@ -54,6 +56,36 @@ describe('Utils', () => {
 
       const extracted = extractAllGetters((b as unknown) as Record<string, unknown>);
       expect(extracted).toEqual({ b: 'b' });
+    });
+  });
+
+  describe('serializeEntity', () => {
+    it('should serialize object properties with the @Serialize() decorator', () => {
+      class Address {
+        streetName: string;
+        number: number;
+        numberAddition: string;
+      }
+
+      class Band implements IEntity {
+        id: string;
+        name: string;
+        @Serialize()
+        address: Address;
+      }
+
+      const address = new Address();
+      address.streetName = 'Baker St.';
+      address.number = 211;
+      address.numberAddition = 'B';
+
+      const band = new Band();
+      band.name = 'the Speckled Band';
+      band.address = address;
+
+      expect(serializeEntity(band, [])).toHaveProperty('name');
+      expect(serializeEntity(band, []).address).not.toBeInstanceOf(Address);
+      expect(serializeEntity(band, []).address['number']).toBe(211);
     });
   });
 });

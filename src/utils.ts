@@ -1,3 +1,4 @@
+import { serializeKey } from './Decorators/Serialize';
 import { SubCollectionMetadata } from './MetadataStorage';
 import { IEntity } from '.';
 
@@ -53,6 +54,16 @@ export function serializeEntity<T extends IEntity>(
   subColMetadata.forEach(scm => {
     delete serializableObj[scm.propertyKey];
   });
+
+  Object.entries(serializableObj).forEach(([propertyKey, propertyValue]) => {
+    if (Reflect.getMetadata(serializeKey, obj, propertyKey) === true) {
+      (serializableObj as { [key: string]: unknown })[propertyKey] = serializeEntity(
+        propertyValue as Partial<T>,
+        []
+      );
+    }
+  });
+
   return serializableObj;
 }
 
