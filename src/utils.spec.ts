@@ -87,5 +87,39 @@ describe('Utils', () => {
       expect(serializeEntity(band, []).address).not.toBeInstanceOf(Address);
       expect(serializeEntity(band, []).address['number']).toBe(211);
     });
+
+    it('should serialize object array properties with the @Serialize() decorator', () => {
+      class Address {
+        streetName: string;
+        number: number;
+        numberAddition: string;
+      }
+
+      class Band implements IEntity {
+        id: string;
+        name: string;
+        @Serialize()
+        addresses: Address[];
+      }
+
+      const address = new Address();
+      address.streetName = 'Baker St.';
+      address.number = 211;
+      address.numberAddition = 'B';
+
+      const address2 = new Address();
+      address2.streetName = 'Baker St.';
+      address2.number = 211;
+      address2.numberAddition = 'C';
+
+      const band = new Band();
+      band.name = 'the Speckled Band';
+      band.addresses = [address, address2];
+
+      expect(serializeEntity(band, [])).toHaveProperty('name');
+      expect(serializeEntity(band, []).addresses[0]).not.toBeInstanceOf(Address);
+      expect(serializeEntity(band, []).addresses[0]['numberAddition']).toBe('B');
+      expect(serializeEntity(band, []).addresses[1]['numberAddition']).toBe('C');
+    });
   });
 });
