@@ -70,7 +70,7 @@ describe('Utils', () => {
       class Band implements IEntity {
         id: string;
         name: string;
-        @Serialize()
+        @Serialize(Address)
         address: Address;
       }
 
@@ -98,7 +98,7 @@ describe('Utils', () => {
       class Band implements IEntity {
         id: string;
         name: string;
-        @Serialize()
+        @Serialize(Address)
         addresses: Address[];
       }
 

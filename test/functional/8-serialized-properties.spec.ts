@@ -10,20 +10,26 @@ describe('Integration test: Serialized properties', () => {
 
   class Manager {
     name: string;
-    @Serialize()
+    @Serialize(Website)
     website: Website;
   }
 
   @Collection(getUniqueColName('band-serialized-repository'))
   class Band extends BandEntity {
-    @Serialize()
+    @Serialize(Website)
     website: Website;
   }
 
   @Collection(getUniqueColName('band-serialized-repository'))
   class DeepBand extends BandEntity {
-    @Serialize()
+    @Serialize(Manager)
     manager: Manager;
+  }
+
+  @Collection(getUniqueColName('band-serialized-repository'))
+  class FancyBand extends BandEntity {
+    @Serialize(Website)
+    websites: Website[];
   }
 
   test('should instantiate serialized objects with the correct class upon retrieval', async () => {
@@ -62,5 +68,25 @@ describe('Integration test: Serialized properties', () => {
     expect(retrievedBand.manager.name).toEqual('Mycroft Holmes');
     expect(retrievedBand.manager.website).toBeInstanceOf(Website);
     expect(retrievedBand.manager.website.url).toEqual('en.wikipedia.org/wiki/Mycroft_Holmes');
+  });
+
+  test('should instantiate serialized objects arrays with the correct class upon retrieval', async () => {
+    const bandRepository = getRepository(FancyBand);
+    const dt = new FancyBand();
+    dt.name = 'DreamTheater';
+    dt.formationYear = 1985;
+    dt.genres = ['progressive-metal', 'progressive-rock'];
+    dt.websites = [new Website(), new Website()];
+    dt.websites[0].url = 'http://www.dreamtheater.net';
+    dt.websites[1].url = 'https://www.dreamtheater.net';
+
+    await bandRepository.create(dt);
+
+    const retrievedBand = await bandRepository.findById(dt.id);
+
+    expect(retrievedBand.websites[0]).toBeInstanceOf(Website);
+    expect(retrievedBand.websites[1]).toBeInstanceOf(Website);
+    expect(retrievedBand.websites[0].url).toEqual('http://www.dreamtheater.net');
+    expect(retrievedBand.websites[1].url).toEqual('https://www.dreamtheater.net');
   });
 });

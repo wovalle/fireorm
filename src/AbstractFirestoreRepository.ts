@@ -114,19 +114,35 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
 
   protected initializeSerializedObjects(entity: T) {
     Object.keys(entity).forEach(propertyKey => {
-      if (Reflect.getMetadata(serializeKey, entity, propertyKey) === true) {
-        const constructor = Reflect.getMetadata('design:type', entity, propertyKey);
-        const subEntity = new constructor();
+      if (Reflect.getMetadata(serializeKey, entity, propertyKey) !== undefined) {
+        // const constructor = Reflect.getMetadata('design:type', entity, propertyKey);
+        const constructor = Reflect.getMetadata(serializeKey, entity, propertyKey);
         const data = (entity as unknown) as { [k: string]: unknown };
         const subData = data[propertyKey] as { [k: string]: unknown };
 
-        for (const i in subData) {
-          subEntity[i] = subData[i];
+        if (Array.isArray(subData)) {
+          ((entity as unknown) as { [key: string]: unknown })[propertyKey] = subData.map(value => {
+            const subEntity = new constructor();
+
+            for (const i in value) {
+              subEntity[i] = value[i];
+            }
+
+            this.initializeSerializedObjects(subEntity);
+
+            return subEntity;
+          });
+        } else {
+          const subEntity = new constructor();
+
+          for (const i in subData) {
+            subEntity[i] = subData[i];
+          }
+
+          this.initializeSerializedObjects(subEntity);
+
+          ((entity as unknown) as { [key: string]: unknown })[propertyKey] = subEntity;
         }
-
-        this.initializeSerializedObjects(subEntity);
-
-        ((entity as unknown) as { [key: string]: unknown })[propertyKey] = subEntity;
       }
     });
   }

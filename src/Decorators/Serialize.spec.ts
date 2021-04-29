@@ -10,13 +10,13 @@ describe('IgnoreDecorator', () => {
     class Band {
       id: string;
       name: string;
-      @Serialize()
+      @Serialize(Address)
       address: Address;
     }
 
     const band = new Band();
 
     expect(Reflect.getMetadata(serializeKey, band, 'name')).toBe(undefined);
-    expect(Reflect.getMetadata(serializeKey, band, 'address')).toBe(true);
+    expect(Reflect.getMetadata(serializeKey, band, 'address')).toBe(Address);
   });
 });

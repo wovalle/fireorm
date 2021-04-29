@@ -56,7 +56,7 @@ export function serializeEntity<T extends IEntity>(
   });
 
   Object.entries(serializableObj).forEach(([propertyKey, propertyValue]) => {
-    if (Reflect.getMetadata(serializeKey, obj, propertyKey) === true) {
+    if (Reflect.getMetadata(serializeKey, obj, propertyKey) !== undefined) {
       if (Array.isArray(propertyValue)) {
         (serializableObj as { [key: string]: unknown })[propertyKey] = propertyValue.map(element =>
           serializeEntity(element, [])
