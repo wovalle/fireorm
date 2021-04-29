@@ -5,6 +5,8 @@ import {
   Coordinates,
   FirestoreDocumentReference,
   AlbumImage,
+  Agent,
+  Website,
 } from '../test/fixture';
 import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { Band } from '../test/BandCollection';
@@ -433,7 +435,7 @@ describe('BaseFirestoreRepository', () => {
 
     it('must filter with whereNotEqualTo', async () => {
       const list = await bandRepository.whereNotEqualTo('name', 'Porcupine Tree').find();
-      expect(list.length).toEqual(1);
+      expect(list.length).toEqual(2);
       expect(list[0].formationYear).toEqual(1983);
     });
 
@@ -841,6 +843,18 @@ describe('BaseFirestoreRepository', () => {
 
       const possibleDocWithoutId = bands.find(band => band.id === docId);
       expect(possibleDocWithoutId).not.toBeUndefined();
+    });
+  });
+
+  describe('deserialization', () => {
+    it('should correctly initialize a repository with an entity', async () => {
+      const bandRepositoryWithPath = new BandRepository(Band);
+      const band = await bandRepositoryWithPath.findById('the-speckled-band');
+      expect(band.name).toEqual('the Speckled Band');
+      expect(band.agents[0]).toBeInstanceOf(Agent);
+      expect(band.agents[0].name).toEqual('Mycroft Holmes');
+      expect(band.agents[0].website).toBeInstanceOf(Website);
+      expect(band.agents[0].website.url).toEqual('en.wikipedia.org/wiki/Mycroft_Holmes');
     });
   });
 });

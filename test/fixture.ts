@@ -1,4 +1,5 @@
 import { IEntity } from '../src';
+import { Serialize } from '../src/Decorators/Serialize';
 
 export class Coordinates {
   latitude: number;
@@ -20,6 +21,16 @@ export class Album {
   name: string;
   releaseDate: Date;
   comment?: string;
+}
+
+export class Website {
+  url: string;
+}
+
+export class Agent {
+  name: string;
+  @Serialize(Website)
+  website: Website;
 }
 
 export class Band {
@@ -178,6 +189,25 @@ export const getInitialData = () => {
               url: 'http://lorempixel.com/100/100',
             },
           ],
+        },
+      ],
+    },
+    {
+      id: 'the-speckled-band',
+      name: 'the Speckled Band',
+      albums: [],
+      agents: [
+        {
+          name: 'Mycroft Holmes',
+          website: {
+            url: 'en.wikipedia.org/wiki/Mycroft_Holmes',
+          },
+        },
+        {
+          name: 'Arthur Conan Doyle',
+          website: {
+            url: 'en.wikipedia.org/wiki/Arthur_Conan_Doyle',
+          },
         },
       ],
     },
