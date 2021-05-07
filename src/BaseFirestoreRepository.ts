@@ -14,6 +14,7 @@ import {
 import { getMetadataStorage } from './MetadataUtils';
 import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
 import { FirestoreBatch } from './Batch/FirestoreBatch';
+import { isEntity } from './TypeGuards';
 
 export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestoreRepository<T>
   implements IRepository<T> {
@@ -42,13 +43,43 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
 
     const doc = item.id ? this.firestoreColRef.doc(item.id) : this.firestoreColRef.doc();
 
-    if (!item.id) {
-      item.id = doc.id;
+    // Check references and see if they need to be created first
+    // TODO: inside transaction
+
+    type TCreatedReferences = {
+      propertyKey: string;
+      path: string;
+    };
+
+    const refs: TCreatedReferences[] = [];
+
+    for (const { propertyKey, target } of this.colMetadata.references) {
+      const { getRepository } = await import('./helpers');
+      const ref = (item as Record<string, unknown>)[propertyKey];
+
+      if (isEntity(ref) && !ref.__fireorm_internal_saved) {
+        const repository = getRepository(target);
+
+        const savedReference = await repository.create(ref);
+
+        const path = repository.getPath(savedReference);
+
+        if (!path) {
+          throw new Error(`Couldn't get reference path`);
+        }
+
+        refs.push({ propertyKey, path });
+      }
     }
 
     await doc.set(this.toSerializableObject(item as T));
 
+    if (!item.id) {
+      item.id = doc.id;
+    }
+
     this.initializeSubCollections(item as T);
+    this.initPath(item as T);
 
     return item as T;
   }

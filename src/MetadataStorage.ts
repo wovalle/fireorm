@@ -1,6 +1,7 @@
 import { Firestore } from '@google-cloud/firestore';
 import { ValidatorOptions } from 'class-validator';
 import { BaseRepository } from './BaseRepository';
+import { DuplicatedReference } from './Errors';
 import { IEntityConstructor, Constructor, IEntity, IEntityRepositoryConstructor } from './types';
 import { arraysAreEqual } from './utils';
 
@@ -25,10 +26,17 @@ export interface SubCollectionMetadataWithSegments extends SubCollectionMetadata
 
 export interface FullCollectionMetadata extends CollectionMetadataWithSegments {
   subCollections: SubCollectionMetadataWithSegments[];
+  references: ReferenceMetadata[];
 }
 export interface RepositoryMetadata {
   target: IEntityRepositoryConstructor;
   entity: IEntityConstructor;
+}
+
+export interface ReferenceMetadata {
+  origin: IEntityConstructor;
+  target: IEntityConstructor;
+  propertyKey: string;
 }
 
 export interface MetadataStorageConfig {
@@ -38,6 +46,7 @@ export interface MetadataStorageConfig {
 
 export class MetadataStorage {
   readonly collections: Array<CollectionMetadataWithSegments> = [];
+  readonly references: Array<ReferenceMetadata> = [];
   protected readonly repositories: Map<IEntityConstructor, RepositoryMetadata> = new Map();
 
   public config: MetadataStorageConfig = {
@@ -77,10 +86,27 @@ export class MetadataStorage {
       s => s.parentEntityConstructor === collection?.entityConstructor
     ) as SubCollectionMetadataWithSegments[];
 
+    const references = this.references.filter(r => r.origin === collection?.entityConstructor);
+
     return {
       ...collection,
       subCollections,
+      references,
     };
+  };
+
+  public getReferences = (col: IEntityConstructor) => {
+    return this.references.filter(r => r.origin === col);
+  };
+
+  public setReference = (ref: ReferenceMetadata) => {
+    const existing = this.getReferences(ref.origin);
+
+    if (existing.length) {
+      throw new DuplicatedReference(ref.propertyKey, ref.origin.name);
+    }
+
+    this.references.push(ref);
   };
 
   public setCollection = (col: CollectionMetadata) => {
