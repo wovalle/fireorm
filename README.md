@@ -196,6 +196,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/JingWangTW"><img src="https://avatars0.githubusercontent.com/u/20182367?v=4?s=100" width="100px;" alt=""/><br /><sub><b>JingWangTW</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=JingWangTW" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/rinkstiekema"><img src="https://avatars.githubusercontent.com/u/5337711?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Rink Stiekema</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=rinkstiekema" title="Code">💻</a></td>
   </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/danieleisenhardt"><img src="https://avatars.githubusercontent.com/u/2325519?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Daniel</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=danieleisenhardt" title="Code">💻</a></td>
+  </tr>
 </table>
 
 <!-- markdownlint-restore -->
