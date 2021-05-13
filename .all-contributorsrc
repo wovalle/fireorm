@@ -139,6 +139,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "danieleisenhardt",
+      "name": "Daniel",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2325519?v=4",
+      "profile": "https://github.com/danieleisenhardt",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
