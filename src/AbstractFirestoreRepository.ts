@@ -115,7 +115,6 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   protected initializeSerializedObjects(entity: T) {
     Object.keys(entity).forEach(propertyKey => {
       if (Reflect.getMetadata(serializeKey, entity, propertyKey) !== undefined) {
-        // const constructor = Reflect.getMetadata('design:type', entity, propertyKey);
         const constructor = Reflect.getMetadata(serializeKey, entity, propertyKey);
         const data = (entity as unknown) as { [k: string]: unknown };
         const subData = data[propertyKey] as { [k: string]: unknown };
