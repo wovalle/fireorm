@@ -11,7 +11,7 @@ import {
   IWherePropParam,
 } from './types';
 
-export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T> {
+export class QueryBuilder<T extends IEntity> implements IQueryBuilder<T> {
   protected queries: Array<IFireOrmQueryLine> = [];
   protected limitVal: number;
   protected orderByObj: IOrderByParams;

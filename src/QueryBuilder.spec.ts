@@ -1,4 +1,4 @@
-import QueryBuilder from './QueryBuilder';
+import { QueryBuilder } from './QueryBuilder';
 import { IQueryExecutor, IFireOrmQueryLine, FirestoreOperators } from './types';
 class Test {
   id: string;
