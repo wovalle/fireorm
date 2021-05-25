@@ -229,7 +229,7 @@ describe('BaseFirestoreRepository', () => {
       const entity = new Band();
       Object.assign(entity, { custom: 'unknown property' });
 
-      const band = ((await bandRepository.create(entity)) as unknown) as BandWithCustomProp;
+      const band = (await bandRepository.create(entity)) as unknown as BandWithCustomProp;
 
       expect(band.custom).toEqual('unknown property');
     });
@@ -239,7 +239,6 @@ describe('BaseFirestoreRepository', () => {
         validateModels: true,
         validatorOptions: { whitelist: true, forbidNonWhitelisted: true },
       });
-      type BandWithCustomProp = Band & { custom: string };
 
       const entity = new Band();
       Object.assign(entity, { custom: 'unknown property' });
@@ -727,7 +726,7 @@ describe('BaseFirestoreRepository', () => {
       try {
         await band.albums.create(firstAlbum);
       } catch (error) {
-        expect(error[0].constraints.length).toEqual('Name is too long');
+        expect(error[0].constraints.isLength).toEqual('Name is too long');
       }
     });
 
@@ -753,7 +752,7 @@ describe('BaseFirestoreRepository', () => {
       try {
         await pt.albums.update(album);
       } catch (error) {
-        expect(error[0].constraints.length).toEqual('Name is too long');
+        expect(error[0].constraints.isLength).toEqual('Name is too long');
       }
     });
 
