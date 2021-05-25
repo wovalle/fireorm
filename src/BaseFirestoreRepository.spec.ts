@@ -727,7 +727,7 @@ describe('BaseFirestoreRepository', () => {
       try {
         await band.albums.create(firstAlbum);
       } catch (error) {
-        expect(error[0].constraints.length).toEqual('Name is too long');
+        expect(error[0].constraints.isLength).toEqual('Name is too long');
       }
     });
 
@@ -753,7 +753,7 @@ describe('BaseFirestoreRepository', () => {
       try {
         await pt.albums.update(album);
       } catch (error) {
-        expect(error[0].constraints.length).toEqual('Name is too long');
+        expect(error[0].constraints.isLength).toEqual('Name is too long');
       }
     });
 
