@@ -30,8 +30,10 @@ import QueryBuilder from './QueryBuilder';
 import { serializeEntity } from './utils';
 import { NoMetadataError } from './Errors';
 
-export abstract class AbstractFirestoreRepository<T extends IEntity> extends BaseRepository
-  implements IRepository<T> {
+export abstract class AbstractFirestoreRepository<T extends IEntity>
+  extends BaseRepository
+  implements IRepository<T>
+{
   protected readonly colMetadata: FullCollectionMetadata;
   protected readonly path: string;
   protected readonly config: MetadataStorageConfig;

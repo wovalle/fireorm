@@ -15,8 +15,10 @@ import { getMetadataStorage } from './MetadataUtils';
 import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
 import { FirestoreBatch } from './Batch/FirestoreBatch';
 
-export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestoreRepository<T>
-  implements IRepository<T> {
+export class BaseFirestoreRepository<T extends IEntity>
+  extends AbstractFirestoreRepository<T>
+  implements IRepository<T>
+{
   async findById(id: string) {
     return this.firestoreColRef
       .doc(id)

@@ -8,6 +8,7 @@ export declare class ValidationError {
    *
    * OPTIONAL - configurable via the ValidatorOptions.validationError.target option
    */
+  // eslint-disable-next-line @typescript-eslint/ban-types -- External module
   target?: object;
   /**
    * Object's property that haven't pass validation.

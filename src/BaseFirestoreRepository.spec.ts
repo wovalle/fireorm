@@ -229,7 +229,7 @@ describe('BaseFirestoreRepository', () => {
       const entity = new Band();
       Object.assign(entity, { custom: 'unknown property' });
 
-      const band = ((await bandRepository.create(entity)) as unknown) as BandWithCustomProp;
+      const band = (await bandRepository.create(entity)) as unknown as BandWithCustomProp;
 
       expect(band.custom).toEqual('unknown property');
     });
@@ -239,7 +239,6 @@ describe('BaseFirestoreRepository', () => {
         validateModels: true,
         validatorOptions: { whitelist: true, forbidNonWhitelisted: true },
       });
-      type BandWithCustomProp = Band & { custom: string };
 
       const entity = new Band();
       Object.assign(entity, { custom: 'unknown property' });
