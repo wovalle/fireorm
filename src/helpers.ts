@@ -97,7 +97,7 @@ export const runTransaction = async <T>(executor: (tran: FirestoreTransaction) =
     const result = await executor(new FirestoreTransaction(t, tranRefStorage));
 
     tranRefStorage.forEach(({ entity, path, propertyKey }) => {
-      const record = (entity as unknown) as Record<string, unknown>;
+      const record = entity as unknown as Record<string, unknown>;
       record[propertyKey] = getRepository(path);
     });
 

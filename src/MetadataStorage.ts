@@ -1,7 +1,12 @@
 import { Firestore } from '@google-cloud/firestore';
-import { ValidatorOptions } from 'class-validator';
 import { BaseRepository } from './BaseRepository';
-import { IEntityConstructor, Constructor, IEntity, IEntityRepositoryConstructor } from './types';
+import type {
+  IEntityConstructor,
+  Constructor,
+  IEntity,
+  IEntityRepositoryConstructor,
+  ValidatorOptions,
+} from './types';
 import { arraysAreEqual } from './utils';
 
 export interface CollectionMetadata {
@@ -10,6 +15,7 @@ export interface CollectionMetadata {
   parentEntityConstructor?: IEntityConstructor;
   propertyKey?: string;
 }
+
 export interface SubCollectionMetadata extends CollectionMetadata {
   parentEntityConstructor: IEntityConstructor;
   propertyKey: string;

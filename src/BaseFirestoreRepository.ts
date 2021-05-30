@@ -9,14 +9,17 @@ import {
   IEntity,
   PartialBy,
   ITransactionRepository,
+  ICustomQuery,
 } from './types';
 
 import { getMetadataStorage } from './MetadataUtils';
 import { AbstractFirestoreRepository } from './AbstractFirestoreRepository';
 import { FirestoreBatch } from './Batch/FirestoreBatch';
 
-export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestoreRepository<T>
-  implements IRepository<T> {
+export class BaseFirestoreRepository<T extends IEntity>
+  extends AbstractFirestoreRepository<T>
+  implements IRepository<T>
+{
   async findById(id: string) {
     return this.firestoreColRef
       .doc(id)
@@ -91,7 +94,8 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
     queries: Array<IFireOrmQueryLine>,
     limitVal?: number,
     orderByObj?: IOrderByParams,
-    single?: boolean
+    single?: boolean,
+    customQuery?: ICustomQuery<T>
   ): Promise<T[]> {
     let query = queries.reduce<Query>((acc, cur) => {
       const op = cur.operator as WhereFilterOp;
@@ -106,6 +110,10 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
       query = query.limit(1);
     } else if (limitVal) {
       query = query.limit(limitVal);
+    }
+
+    if (customQuery) {
+      query = await customQuery(query, this.firestoreColRef);
     }
 
     return query.get().then(this.extractTFromColSnap);

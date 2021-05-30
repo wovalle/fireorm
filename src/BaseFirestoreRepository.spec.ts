@@ -229,7 +229,7 @@ describe('BaseFirestoreRepository', () => {
       const entity = new Band();
       Object.assign(entity, { custom: 'unknown property' });
 
-      const band = ((await bandRepository.create(entity)) as unknown) as BandWithCustomProp;
+      const band = (await bandRepository.create(entity)) as unknown as BandWithCustomProp;
 
       expect(band.custom).toEqual('unknown property');
     });
@@ -239,7 +239,6 @@ describe('BaseFirestoreRepository', () => {
         validateModels: true,
         validatorOptions: { whitelist: true, forbidNonWhitelisted: true },
       });
-      type BandWithCustomProp = Band & { custom: string };
 
       const entity = new Band();
       Object.assign(entity, { custom: 'unknown property' });
@@ -478,6 +477,27 @@ describe('BaseFirestoreRepository', () => {
     it('must filter with whereNotIn', async () => {
       const list = await bandRepository.whereNotIn('formationYear', [1965]).find();
       expect(list.length).toEqual(2);
+    });
+
+    it('must filter with customQuery', async () => {
+      const list = await bandRepository
+        .customQuery(async (_, col) => {
+          return col.where('id', '==', 'porcupine-tree');
+        })
+        .find();
+      expect(list[0].name).toEqual('Porcupine Tree');
+    });
+
+    it('must mutate query with customQuery', async () => {
+      const list = await bandRepository
+        .whereGreaterOrEqualThan(b => b.formationYear, 1983)
+        .orderByAscending(p => p.name) // to make it deterministic
+        .customQuery(async q => {
+          return q.limit(1);
+        })
+        .find();
+
+      expect(list[0].name).toEqual('Porcupine Tree');
     });
 
     it('should throw with whereArrayContainsAny and more than 10 items in val array', async () => {
@@ -727,7 +747,7 @@ describe('BaseFirestoreRepository', () => {
       try {
         await band.albums.create(firstAlbum);
       } catch (error) {
-        expect(error[0].constraints.length).toEqual('Name is too long');
+        expect(error[0].constraints.isLength).toEqual('Name is too long');
       }
     });
 
@@ -753,7 +773,7 @@ describe('BaseFirestoreRepository', () => {
       try {
         await pt.albums.update(album);
       } catch (error) {
-        expect(error[0].constraints.length).toEqual('Name is too long');
+        expect(error[0].constraints.isLength).toEqual('Name is too long');
       }
     });
 

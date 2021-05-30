@@ -1,13 +1,12 @@
-import { IEntity, Constructor } from '../types';
 import { Firestore, DocumentReference } from '@google-cloud/firestore';
-import { FullCollectionMetadata } from '../MetadataStorage';
 import { serializeEntity } from '../utils';
-import { ValidationError } from '../Errors/ValidationError';
-import { ValidatorOptions } from 'class-validator';
+import type { FullCollectionMetadata } from '../MetadataStorage';
+import type { ValidationError } from '../Errors/ValidationError';
+import type { IEntity, Constructor, ValidatorOptions } from '../types';
 
 type BatchOperation<T extends IEntity> = {
   type: 'create' | 'update' | 'delete';
-  item: IEntity;
+  item: T;
   ref: DocumentReference;
   collectionMetadata: FullCollectionMetadata;
   validateModels: boolean;

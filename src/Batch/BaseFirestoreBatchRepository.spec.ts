@@ -173,10 +173,10 @@ describe('BaseFirestoreBatchRepository', () => {
       const validationBandRepository = new BaseFirestoreBatchRepository(Band, validationBatch);
 
       let entity = new Band();
-      entity = ({
+      entity = {
         ...entity,
         unknownProperty: 'unknown property',
-      } as unknown) as Band;
+      } as unknown as Band;
 
       validationBandRepository.create(entity);
       expect(validationBatch.commit).not.toThrow();
@@ -192,10 +192,10 @@ describe('BaseFirestoreBatchRepository', () => {
       const validationBandRepository = new BaseFirestoreBatchRepository(Band, validationBatch);
 
       let entity = new Band();
-      entity = ({
+      entity = {
         ...entity,
         unknownProperty: 'unknown property',
-      } as unknown) as Band;
+      } as unknown as Band;
 
       validationBandRepository.create(entity);
 

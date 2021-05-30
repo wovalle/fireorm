@@ -18,6 +18,7 @@ import {
   PartialBy,
   IEntityConstructor,
   ITransactionReferenceStorage,
+  ICustomQuery,
 } from './types';
 
 import { isDocumentReference, isGeoPoint, isObject, isTimestamp } from './TypeGuards';
@@ -26,12 +27,14 @@ import { getMetadataStorage } from './MetadataUtils';
 import { MetadataStorageConfig, FullCollectionMetadata } from './MetadataStorage';
 
 import { BaseRepository } from './BaseRepository';
-import QueryBuilder from './QueryBuilder';
+import { QueryBuilder } from './QueryBuilder';
 import { serializeEntity } from './utils';
 import { NoMetadataError } from './Errors';
 
-export abstract class AbstractFirestoreRepository<T extends IEntity> extends BaseRepository
-  implements IRepository<T> {
+export abstract class AbstractFirestoreRepository<T extends IEntity>
+  extends BaseRepository
+  implements IRepository<T>
+{
   protected readonly colMetadata: FullCollectionMetadata;
   protected readonly path: string;
   protected readonly config: MetadataStorageConfig;
@@ -355,6 +358,19 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   }
 
   /**
+   * Returns a new QueryBuilder with an custom query
+   * specified by @param func. Can only be used once per query.
+   *
+   * @param {ICustomQuery<T>} func function to run in a new query
+   * @returns {QueryBuilder<T>} A new QueryBuilder with the specified
+   * custom query applied.
+   * @memberof AbstractFirestoreRepository
+   */
+  customQuery(func: ICustomQuery<T>): IQueryBuilder<T> {
+    return new QueryBuilder<T>(this).customQuery(func);
+  }
+
+  /**
    * Uses class-validator to validate an entity using decorators set in the collection class
    *
    * @param item class or object representing an entity
@@ -401,7 +417,8 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     queries: IFireOrmQueryLine[],
     limitVal?: number,
     orderByObj?: IOrderByParams,
-    single?: boolean
+    single?: boolean,
+    customQuery?: ICustomQuery<T>
   ): Promise<T[]>;
 
   /**

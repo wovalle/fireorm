@@ -11,8 +11,10 @@ import {
 } from '../types';
 
 import { AbstractFirestoreRepository } from '../AbstractFirestoreRepository';
-export class TransactionRepository<T extends IEntity> extends AbstractFirestoreRepository<T>
-  implements ITransactionRepository<T> {
+export class TransactionRepository<T extends IEntity>
+  extends AbstractFirestoreRepository<T>
+  implements ITransactionRepository<T>
+{
   constructor(
     pathOrConstructor: EntityConstructorOrPath<T>,
     private transaction: Transaction,
