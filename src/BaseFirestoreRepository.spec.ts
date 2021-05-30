@@ -479,6 +479,27 @@ describe('BaseFirestoreRepository', () => {
       expect(list.length).toEqual(2);
     });
 
+    it('must filter with customQuery', async () => {
+      const list = await bandRepository
+        .customQuery(async (_, col) => {
+          return col.where('id', '==', 'porcupine-tree');
+        })
+        .find();
+      expect(list[0].name).toEqual('Porcupine Tree');
+    });
+
+    it('must mutate query with customQuery', async () => {
+      const list = await bandRepository
+        .whereGreaterOrEqualThan(b => b.formationYear, 1983)
+        .orderByAscending(p => p.name) // to make it deterministic
+        .customQuery(async q => {
+          return q.limit(1);
+        })
+        .find();
+
+      expect(list[0].name).toEqual('Porcupine Tree');
+    });
+
     it('should throw with whereArrayContainsAny and more than 10 items in val array', async () => {
       expect(async () => {
         await bandRepository
