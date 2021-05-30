@@ -198,6 +198,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   </tr>
   <tr>
     <td align="center"><a href="https://github.com/danieleisenhardt"><img src="https://avatars.githubusercontent.com/u/2325519?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Daniel</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=danieleisenhardt" title="Code">💻</a></td>
+    <td align="center"><a href="https://zabreznik.net"><img src="https://avatars.githubusercontent.com/u/1311249?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Marko Zabreznik</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=MarZab" title="Code">💻</a></td>
   </tr>
 </table>
 

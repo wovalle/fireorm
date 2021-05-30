@@ -148,6 +148,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "MarZab",
+      "name": "Marko Zabreznik",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1311249?v=4",
+      "profile": "https://zabreznik.net",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
