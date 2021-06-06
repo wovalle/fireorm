@@ -1,5 +1,7 @@
 import { Collection, SubCollection } from '../src/Decorators';
+import { Serialize } from '../src/Decorators/Serialize';
 import {
+  Agent,
   Album as AlbumEntity,
   AlbumImage as AlbumImageEntity,
   Coordinates,
@@ -48,6 +50,9 @@ export class Band {
 
   @Type(() => FirestoreDocumentReference)
   relatedBand?: FirestoreDocumentReference;
+
+  @Serialize(Agent)
+  agents: Agent[];
 
   getLastShowYear() {
     return this.lastShow.getFullYear();
