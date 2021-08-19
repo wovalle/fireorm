@@ -161,7 +161,7 @@ describe('MetadataStorage', () => {
 
     const entityRepository: RepositoryMetadata = {
       entity: Entity,
-      target: (EntityRepository as unknown) as Constructor<IRepository<Entity>>,
+      target: EntityRepository as unknown as Constructor<IRepository<Entity>>,
     };
 
     beforeEach(() => {
@@ -190,7 +190,7 @@ describe('MetadataStorage', () => {
 
     const entityRepository: RepositoryMetadata = {
       entity: Entity,
-      target: (EntityRepository as unknown) as Constructor<IRepository<Entity>>,
+      target: EntityRepository as unknown as Constructor<IRepository<Entity>>,
     };
 
     it('should store repositories', () => {
@@ -204,7 +204,7 @@ describe('MetadataStorage', () => {
 
       const entityRepository2: RepositoryMetadata = {
         entity: Entity,
-        target: (EntityRepository2 as unknown) as Constructor<IRepository<Entity>>,
+        target: EntityRepository2 as unknown as Constructor<IRepository<Entity>>,
       };
 
       metadataStorage.setRepository(entityRepository);
@@ -222,7 +222,7 @@ describe('MetadataStorage', () => {
 
       const entityRepository2: RepositoryMetadata = {
         entity: Entity2,
-        target: (EntityRepository2 as unknown) as Constructor<IRepository<Entity>>,
+        target: EntityRepository2 as unknown as Constructor<IRepository<Entity>>,
       };
 
       metadataStorage.setRepository(entityRepository);

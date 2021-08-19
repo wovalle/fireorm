@@ -9,12 +9,14 @@ import {
   IQueryExecutor,
   IEntity,
   IWherePropParam,
+  ICustomQuery,
 } from './types';
 
-export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T> {
+export class QueryBuilder<T extends IEntity> implements IQueryBuilder<T> {
   protected queries: Array<IFireOrmQueryLine> = [];
   protected limitVal: number;
   protected orderByObj: IOrderByParams;
+  protected customQueryFunction?: ICustomQuery<T>;
 
   constructor(protected executor: IQueryExecutor<T>) {}
 
@@ -172,7 +174,23 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
   }
 
   find() {
-    return this.executor.execute(this.queries, this.limitVal, this.orderByObj);
+    return this.executor.execute(
+      this.queries,
+      this.limitVal,
+      this.orderByObj,
+      false,
+      this.customQueryFunction
+    );
+  }
+
+  customQuery(func: ICustomQuery<T>) {
+    if (this.customQueryFunction) {
+      throw new Error('Only one custom query can be used per query expression');
+    }
+
+    this.customQueryFunction = func;
+
+    return this;
   }
 
   async findOne() {
@@ -180,7 +198,8 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
       this.queries,
       this.limitVal,
       this.orderByObj,
-      true
+      true,
+      this.customQueryFunction
     );
 
     return queryResult.length ? queryResult[0] : null;

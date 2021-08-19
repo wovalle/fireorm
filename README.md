@@ -5,7 +5,6 @@
 [![Typescript lang](https://img.shields.io/badge/Language-Typescript-Blue.svg)](https://www.typescriptlang.org)
 [![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg?style=flat-square)](#contributors)
 [![License](https://img.shields.io/npm/l/fireorm.svg?style=flat)](https://www.npmjs.com/package/fireorm)
-[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/fireorm/community)
 
 Fireorm is a tiny wrapper on top of firebase-admin that makes life easier when dealing with a Firestore database. Fireorm tries to ease the development of apps that rely on Firestore at the database layer by abstracting the access layer providing a familiar repository pattern. It basically helps us not worry about Firestore details and focus on what matters: adding cool new features!
 
@@ -198,6 +197,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   </tr>
   <tr>
     <td align="center"><a href="https://github.com/danieleisenhardt"><img src="https://avatars.githubusercontent.com/u/2325519?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Daniel</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=danieleisenhardt" title="Code">💻</a></td>
+    <td align="center"><a href="https://zabreznik.net"><img src="https://avatars.githubusercontent.com/u/1311249?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Marko Zabreznik</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=MarZab" title="Code">💻</a></td>
   </tr>
 </table>
 
