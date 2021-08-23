@@ -69,7 +69,7 @@ describe('BaseFirestoreRepository', () => {
 
     it('must not throw any exceptions if a query with no results is limited', async () => {
       const oldBands = await bandRepository
-        .whereLessOrEqualThan('formationYear', 1930)
+        .whereLessOrEqualThan('formationYear', 1688)
         .limit(4)
         .find();
       expect(oldBands.length).toEqual(0);
@@ -93,7 +93,7 @@ describe('BaseFirestoreRepository', () => {
     describe('orderByAscending', () => {
       it('must order repository objects', async () => {
         const bands = await bandRepository.orderByAscending('formationYear').find();
-        expect(bands[0].id).toEqual('pink-floyd');
+        expect(bands[0].id).toEqual('the-speckled-band');
       });
 
       it('must order the objects in a subcollection', async () => {
@@ -114,7 +114,7 @@ describe('BaseFirestoreRepository', () => {
       });
 
       it('must be chainable with limit', async () => {
-        const bands = await bandRepository.orderByAscending('formationYear').limit(2).find();
+        const bands = await bandRepository.orderByAscending('formationYear').limit(3).find();
         const lastBand = bands[bands.length - 1];
         expect(lastBand.id).toEqual('red-hot-chili-peppers');
       });
@@ -451,12 +451,12 @@ describe('BaseFirestoreRepository', () => {
     it('must filter with whereLessThan', async () => {
       const list = await bandRepository.whereLessThan('formationYear', 1983).find();
 
-      expect(list.length).toEqual(1);
+      expect(list.length).toEqual(2);
     });
 
     it('must filter with whereLessOrEqualThan', async () => {
       const list = await bandRepository.whereLessOrEqualThan('formationYear', 1983).find();
-      expect(list.length).toEqual(2);
+      expect(list.length).toEqual(3);
     });
 
     it('must filter with whereArrayContains', async () => {
@@ -749,7 +749,7 @@ describe('BaseFirestoreRepository', () => {
       try {
         await band.albums.create(firstAlbum);
       } catch (error) {
-        expect(error[0].constraints.isLength).toEqual('Name is too long');
+        expect(error[0].constraints.length).toEqual('Name is too long');
       }
     });
 
@@ -775,7 +775,7 @@ describe('BaseFirestoreRepository', () => {
       try {
         await pt.albums.update(album);
       } catch (error) {
-        expect(error[0].constraints.isLength).toEqual('Name is too long');
+        expect(error[0].constraints.length).toEqual('Name is too long');
       }
     });
 
