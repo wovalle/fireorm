@@ -34,7 +34,8 @@ import { NoMetadataError } from './Errors';
 
 export abstract class AbstractFirestoreRepository<T extends IEntity>
   extends BaseRepository
-  implements IRepository<T> {
+  implements IRepository<T>
+{
   protected readonly colMetadata: FullCollectionMetadata;
   protected readonly path: string;
   protected readonly config: MetadataStorageConfig;
@@ -118,11 +119,11 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
     Object.keys(entity).forEach(propertyKey => {
       if (Reflect.getMetadata(serializeKey, entity, propertyKey) !== undefined) {
         const constructor = Reflect.getMetadata(serializeKey, entity, propertyKey);
-        const data = (entity as unknown) as { [k: string]: unknown };
+        const data = entity as unknown as { [k: string]: unknown };
         const subData = data[propertyKey] as { [k: string]: unknown };
 
         if (Array.isArray(subData)) {
-          ((entity as unknown) as { [key: string]: unknown })[propertyKey] = subData.map(value => {
+          (entity as unknown as { [key: string]: unknown })[propertyKey] = subData.map(value => {
             const subEntity = new constructor();
 
             for (const i in value) {
@@ -142,7 +143,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
 
           this.initializeSerializedObjects(subEntity);
 
-          ((entity as unknown) as { [key: string]: unknown })[propertyKey] = subEntity;
+          (entity as unknown as { [key: string]: unknown })[propertyKey] = subEntity;
         }
       }
     });

@@ -18,7 +18,8 @@ import { FirestoreBatch } from './Batch/FirestoreBatch';
 
 export class BaseFirestoreRepository<T extends IEntity>
   extends AbstractFirestoreRepository<T>
-  implements IRepository<T> {
+  implements IRepository<T>
+{
   async findById(id: string) {
     return this.firestoreColRef
       .doc(id)
