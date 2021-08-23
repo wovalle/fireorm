@@ -316,14 +316,14 @@ describe('BaseFirestoreTransactionRepository', () => {
       await bandRepository.runTransaction(async tran => {
         const list = await tran.whereLessThan('formationYear', 1983).find();
 
-        expect(list.length).toEqual(1);
+        expect(list.length).toEqual(2);
       });
     });
 
     it('must filter with whereLessOrEqualThan', async () => {
       await bandRepository.runTransaction(async tran => {
-        const list = await tran.whereLessOrEqualThan('formationYear', 1983).find();
-        expect(list.length).toEqual(2);
+        const list = await tran.whereLessOrEqualThan('formationYear', 1900).find();
+        expect(list.length).toEqual(1);
       });
     });
 

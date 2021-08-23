@@ -1,4 +1,4 @@
-import { ignoreKey } from './Decorators/Ignore';
+import { ignoreKey, serializeKey } from './Decorators';
 import { SubCollectionMetadata } from './MetadataStorage';
 import { IEntity } from '.';
 
@@ -58,6 +58,21 @@ export function serializeEntity<T extends IEntity>(
   Object.keys(obj).forEach(propertyKey => {
     if (Reflect.getMetadata(ignoreKey, obj, propertyKey) === true) {
       delete serializableObj[propertyKey];
+    }
+  });
+
+  Object.entries(serializableObj).forEach(([propertyKey, propertyValue]) => {
+    if (Reflect.getMetadata(serializeKey, obj, propertyKey) !== undefined) {
+      if (Array.isArray(propertyValue)) {
+        (serializableObj as { [key: string]: unknown })[propertyKey] = propertyValue.map(element =>
+          serializeEntity(element, [])
+        );
+      } else {
+        (serializableObj as { [key: string]: unknown })[propertyKey] = serializeEntity(
+          propertyValue as Partial<T>,
+          []
+        );
+      }
     }
   });
 

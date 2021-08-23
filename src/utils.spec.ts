@@ -1,4 +1,4 @@
-import { Ignore } from './Decorators/Ignore';
+import { Ignore, Serialize } from './Decorators';
 import { IEntity } from './types';
 import { extractAllGetters, serializeEntity } from './utils';
 
@@ -74,6 +74,68 @@ describe('Utils', () => {
 
       expect(serializeEntity(rhcp, [])).toHaveProperty('name');
       expect(serializeEntity(rhcp, [])).not.toHaveProperty('temporaryName');
+    });
+
+    it('should serialize object properties with the @Serialize() decorator', () => {
+      class Address {
+        streetName: string;
+        number: number;
+        numberAddition: string;
+      }
+
+      class Band implements IEntity {
+        id: string;
+        name: string;
+        @Serialize(Address)
+        address: Address;
+      }
+
+      const address = new Address();
+      address.streetName = 'Baker St.';
+      address.number = 211;
+      address.numberAddition = 'B';
+
+      const band = new Band();
+      band.name = 'the Speckled Band';
+      band.address = address;
+
+      expect(serializeEntity(band, [])).toHaveProperty('name');
+      expect(serializeEntity(band, []).address).not.toBeInstanceOf(Address);
+      expect(serializeEntity(band, []).address['number']).toBe(211);
+    });
+
+    it('should serialize object array properties with the @Serialize() decorator', () => {
+      class Address {
+        streetName: string;
+        number: number;
+        numberAddition: string;
+      }
+
+      class Band implements IEntity {
+        id: string;
+        name: string;
+        @Serialize(Address)
+        addresses: Address[];
+      }
+
+      const address = new Address();
+      address.streetName = 'Baker St.';
+      address.number = 211;
+      address.numberAddition = 'B';
+
+      const address2 = new Address();
+      address2.streetName = 'Baker St.';
+      address2.number = 211;
+      address2.numberAddition = 'C';
+
+      const band = new Band();
+      band.name = 'the Speckled Band';
+      band.addresses = [address, address2];
+
+      expect(serializeEntity(band, [])).toHaveProperty('name');
+      expect(serializeEntity(band, []).addresses[0]).not.toBeInstanceOf(Address);
+      expect(serializeEntity(band, []).addresses[0]['numberAddition']).toBe('B');
+      expect(serializeEntity(band, []).addresses[1]['numberAddition']).toBe('C');
     });
   });
 });
