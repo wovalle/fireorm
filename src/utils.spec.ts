@@ -17,7 +17,7 @@ describe('Utils', () => {
 
         const b = new ClassTest();
 
-        const extracted = extractAllGetters(b as unknown as Record<string, unknown>);
+        const extracted = extractAllGetters((b as unknown) as Record<string, unknown>);
         expect(extracted).toEqual({ b: 'b' });
       });
 
@@ -34,7 +34,7 @@ describe('Utils', () => {
 
         const b = new ClassTest();
 
-        const extracted = extractAllGetters(b as unknown as Record<string, unknown>);
+        const extracted = extractAllGetters((b as unknown) as Record<string, unknown>);
         expect(extracted).toEqual({ b: 'b' });
       });
     });
@@ -54,7 +54,7 @@ describe('Utils', () => {
 
       const b = new ClassTest();
 
-      const extracted = extractAllGetters(b as unknown as Record<string, unknown>);
+      const extracted = extractAllGetters((b as unknown) as Record<string, unknown>);
       expect(extracted).toEqual({ b: 'b' });
     });
   });

@@ -13,8 +13,7 @@ import { BaseFirestoreBatchRepository } from './BaseFirestoreBatchRepository';
  */
 export class FirestoreBatchSingleRepository<T extends IEntity>
   extends BaseFirestoreBatchRepository<T>
-  implements IFirestoreBatchSingleRepository<T>
-{
+  implements IFirestoreBatchSingleRepository<T> {
   async commit() {
     await this.batch.commit();
   }
