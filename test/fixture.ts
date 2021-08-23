@@ -195,6 +195,9 @@ export const getInitialData = () => {
     {
       id: 'the-speckled-band',
       name: 'the Speckled Band',
+      formationYear: 1892,
+      lastShow: null,
+      genres: [],
       albums: [],
       agents: [
         {
