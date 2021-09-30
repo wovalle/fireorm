@@ -12,7 +12,7 @@ jobs:
     - stage: test
       script:
         - yarn eslint '*/**/*.{js,ts}' --quiet
-        - commitlint-travis
+        # - commitlint-travis
         - yarn test
         - yarn test:integration
         - yarn add --dev codecov
