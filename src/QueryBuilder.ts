@@ -17,6 +17,7 @@ export class QueryBuilder<T extends IEntity> implements IQueryBuilder<T> {
   protected limitVal: number;
   protected orderByObj: IOrderByParams;
   protected customQueryFunction?: ICustomQuery<T>;
+  protected orderByFields: Set<string> = new Set();
 
   constructor(protected executor: IQueryExecutor<T>) {}
 
@@ -144,10 +145,17 @@ export class QueryBuilder<T extends IEntity> implements IQueryBuilder<T> {
   }
 
   orderByAscending(prop: IWherePropParam<T>) {
-    if (this.orderByObj) {
+    const fieldProp: string = typeof prop == 'string' ? prop : '';
+    const alreadyOrderedByField = this.orderByFields.has(fieldProp);
+
+    if (this.orderByObj && alreadyOrderedByField) {
       throw new Error(
         'An orderBy function cannot be called more than once in the same query expression'
       );
+    }
+
+    if (!alreadyOrderedByField && fieldProp) {
+      this.orderByFields.add(fieldProp);
     }
 
     this.orderByObj = {
@@ -159,10 +167,17 @@ export class QueryBuilder<T extends IEntity> implements IQueryBuilder<T> {
   }
 
   orderByDescending(prop: IWherePropParam<T>) {
-    if (this.orderByObj) {
+    const fieldProp: string = typeof prop == 'string' ? prop : '';
+    const alreadyOrderedByField = this.orderByFields.has(fieldProp);
+
+    if (this.orderByObj && alreadyOrderedByField) {
       throw new Error(
         'An orderBy function cannot be called more than once in the same query expression'
       );
+    }
+
+    if (!alreadyOrderedByField && fieldProp) {
+      this.orderByFields.add(fieldProp);
     }
 
     this.orderByObj = {

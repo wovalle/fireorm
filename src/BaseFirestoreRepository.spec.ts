@@ -126,7 +126,16 @@ describe('BaseFirestoreRepository', () => {
           albumsSubColl.orderByAscending('releaseDate').orderByDescending('releaseDate');
         }).toThrow();
       });
+
+      it('must succeed when orderBy* function is called more than once in the same expression with different fields', async () => {
+        const pt = await bandRepository.findById('porcupine-tree');
+        const albumsSubColl = pt.albums;
+        expect(() => {
+          albumsSubColl.orderByAscending('releaseDate').orderByDescending('name');
+        }).toBeTruthy();
+      });
     });
+  });
 
     describe('orderByDescending', () => {
       it('must order repository objects', async () => {
@@ -164,8 +173,15 @@ describe('BaseFirestoreRepository', () => {
           albumsSubColl.orderByAscending('releaseDate').orderByDescending('releaseDate');
         }).toThrow();
       });
+
+      it('must succeed when orderBy* function is called more than once in the same expression with different fields', async () => {
+        const pt = await bandRepository.findById('porcupine-tree');
+        const albumsSubColl = pt.albums;
+        expect(() => {
+          albumsSubColl.orderByAscending('releaseDate').orderByDescending('name');
+        }).toBeTruthy();
+      });
     });
-  });
 
   describe('findById', () => {
     it('must find by id', async () => {
