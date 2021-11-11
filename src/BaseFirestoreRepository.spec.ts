@@ -126,7 +126,24 @@ describe('BaseFirestoreRepository', () => {
           albumsSubColl.orderByAscending('releaseDate').orderByDescending('releaseDate');
         }).toThrow();
       });
+
+      it('must throw an Error if an orderBy* function is called more than once in the same expression ascending', async () => {
+        const pt = await bandRepository.findById('porcupine-tree');
+        const albumsSubColl = pt.albums;
+        expect(() => {
+          albumsSubColl.orderByAscending('releaseDate').orderByAscending('releaseDate');
+        }).toThrow();
+      });
+
+      it('must succeed when orderBy* function is called more than once in the same expression with different fields', async () => {
+        const pt = await bandRepository.findById('porcupine-tree');
+        const albumsSubColl = pt.albums;
+        expect(() => {
+          albumsSubColl.orderByAscending('releaseDate').orderByDescending('name');
+        }).not.toThrow();
+      });
     });
+  });
 
     describe('orderByDescending', () => {
       it('must order repository objects', async () => {
@@ -164,8 +181,39 @@ describe('BaseFirestoreRepository', () => {
           albumsSubColl.orderByAscending('releaseDate').orderByDescending('releaseDate');
         }).toThrow();
       });
+
+      it('must throw an Error if an orderBy* function is called more than once in the same expression descending', async () => {
+        const pt = await bandRepository.findById('porcupine-tree');
+        const albumsSubColl = pt.albums;
+        expect(() => {
+          albumsSubColl.orderByDescending('releaseDate').orderByDescending('releaseDate');
+        }).toThrow();
+      });
+
+      it('must succeed when orderBy* function is called more than once in the same expression with different fields', async () => {
+        const pt = await bandRepository.findById('porcupine-tree');
+        const albumsSubColl = pt.albums;
+        expect(() => {
+          albumsSubColl.orderByAscending('releaseDate').orderByDescending('name');
+        }).not.toThrow();
+      });
+
+      it('must succeed when orderBy* function is called more than once in the same expression with different fields ascending', async () => {
+        const pt = await bandRepository.findById('porcupine-tree');
+        const albumsSubColl = pt.albums;
+        expect(() => {
+          albumsSubColl.orderByAscending('releaseDate').orderByAscending('name');
+        }).not.toThrow();
+      });
+
+      it('must succeed when orderBy* function is called more than once in the same expression with different fields descending', async () => {
+        const pt = await bandRepository.findById('porcupine-tree');
+        const albumsSubColl = pt.albums;
+        expect(() => {
+          albumsSubColl.orderByDescending('releaseDate').orderByDescending('name');
+        }).not.toThrow();
+      });
     });
-  });
 
   describe('findById', () => {
     it('must find by id', async () => {
