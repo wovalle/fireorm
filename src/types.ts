@@ -64,6 +64,7 @@ export interface ILimitable<T extends IEntity> {
 
 export type IQueryBuilder<T extends IEntity> = IQueryable<T> & IOrderable<T> & ILimitable<T>;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export type ICustomQuery<T> = (
   query: Query,
   firestoreColRef: CollectionReference
