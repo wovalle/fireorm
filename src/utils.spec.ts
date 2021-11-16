@@ -80,16 +80,16 @@ describe('Utils', () => {
       class Band implements IEntity {
         id: string;
         name: string;
-        
+
         get removeFirstLetterOfName() {
-          if (!this.name) return ''
-          return this.name.charAt(0)
+          if (!this.name) return '';
+          return this.name.charAt(0);
         }
 
         @Ignore()
         get capitalizedName() {
-          if (!this.name) return ''
-          return this.name.charAt(0).toUpperCase() + this.name.slice(1)
+          if (!this.name) return '';
+          return this.name.charAt(0).toUpperCase() + this.name.slice(1);
         }
       }
 
