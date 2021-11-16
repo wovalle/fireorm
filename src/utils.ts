@@ -55,13 +55,10 @@ export function serializeEntity<T extends IEntity>(
     delete serializableObj[scm.propertyKey];
   });
 
-  Object.keys(obj).forEach(propertyKey => {
+  Object.entries(serializableObj).forEach(([propertyKey, propertyValue]) => {
     if (Reflect.getMetadata(ignoreKey, obj, propertyKey) === true) {
       delete serializableObj[propertyKey];
     }
-  });
-
-  Object.entries(serializableObj).forEach(([propertyKey, propertyValue]) => {
     if (Reflect.getMetadata(serializeKey, obj, propertyKey) !== undefined) {
       if (Array.isArray(propertyValue)) {
         (serializableObj as { [key: string]: unknown })[propertyKey] = propertyValue.map(element =>
