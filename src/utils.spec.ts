@@ -76,6 +76,31 @@ describe('Utils', () => {
       expect(serializeEntity(rhcp, [])).not.toHaveProperty('temporaryName');
     });
 
+    it('should not return getter properties with an Ignore() decorator', () => {
+      class Band implements IEntity {
+        id: string;
+        name: string;
+
+        get removeFirstLetterOfName() {
+          if (!this.name) return '';
+          return this.name.charAt(0);
+        }
+
+        @Ignore()
+        get capitalizedName() {
+          if (!this.name) return '';
+          return this.name.charAt(0).toUpperCase() + this.name.slice(1);
+        }
+      }
+
+      const rhcp = new Band();
+      rhcp.name = 'red Hot Chili Peppers';
+
+      expect(serializeEntity(rhcp, [])).toHaveProperty('name');
+      expect(serializeEntity(rhcp, [])).toHaveProperty('removeFirstLetterOfName');
+      expect(serializeEntity(rhcp, [])).not.toHaveProperty('capitalizedName');
+    });
+
     it('should serialize object properties with the @Serialize() decorator', () => {
       class Address {
         streetName: string;
