@@ -67,7 +67,7 @@
     "prettier": "^2.3.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",
-    "semantic-release": "^17.4.3",
+    "semantic-release": "^19.0.3",
     "ts-jest": "^27.0.1",
     "ts-node": "^10.0.0",
     "typedoc": "^0.20.36",
