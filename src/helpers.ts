@@ -3,6 +3,7 @@ import { BaseFirestoreRepository } from './BaseFirestoreRepository';
 import { IEntity, EntityConstructorOrPath, ITransactionReferenceStorage } from './types';
 import { FirestoreTransaction } from './Transaction/FirestoreTransaction';
 import { FirestoreBatch } from './Batch/FirestoreBatch';
+import { runTransaction as firestoreRunTransaction } from '@firebase/firestore';
 
 type RepositoryType = 'default' | 'base' | 'custom' | 'transaction';
 
@@ -92,7 +93,7 @@ export const runTransaction = async <T>(executor: (tran: FirestoreTransaction) =
     throw new Error('Firestore must be initialized first');
   }
 
-  return metadataStorage.firestoreRef.runTransaction(async t => {
+  return firestoreRunTransaction(metadataStorage.firestoreRef, async t => {
     const tranRefStorage: ITransactionReferenceStorage = new Set();
     const result = await executor(new FirestoreTransaction(t, tranRefStorage));
 

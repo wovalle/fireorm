@@ -1,9 +1,13 @@
-/// JMULEIN/FreddieMercurial WIP
 import {
   doc,
   DocumentData,
+  getDoc,
+  getDocs,
+  getFirestore,
   query,
   Query,
+  QueryDocumentSnapshot,
+  runTransaction,
   Transaction,
   where,
   WhereFilterOp,
@@ -35,23 +39,32 @@ export class TransactionRepository<T extends IEntity>
   }
 
   async execute(queries: IFireOrmQueryLine[]): Promise<T[]> {
-    // WTF TODO
-    const docQuery = queries.reduce<Query>(
-      (accumulator: Query<DocumentData>, cur: IFireOrmQueryLine) => {
-        const op = cur.operator as WhereFilterOp;
-        const newConstraint = where(cur.prop, op, cur.val);
-        return query(accumulator, newConstraint);
-      },
-      this.firestoreColRef
-    );
-    this.transaction.get(docQuery);
+    const finalResult: Array<T> = [];
+    await runTransaction(getFirestore(), async () => {
+      const docQuery = queries.reduce<Query>(
+        (accumulator: Query<DocumentData>, cur: IFireOrmQueryLine) => {
+          const op = cur.operator as WhereFilterOp;
+          const newConstraint = where(cur.prop, op, cur.val);
+          return query(accumulator, newConstraint);
+        },
+        this.firestoreColRef
+      );
 
-    const result = await getDocs(docQuery).then(c =>
-      this.extractTFromColSnap(result, this.transaction, this.tranRefStorage)
-    );
-
-    const values = (await snapshot).values();
-    return Promise.resolve(values);
+      const result = await getDocs(docQuery);
+      result.docs.forEach(async doc => {
+        // make reference to doc for the transaction
+        const transactionData = await this.transaction.get(doc.ref);
+      });
+      this.extractTFromColSnap(result, this.transaction, this.tranRefStorage);
+      const docValues = (await result).docs.values();
+      let done = false;
+      do {
+        const d = docValues.next();
+        done = d.done === undefined ? true : d.done;
+        finalResult.push(d.value.data() as T);
+      } while (!done);
+    });
+    return finalResult;
   }
 
   findById(id: string) {

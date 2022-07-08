@@ -6,9 +6,14 @@ import {
   DocumentData,
   DocumentSnapshot,
   getDoc,
+  getDocs,
+  limit,
+  orderBy,
+  query,
   Query,
   setDoc,
   updateDoc,
+  where,
   WhereFilterOp,
 } from '@firebase/firestore';
 
@@ -106,25 +111,29 @@ export class BaseFirestoreRepository<T extends IEntity>
     single?: boolean,
     customQuery?: ICustomQuery<T>
   ): Promise<T[]> {
-    let query = queries.reduce<Query>((acc, cur) => {
-      const op = cur.operator as WhereFilterOp;
-      return acc.where(cur.prop, op, cur.val);
-    }, this.firestoreColRef);
+    let docQuery = queries.reduce<Query>(
+      (accumulator: Query<DocumentData>, cur: IFireOrmQueryLine) => {
+        const op = cur.operator as WhereFilterOp;
+        const newConstraint = where(cur.prop, op, cur.val);
+        return query(accumulator, newConstraint);
+      },
+      this.firestoreColRef
+    );
 
     if (orderByObj) {
-      query = query.orderBy(orderByObj.fieldPath, orderByObj.directionStr);
+      query(docQuery, orderBy(orderByObj.fieldPath, orderByObj.directionStr));
     }
 
     if (single) {
-      query = query.limit(1);
+      query(docQuery, limit(1));
     } else if (limitVal) {
-      query = query.limit(limitVal);
+      query(docQuery, limit(limitVal));
     }
 
     if (customQuery) {
-      query = await customQuery(query, this.firestoreColRef);
+      docQuery = await customQuery(docQuery, this.firestoreColRef);
     }
 
-    return query.get().then(this.extractTFromColSnap);
+    return getDocs(docQuery).then(this.extractTFromColSnap);
   }
 }
