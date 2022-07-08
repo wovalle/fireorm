@@ -1,4 +1,4 @@
-import { Transaction } from '@google-cloud/firestore';
+import { Transaction } from '@firebase/firestore';
 
 import { FirestoreTransaction } from './FirestoreTransaction';
 import { initialize } from '..';

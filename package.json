@@ -40,15 +40,25 @@
     "bw": "yarn build:watch"
   },
   "dependencies": {
+    "@firebase/app": "^0.7.28",
+    "@firebase/app-compat": "^0.1.29",
+    "@firebase/app-types": "^0.7.0",
+    "@firebase/firestore": "^3.4.12",
+    "@firebase/util": "^1.6.3",
+    "@octokit/core": "^4.0.4",
+    "@types/node": "^18.0.3",
     "class-transformer": "0.4.0",
+    "firebase-tools": "^1.2.0",
+    "firestore-storage": "^2.5.1",
+    "firestore-storage-core": "^5.1.1",
     "pluralize": "^8.0.0",
+    "ts-jest": "^28.0.5",
     "ts-object-path": "^0.1.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",
     "@commitlint/travis-cli": "^12.1.4",
-    "@google-cloud/firestore": "^4.12.2",
     "@types/jest": "^26.0.23",
     "@types/pluralize": "^0.0.29",
     "@typescript-eslint/eslint-plugin": "^4.25.0",
@@ -59,20 +69,20 @@
     "eslint": "^7.27.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
-    "firebase-admin": "^9.9.0",
+    "firebase-admin": "^11.0.0",
     "gh-pages-deploy": "^0.5.1",
     "husky": "^6.0.0",
-    "jest": "^27.0.3",
+    "jest": "^28.0.0",
     "mock-cloud-firestore": "^0.12.0",
     "prettier": "^2.3.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",
-    "semantic-release": "^17.4.3",
-    "ts-jest": "^27.0.1",
+    "semantic-release": "^19.0.3",
     "ts-node": "^10.0.0",
-    "typedoc": "^0.20.36",
+    "typedoc": "^0.23.6",
     "typedoc-plugin-markdown": "^3.8.2",
-    "typescript": "^4.3.2"
+    "typescript": "^4.7.4",
+    "yarn-audit-fix": "^9.3.2"
   },
   "peerDependencies": {
     "reflect-metadata": "^0.1.13"

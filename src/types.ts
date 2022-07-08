@@ -1,5 +1,5 @@
-import { OrderByDirection, DocumentReference, CollectionReference } from '@google-cloud/firestore';
-import { Query } from '@google-cloud/firestore';
+import { OrderByDirection, DocumentReference, CollectionReference } from '@firebase/firestore';
+import { Query } from '@firebase/firestore';
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 export type PartialWithRequiredBy<T, K extends keyof T> = Pick<T, K> & Partial<Omit<T, K>>;

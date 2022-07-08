@@ -1,7 +1,7 @@
 import { IEntity, EntityConstructorOrPath, IFirestoreBatch } from '../types';
 import { BaseFirestoreBatchRepository } from './BaseFirestoreBatchRepository';
 import { FirestoreBatchSingleRepository } from './FirestoreBatchSingleRepository';
-import { Firestore } from '@google-cloud/firestore';
+import { Firestore } from '@firebase/firestore';
 import { FirestoreBatchUnit } from './FirestoreBatchUnit';
 
 // TODO: handle status where batch was already committed.

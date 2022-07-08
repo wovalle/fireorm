@@ -1,4 +1,4 @@
-import { Firestore } from '@google-cloud/firestore';
+import { Firestore } from '@firebase/firestore';
 import { BaseRepository } from './BaseRepository';
 import type {
   IEntityConstructor,

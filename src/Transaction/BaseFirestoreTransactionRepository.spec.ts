@@ -1,4 +1,4 @@
-import { Firestore } from '@google-cloud/firestore';
+import { Firestore } from '@firebase/firestore';
 import { BaseFirestoreRepository } from '../BaseFirestoreRepository';
 import { getFixture, Album, AlbumImage } from '../../test/fixture';
 import { initialize } from '../MetadataUtils';
@@ -57,6 +57,9 @@ describe('BaseFirestoreTransactionRepository', () => {
     it('must find by id', async () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
+        if (pt === null) {
+          throw new Error('Porcupine tree not found');
+        }
         expect(pt).toBeInstanceOf(Band);
         expect(pt.id).toEqual('porcupine-tree');
         expect(pt.name).toEqual('Porcupine Tree');
@@ -66,6 +69,9 @@ describe('BaseFirestoreTransactionRepository', () => {
     it('must have proper getters', async () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
+        if (pt === null) {
+          throw new Error('Porcupine tree not found');
+        }
         expect(pt.getLastShowYear()).toEqual(2010);
       });
     });
@@ -173,7 +179,8 @@ describe('BaseFirestoreTransactionRepository', () => {
       await bandRepository.runTransaction(async tran => {
         const band = await tran.create(entity);
         const foundBand = await tran.findById(band.id);
-        expect(band.id).toEqual(foundBand.id);
+        expect(foundBand).toBeInstanceOf(Band);
+        expect(band.id).toEqual(foundBand?.id);
       });
     });
 
@@ -184,19 +191,30 @@ describe('BaseFirestoreTransactionRepository', () => {
     it('must update and return updated item', async () => {
       await bandRepository.runTransaction(async tran => {
         const band = await tran.findById('porcupine-tree');
+        expect(band).toBeInstanceOf(Band);
+        // satisfy null check for IDE
+        if (band === null) {
+          throw new Error('Porcupine tree not found');
+        }
         band.name = 'Steven Wilson';
         const updatedBand = await tran.update(band);
-        expect(band.name).toEqual(updatedBand.name);
+        expect(band?.name).toEqual(updatedBand.name);
       });
     });
 
     it('must update and store updated item', async () => {
       await bandRepository.runTransaction(async tran => {
         const band = await tran.findById('porcupine-tree');
+        expect(band).toBeInstanceOf(Band);
+        // satisfy null check for IDE
+        if (band === null) {
+          throw new Error('Porcupine tree not found');
+        }
         band.name = 'Steven Wilson';
         await tran.update(band);
         const updatedBand = await tran.findById('porcupine-tree');
-        expect(band.name).toEqual(updatedBand.name);
+        expect(updatedBand).toBeInstanceOf(Band);
+        expect(band.name).toEqual(updatedBand?.name);
       });
     });
 
@@ -205,16 +223,28 @@ describe('BaseFirestoreTransactionRepository', () => {
 
       await bandRepository.runTransaction(async tran => {
         const band = await tran.findById('porcupine-tree');
+        expect(band).toBeInstanceOf(Band);
+        // satisfy null check for IDE
+        if (band === null) {
+          throw new Error('Porcupine tree not found');
+        }
+
         band.contactEmail = 'Not an email';
         await tran.update(band);
         const updatedBand = await tran.findById('porcupine-tree');
-        expect(updatedBand.contactEmail).toEqual('Not an email');
+        expect(updatedBand).toBeInstanceOf(Band);
+        expect(updatedBand?.contactEmail).toEqual('Not an email');
       });
     });
 
     it('must fail validation if an invalid class is given', async () => {
       await bandRepository.runTransaction(async tran => {
         const band = await tran.findById('porcupine-tree');
+        expect(band).toBeInstanceOf(Band);
+        // satisfy null check for IDE
+        if (band === null) {
+          throw new Error('Band not found');
+        }
 
         band.contactEmail = 'Not an email';
 
@@ -382,11 +412,12 @@ describe('BaseFirestoreTransactionRepository', () => {
     it('should correctly parse dates', async () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
-        const { releaseDate } = await pt.albums.findById('deadwing');
+        expect(pt).toBeInstanceOf(Band);
+        const { releaseDate } = (await pt?.albums?.findById('deadwing')) as Album;
         expect(releaseDate).toBeInstanceOf(Date);
-        expect(releaseDate.toISOString()).toEqual('2005-03-25T00:00:00.000Z');
-        expect(pt.lastShow).toBeInstanceOf(Date);
-        expect(pt.lastShow.toISOString()).toEqual('2010-10-14T00:00:00.000Z');
+        expect(releaseDate?.toISOString()).toEqual('2005-03-25T00:00:00.000Z');
+        expect(pt?.lastShow).toBeInstanceOf(Date);
+        expect(pt?.lastShow.toISOString()).toEqual('2010-10-14T00:00:00.000Z');
       });
     });
   });
@@ -401,13 +432,15 @@ describe('BaseFirestoreTransactionRepository', () => {
         band.genres = ['alternative-rock'];
 
         await tran.create(band);
+        expect(band).toBeInstanceOf(Band);
 
         const firstAlbum = new Album();
         firstAlbum.id = '30-seconds-to-mars';
         firstAlbum.name = '30 Seconds to Mars (Album)';
         firstAlbum.releaseDate = new Date('2002-07-22');
 
-        const album = await band.albums.create(firstAlbum);
+        const album = await band.albums?.create(firstAlbum);
+        expect(album).toBeInstanceOf(Album);
 
         const image1 = new AlbumImage();
         image1.id = 'image1';
@@ -417,16 +450,21 @@ describe('BaseFirestoreTransactionRepository', () => {
         image2.id = 'image2';
         image2.url = 'http://image2.com';
 
+        if (album?.images === undefined) {
+          throw new Error('Album images not initialized');
+        }
+
         await album.images.create(image1);
         await album.images.create(image2);
 
-        expect(band.albums.constructor.name).toEqual('TransactionRepository');
+        expect(band?.albums?.constructor.name).toEqual('TransactionRepository');
         expect(album.images.constructor.name).toEqual('TransactionRepository');
       });
     });
 
     it('should revert transaction repositories to normal repositories', () => {
-      expect(band.albums.constructor.name).toEqual('BaseFirestoreRepository');
+      expect(band).toBeInstanceOf(Band);
+      expect(band?.albums?.constructor.name).toEqual('BaseFirestoreRepository');
     });
   });
 
@@ -434,12 +472,14 @@ describe('BaseFirestoreTransactionRepository', () => {
     it('should initialize nested subcollections', async () => {
       await bandRepository.runTransaction(async tran => {
         const band = await tran.findById('red-hot-chili-peppers');
-        expect(band.name).toEqual('Red Hot Chili Peppers');
-        expect(band.albums).toBeInstanceOf(TransactionRepository);
+        expect(band).toBeInstanceOf(Band);
+        expect(band?.name).toEqual('Red Hot Chili Peppers');
+        expect(band?.albums).toBeInstanceOf(TransactionRepository);
 
-        const album = await band.albums.findById('stadium-arcadium');
-        expect(album.name).toEqual('Stadium Arcadium');
-        expect(album.images).toBeInstanceOf(TransactionRepository);
+        const album = await band?.albums?.findById('stadium-arcadium');
+        expect(album).toBeInstanceOf(Album);
+        expect(album?.name).toEqual('Stadium Arcadium');
+        expect(album?.images).toBeInstanceOf(TransactionRepository);
       });
     });
 
@@ -469,11 +509,16 @@ describe('BaseFirestoreTransactionRepository', () => {
         await tran.create(band);
         const albumsRef = band.albums;
 
-        await albumsRef.create(firstAlbum);
-        await albumsRef.create(secondAlbum);
-        await albumsRef.create(thirdAlbum);
+        await albumsRef?.create(firstAlbum);
+        await albumsRef?.create(secondAlbum);
+        await albumsRef?.create(thirdAlbum);
 
-        const albums = await albumsRef.find();
+        const albums = await albumsRef?.find();
+        expect(albums).toBeInstanceOf(Array);
+        // satisfy undefined check
+        if (albums === undefined) {
+          throw new Error('Albums is undefined');
+        }
         expect(albums.length).toEqual(3);
         expect(albums[0].images).toBeInstanceOf(TransactionRepository);
       });
@@ -496,7 +541,7 @@ describe('BaseFirestoreTransactionRepository', () => {
         const albumsRef = band.albums;
 
         try {
-          await albumsRef.create(firstAlbum);
+          await albumsRef?.create(firstAlbum);
         } catch (error) {
           expect(error[0].constraints.length).toEqual('Name is too long');
         }
@@ -506,25 +551,44 @@ describe('BaseFirestoreTransactionRepository', () => {
     it('should be able to update subcollections', async () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
-        const albumsRef = pt.albums;
+        expect(pt).toBeInstanceOf(Band);
+        const albumsRef = pt?.albums;
+        if (albumsRef === undefined) {
+          throw new Error('Albums not initialized');
+        }
 
         const album = await albumsRef.findById('fear-blank-planet');
+        expect(album).toBeInstanceOf(Album);
+        // satisfy null check
+        if (album === null) {
+          throw new Error('Album not found');
+        }
         album.comment = 'Anesthethize is top 3 IMHO';
 
         await albumsRef.update(album);
 
         const updatedAlbum = await albumsRef.findById('fear-blank-planet');
-
-        expect(updatedAlbum.comment).toEqual('Anesthethize is top 3 IMHO');
+        expect(updatedAlbum).toBeInstanceOf(Album);
+        expect(updatedAlbum?.comment).toEqual('Anesthethize is top 3 IMHO');
       });
     });
 
     it('should be able to validate subcollections on update', async () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
-        const albumsRef = pt.albums;
+        expect(pt).toBeInstanceOf(Band);
+        const albumsRef = pt?.albums;
+        // satisfy undefined check
+        if (albumsRef === undefined) {
+          throw new Error('Albums not initialized');
+        }
 
         const album = await albumsRef.findById('fear-blank-planet');
+        expect(album).toBeInstanceOf(Album);
+        // satisfy null check
+        if (album === null) {
+          throw new Error('Album not found');
+        }
         album.name = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
 
         try {
@@ -538,6 +602,11 @@ describe('BaseFirestoreTransactionRepository', () => {
     it('should be able to update collections with subcollections', async () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
+        expect(pt).toBeInstanceOf(Band);
+        // satisfy null check
+        if (pt === null) {
+          throw new Error('Band not found');
+        }
         pt.name = 'Porcupine Tree IS THE BEST';
         const updatedPt = await tran.update(pt);
         const foundUpdatedPt = await tran.update(pt);
@@ -550,11 +619,13 @@ describe('BaseFirestoreTransactionRepository', () => {
     it('should be able to delete subcollections', async () => {
       await bandRepository.runTransaction(async tran => {
         const pt = await tran.findById('porcupine-tree');
-        const albumsRef = pt.albums;
-        await albumsRef.delete('fear-blank-planet');
+        expect(pt).toBeInstanceOf(Band);
+        const albumsRef = pt?.albums;
+        await albumsRef?.delete('fear-blank-planet');
 
-        const updatedBandAlbums = await albumsRef.find();
-        expect(updatedBandAlbums.length).toEqual(3);
+        const updatedBandAlbums = await albumsRef?.find();
+        expect(updatedBandAlbums).toBeInstanceOf(Array);
+        expect(updatedBandAlbums?.length).toEqual(3);
       });
     });
 
@@ -567,13 +638,15 @@ describe('BaseFirestoreTransactionRepository', () => {
         band.genres = ['alternative-rock'];
 
         await tran.create(band);
+        expect(band).toBeInstanceOf(Band);
 
         const firstAlbum = new Album();
         firstAlbum.id = '30-seconds-to-mars';
         firstAlbum.name = '30 Seconds to Mars (Album)';
         firstAlbum.releaseDate = new Date('2002-07-22');
 
-        const album = await band.albums.create(firstAlbum);
+        const album = await band?.albums?.create(firstAlbum);
+        expect(album).toBeInstanceOf(Album);
 
         const image1 = new AlbumImage();
         image1.id = 'image1';
@@ -583,24 +656,28 @@ describe('BaseFirestoreTransactionRepository', () => {
         image2.id = 'image2';
         image2.url = 'http://image2.com';
 
-        await album.images.create(image1);
-        await album.images.create(image2);
+        await album?.images?.create(image1);
+        await album?.images?.create(image2);
 
-        const images = await album.images.find();
-        expect(images.length).toEqual(2);
+        const images = await album?.images?.find();
+        expect(images).toBeInstanceOf(Array);
+        expect(images?.length).toEqual(2);
       });
 
       await bandRepository.runTransaction(async tran => {
         const band = await tran.findById('30-seconds-to-mars');
-        expect(band.name).toEqual('30 Seconds To Mars');
-        const albums = await band.albums.find();
+        expect(band).toBeInstanceOf(Band);
+        expect(band?.name).toEqual('30 Seconds To Mars');
+        const albums = await band?.albums?.find();
+        expect(albums).toBeInstanceOf(Array);
+        expect(albums?.length).toEqual(1);
+        const firstAlbum = albums?.at(0);
+        expect(firstAlbum?.name).toEqual('30 Seconds to Mars (Album)');
 
-        expect(albums.length).toEqual(1);
-        expect(albums[0].name).toEqual('30 Seconds to Mars (Album)');
-
-        const images = await albums[0].images.find();
-        expect(images.length).toEqual(2);
-        expect(images[0].id).toEqual('image1');
+        const images = await firstAlbum?.images?.find();
+        expect(images).toBeInstanceOf(Array);
+        expect(images?.length).toEqual(2);
+        expect(images?.at(0)?.id).toEqual('image1');
       });
     });
   });

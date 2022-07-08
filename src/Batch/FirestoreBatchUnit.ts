@@ -1,4 +1,4 @@
-import { Firestore, DocumentReference } from '@google-cloud/firestore';
+import { Firestore, DocumentReference } from '@firebase/firestore';
 import { serializeEntity } from '../utils';
 import type { FullCollectionMetadata } from '../MetadataStorage';
 import type { ValidationError } from '../Errors/ValidationError';

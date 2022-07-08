@@ -2,7 +2,7 @@ import { getRepository, Collection, initialize } from '../../src';
 import { Band as BandEntity } from '../fixture';
 import { getUniqueColName } from '../setup';
 import { IsEmail } from 'class-validator';
-import { Firestore } from '@google-cloud/firestore';
+import { Firestore } from '@firebase/firestore';
 
 describe('Integration test: Validations', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

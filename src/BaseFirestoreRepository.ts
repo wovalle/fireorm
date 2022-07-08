@@ -1,6 +1,16 @@
 import 'reflect-metadata';
 
-import { Query, WhereFilterOp } from '@google-cloud/firestore';
+import {
+  deleteDoc,
+  doc,
+  DocumentData,
+  DocumentSnapshot,
+  getDoc,
+  Query,
+  setDoc,
+  updateDoc,
+  WhereFilterOp,
+} from '@firebase/firestore';
 
 import {
   IRepository,
@@ -21,10 +31,9 @@ export class BaseFirestoreRepository<T extends IEntity>
   implements IRepository<T>
 {
   async findById(id: string) {
-    return this.firestoreColRef
-      .doc(id)
-      .get()
-      .then(d => (d.exists ? this.extractTFromDocSnap(d) : null));
+    return getDoc(doc(this.firestoreColRef, id)).then((d: DocumentSnapshot<DocumentData>) =>
+      d.exists() ? this.extractTFromDocSnap(d) : null
+    );
   }
 
   async create(item: PartialBy<T, 'id'>): Promise<T> {
@@ -43,13 +52,13 @@ export class BaseFirestoreRepository<T extends IEntity>
       }
     }
 
-    const doc = item.id ? this.firestoreColRef.doc(item.id) : this.firestoreColRef.doc();
+    const newDoc = item.id ? doc(this.firestoreColRef, item.id) : doc(this.firestoreColRef);
 
     if (!item.id) {
-      item.id = doc.id;
+      item.id = newDoc.id;
     }
 
-    await doc.set(this.toSerializableObject(item as T));
+    await setDoc(newDoc, this.toSerializableObject(item as T));
 
     this.initializeSubCollections(item as T);
 
@@ -66,13 +75,13 @@ export class BaseFirestoreRepository<T extends IEntity>
     }
 
     // TODO: handle errors
-    await this.firestoreColRef.doc(item.id).update(this.toSerializableObject(item));
+    await updateDoc(doc(this.firestoreColRef, item.id), this.toSerializableObject(item));
     return item;
   }
 
   async delete(id: string): Promise<void> {
     // TODO: handle errors
-    await this.firestoreColRef.doc(id).delete();
+    await deleteDoc(doc(this.firestoreColRef, id));
   }
 
   async runTransaction<R>(executor: (tran: ITransactionRepository<T>) => Promise<R>) {

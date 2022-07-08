@@ -1,4 +1,4 @@
-import { Transaction } from '@google-cloud/firestore';
+import { Transaction } from '@firebase/firestore';
 import { TransactionRepository } from './BaseFirestoreTransactionRepository';
 import { getMetadataStorage } from '../MetadataUtils';
 import {

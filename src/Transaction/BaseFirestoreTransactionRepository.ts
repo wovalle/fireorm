@@ -1,4 +1,13 @@
-import { Query, Transaction, WhereFilterOp } from '@google-cloud/firestore';
+/// JMULEIN/FreddieMercurial WIP
+import {
+  doc,
+  DocumentData,
+  query,
+  Query,
+  Transaction,
+  where,
+  WhereFilterOp,
+} from '@firebase/firestore';
 
 import {
   IEntity,
@@ -26,23 +35,32 @@ export class TransactionRepository<T extends IEntity>
   }
 
   async execute(queries: IFireOrmQueryLine[]): Promise<T[]> {
-    const query = queries.reduce<Query>((acc, cur) => {
-      const op = cur.operator as WhereFilterOp;
-      return acc.where(cur.prop, op, cur.val);
-    }, this.firestoreColRef);
+    // WTF TODO
+    const docQuery = queries.reduce<Query>(
+      (accumulator: Query<DocumentData>, cur: IFireOrmQueryLine) => {
+        const op = cur.operator as WhereFilterOp;
+        const newConstraint = where(cur.prop, op, cur.val);
+        return query(accumulator, newConstraint);
+      },
+      this.firestoreColRef
+    );
+    this.transaction.get(docQuery);
 
-    return this.transaction
-      .get(query)
-      .then(c => this.extractTFromColSnap(c, this.transaction, this.tranRefStorage));
+    const result = await getDocs(docQuery).then(c =>
+      this.extractTFromColSnap(result, this.transaction, this.tranRefStorage)
+    );
+
+    const values = (await snapshot).values();
+    return Promise.resolve(values);
   }
 
   findById(id: string) {
-    const query = this.firestoreColRef.doc(id);
+    const query = doc(this.firestoreColRef, id);
 
     return this.transaction
       .get(query)
       .then(c =>
-        c.exists ? this.extractTFromDocSnap(c, this.transaction, this.tranRefStorage) : null
+        c.exists() ? this.extractTFromDocSnap(c, this.transaction, this.tranRefStorage) : null
       );
   }
 
@@ -55,13 +73,13 @@ export class TransactionRepository<T extends IEntity>
       }
     }
 
-    const doc = item.id ? this.firestoreColRef.doc(item.id) : this.firestoreColRef.doc();
+    const firestoreDoc = item.id ? doc(this.firestoreColRef, item.id) : doc(this.firestoreColRef);
 
     if (!item.id) {
-      item.id = doc.id;
+      item.id = firestoreDoc.id;
     }
 
-    this.transaction.set(doc, this.toSerializableObject(item as T));
+    this.transaction.set(firestoreDoc, this.toSerializableObject(item as T));
     this.initializeSubCollections(item as T, this.transaction, this.tranRefStorage);
 
     return item as T;
@@ -76,14 +94,16 @@ export class TransactionRepository<T extends IEntity>
       }
     }
 
-    const query = this.firestoreColRef.doc(item.id);
-    this.transaction.update(query, this.toSerializableObject(item));
+    this.transaction.update(
+      doc(this.firestoreColRef, item.id),
+      this.toSerializableObject(item) as Record<string, never>
+    );
 
     return item;
   }
 
   async delete(id: string): Promise<void> {
-    this.transaction.delete(this.firestoreColRef.doc(id));
+    this.transaction.delete(doc(this.firestoreColRef, id));
   }
 
   limit(): IQueryBuilder<T> {
