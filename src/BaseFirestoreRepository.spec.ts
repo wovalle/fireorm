@@ -30,7 +30,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     firestore = firebase.firestore();
-    expect(firestore).toBeInstanceOf(Firestore);
+    expect(firestore).toBeDefined();
     if (firestore === null) {
       throw new Error('Firestore is not initialized');
     }
@@ -328,7 +328,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must not validate if the validate config by default', async () => {
-      expect(firestore).toBeInstanceOf(Firestore);
+      expect(firestore).toBeDefined();
       initialize(firestore as Firestore);
 
       bandRepository = new BandRepository('bands');
@@ -341,7 +341,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must not validate if the validateModels: false', async () => {
-      expect(firestore).toBeInstanceOf(Firestore);
+      expect(firestore).toBeDefined();
       initialize(firestore as Firestore, { validateModels: false });
 
       bandRepository = new BandRepository('bands');
@@ -354,7 +354,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must not validate forbidden non-whitelisted properties if the validatorOptions: {}', async () => {
-      expect(firestore).toBeInstanceOf(Firestore);
+      expect(firestore).toBeDefined();
       initialize(firestore as Firestore, { validateModels: true, validatorOptions: {} });
 
       type BandWithCustomProp = Band & { custom: string };
@@ -371,7 +371,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must validate forbidden non-whitelisted properties if the validatorOptions: { whitelist: true, forbidNonWhitelisted: true }', async () => {
-      expect(firestore).toBeInstanceOf(Firestore);
+      expect(firestore).toBeDefined();
       initialize(firestore as Firestore, {
         validateModels: true,
         validatorOptions: { whitelist: true, forbidNonWhitelisted: true },
@@ -391,7 +391,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must fail validation if an invalid class is given', async () => {
-      expect(firestore).toBeInstanceOf(Firestore);
+      expect(firestore).toBeDefined();
       initialize(firestore as Firestore, { validateModels: true });
 
       const entity = new Band();
@@ -407,7 +407,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must fail validation if an invalid object is given', async () => {
-      expect(firestore).toBeInstanceOf(Firestore);
+      expect(firestore).toBeDefined();
       initialize(firestore as Firestore, { validateModels: true });
 
       const entity: Partial<Band> = {
@@ -499,7 +499,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must not validate if the validate config property is false', async () => {
-      expect(firestore).toBeInstanceOf(Firestore);
+      expect(firestore).toBeDefined();
       initialize(firestore as Firestore, { validateModels: false });
 
       bandRepository = new BandRepository('bands');
@@ -523,7 +523,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must fail validation if an invalid class is given', async () => {
-      expect(firestore).toBeInstanceOf(Firestore);
+      expect(firestore).toBeDefined();
       initialize(firestore as Firestore, { validateModels: true });
 
       const band = await (bandRepository as BaseFirestoreRepository<Band>).findById(
@@ -544,7 +544,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must fail validation if an invalid object is given', async () => {
-      expect(firestore).toBeInstanceOf(Firestore);
+      expect(firestore).toBeDefined();
       initialize(firestore as Firestore, { validateModels: true });
 
       const band = await (bandRepository as BaseFirestoreRepository<Band>).findById(
@@ -760,7 +760,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('must support document references in where methods', async () => {
-      expect(firestore).toBeInstanceOf(Firestore);
+      expect(firestore).toBeDefined();
       const docRef = doc(collection(firestore as Firestore, 'bands'), 'steven-wilson');
 
       const band = await (bandRepository as BaseFirestoreRepository<Band>).findById(
@@ -833,7 +833,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('should correctly parse references', async () => {
-      expect(firestore).toBeInstanceOf(Firestore);
+      expect(firestore).toBeDefined();
       const docRef = doc(collection(firestore as Firestore, 'bands'), 'opeth');
 
       const band = await (bandRepository as BaseFirestoreRepository<Band>).findById(
@@ -1009,7 +1009,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('should be able to validate subcollections on create', async () => {
-      expect(firestore).toBeInstanceOf(Firestore);
+      expect(firestore).toBeDefined();
       initialize(firestore as Firestore, { validateModels: true });
 
       const band = new Band();
@@ -1052,7 +1052,7 @@ describe('BaseFirestoreRepository', () => {
     });
 
     it('should be able to validate subcollections on update', async () => {
-      expect(firestore).toBeInstanceOf(Firestore);
+      expect(firestore).toBeDefined();
       initialize(firestore as Firestore, { validateModels: true });
 
       const pt = await (bandRepository as BaseFirestoreRepository<Band>).findById('porcupine-tree');
@@ -1158,7 +1158,7 @@ describe('BaseFirestoreRepository', () => {
     let docId: string;
 
     beforeEach(async () => {
-      expect(firestore).toBeInstanceOf(Firestore);
+      expect(firestore).toBeDefined();
       const bandWithoutId = new Band();
       const addedDoc = await addDoc(
         await collection(firestore as Firestore, 'bands'),
