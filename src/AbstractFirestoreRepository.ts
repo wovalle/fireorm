@@ -5,6 +5,7 @@ import {
   CollectionReference,
   Transaction,
   collection,
+  doc,
 } from '@firebase/firestore';
 import { serializeKey } from './Decorators/Serialize';
 import { ValidationError } from './Errors/ValidationError';
@@ -60,6 +61,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
 
     this.colMetadata = colMetadata;
     this.path = typeof pathOrConstructor === 'string' ? pathOrConstructor : this.colMetadata.name;
+    const docRef = doc(firestoreRef, this.path);
     this.firestoreColRef = collection(firestoreRef, this.path);
   }
 
