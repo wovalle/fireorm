@@ -10,6 +10,13 @@ Fireorm is a tiny wrapper on top of firebase-admin that makes life easier when d
 
 You can read more about the motivations and features of fireorm [on its introductory post](https://medium.com/p/ba7734644684). Also, the [API documentation](https://wovalle.github.io/fireorm) is available.
 
+> :warning: Due to personal and professional reasons, I am unable to continue active development and support for this project.
+>
+>However, I want to assure you that the project will remain available for use and that I will still check pull requests if needed. I encourage the community to continue to use and contribute to this project, and I hope that it will continue to be a valuable resource for developers.
+
+
+
+
 ## Usage
 
 1.  Install the npm package:
