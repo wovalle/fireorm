@@ -2,7 +2,7 @@ import { BaseFirestoreBatchRepository } from './BaseFirestoreBatchRepository';
 import { getFixture } from '../../test/fixture';
 import { initialize } from '../MetadataUtils';
 import { Band, Album } from '../../test/BandCollection';
-import { Firestore, WriteBatch } from '@google-cloud/firestore';
+import { Firestore, WriteBatch } from '@firebase/firestore';
 import { FirestoreBatchUnit } from './FirestoreBatchUnit';
 import { BaseFirestoreRepository } from '../BaseFirestoreRepository';
 import { getRepository } from '../helpers';

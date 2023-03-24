@@ -4,7 +4,9 @@ import {
   QuerySnapshot,
   CollectionReference,
   Transaction,
-} from '@google-cloud/firestore';
+  collection,
+  doc,
+} from '@firebase/firestore';
 import { serializeKey } from './Decorators/Serialize';
 import { ValidationError } from './Errors/ValidationError';
 
@@ -59,7 +61,8 @@ export abstract class AbstractFirestoreRepository<T extends IEntity>
 
     this.colMetadata = colMetadata;
     this.path = typeof pathOrConstructor === 'string' ? pathOrConstructor : this.colMetadata.name;
-    this.firestoreColRef = firestoreRef.collection(this.path);
+    const docRef = doc(firestoreRef, this.path);
+    this.firestoreColRef = collection(firestoreRef, this.path);
   }
 
   protected toSerializableObject = (obj: T): Record<string, unknown> =>

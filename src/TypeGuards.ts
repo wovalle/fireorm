@@ -1,4 +1,4 @@
-import { Timestamp, GeoPoint, DocumentReference } from '@google-cloud/firestore';
+import { Timestamp, GeoPoint, DocumentReference } from '@firebase/firestore';
 
 export function isTimestamp(x: unknown): x is Timestamp {
   return typeof x === 'object' && x !== null && 'toDate' in x;

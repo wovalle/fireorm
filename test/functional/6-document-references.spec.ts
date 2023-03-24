@@ -1,7 +1,7 @@
 import { getRepository, Collection, Type, BaseFirestoreRepository } from '../../src';
 import { Band as BandEntity, FirestoreDocumentReference } from '../fixture';
 import { getUniqueColName } from '../setup';
-import { Firestore } from '@google-cloud/firestore';
+import { Firestore } from '@firebase/firestore';
 
 describe('Integration test: Using Document References', () => {
   const colName = getUniqueColName('document-references');

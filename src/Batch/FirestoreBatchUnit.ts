@@ -1,4 +1,4 @@
-import { Firestore, DocumentReference } from '@google-cloud/firestore';
+import { writeBatch, Firestore, DocumentReference } from '@firebase/firestore';
 import { serializeEntity } from '../utils';
 import type { FullCollectionMetadata } from '../MetadataStorage';
 import type { ValidationError } from '../Errors/ValidationError';
@@ -47,7 +47,7 @@ export class FirestoreBatchUnit {
     }
 
     this.status = 'committing';
-    const batch = this.firestoreRef.batch();
+    const batch = writeBatch(this.firestoreRef);
 
     for (const op of this.operations) {
       if (op.validateModels && ['create', 'update'].includes(op.type)) {
@@ -69,10 +69,10 @@ export class FirestoreBatchUnit {
           batch.set(op.ref, serialized);
           break;
         case 'update':
-          batch.update(op.ref, serialized);
+          batch.update(op.ref, serialized as Record<string, never>);
           break;
         case 'delete':
-          batch.delete(op.ref, serialized);
+          batch.delete(op.ref);
           break;
       }
     }
@@ -99,7 +99,7 @@ export class FirestoreBatchUnit {
 
       return classValidator.validate(entity, validatorOptions);
     } catch (error) {
-      if (error.code === 'MODULE_NOT_FOUND') {
+      if ((error as any).code === 'MODULE_NOT_FOUND') {
         throw new Error(
           'It looks like class-validator is not installed. Please run `npm i -S class-validator` to fix this error, or initialize FireORM with `validateModels: false` to disable validation.'
         );
