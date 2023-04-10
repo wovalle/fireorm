@@ -1,21 +1,21 @@
 import * as admin from 'firebase-admin';
+
 import { initialize } from '../src';
 
 console.log('Running Integration Test Setup');
 
-const serviceAccount = {
-  projectId: process.env.FIRESTORE_PROJECT_ID,
-  databaseUrl: process.env.FIREBASE_DATABASE_URL,
-  privateKey: Buffer.from(process.env.FIRESTORE_PRIVATE_KEY_BASE_64, 'base64').toString('ascii'),
-  clientEmail: process.env.FIRESTORE_CLIENT_EMAIL,
-};
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: serviceAccount.databaseUrl,
+  projectId: process.env.FIRESTORE_PROJECT_ID
 });
 
 const firestore = admin.firestore();
+
+firestore.settings({
+  host: process.env.FIREBASE_EMULATOR_URL,
+  ssl: false,
+});
+
 // To understand this, see 5-document-references.spec.ts
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (global as any).firestoreRef = firestore;
