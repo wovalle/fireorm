@@ -134,11 +134,17 @@ describe('MetadataStorage', () => {
       expect(collection.segments).toEqual([col.name]);
     });
 
-    it('should throw when trying to store duplicate collections', () => {
+    it('should not throw when trying to store duplicate collections', () => {
       metadataStorage.setCollection(col);
-      expect(() => metadataStorage.setCollection(col)).toThrowError(
-        `Collection with name ${col.name} has already been registered`
+      const collection = metadataStorage.collections.find(
+        c => c.entityConstructor === col.entityConstructor
       );
+
+      expect(collection.entityConstructor).toEqual(col.entityConstructor);
+      expect(collection.name).toEqual(col.name);
+      expect(collection.parentEntityConstructor).toEqual(col.parentEntityConstructor);
+      expect(collection.propertyKey).toEqual(col.propertyKey);
+      expect(collection.segments).toEqual([col.name]);
     });
 
     it('should update segments for nested subcollections', () => {

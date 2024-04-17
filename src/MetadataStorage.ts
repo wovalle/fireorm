@@ -92,34 +92,33 @@ export class MetadataStorage {
   public setCollection = (col: CollectionMetadata) => {
     const existing = this.getCollection(col.entityConstructor);
 
-    if (existing) {
-      throw new Error(`Collection with name ${existing.name} has already been registered`);
-    }
-
-    const colToAdd = {
-      ...col,
-      segments: [col.name],
-    };
-
-    this.collections.push(colToAdd);
-
-    const getWhereImParent = (p: Constructor<IEntity>) =>
-      this.collections.filter(c => c.parentEntityConstructor === p);
-
-    const colsToUpdate = getWhereImParent(col.entityConstructor);
-
-    // Update segments for subcollections and subcollections of subcollections
-    while (colsToUpdate.length) {
-      const c = colsToUpdate.pop();
-
-      if (!c) {
-        return;
+    if (!existing) {
+      const colToAdd = {
+        ...col,
+        segments: [col.name],
+      };
+  
+      this.collections.push(colToAdd);
+  
+      const getWhereImParent = (p: Constructor<IEntity>) =>
+        this.collections.filter(c => c.parentEntityConstructor === p);
+  
+      const colsToUpdate = getWhereImParent(col.entityConstructor);
+  
+      // Update segments for subcollections and subcollections of subcollections
+      while (colsToUpdate.length) {
+        const c = colsToUpdate.pop();
+  
+        if (!c) {
+          return;
+        }
+  
+        const parent = this.collections.find(p => p.entityConstructor === c.parentEntityConstructor);
+        c.segments = parent?.segments.concat(c.name) || [];
+        getWhereImParent(c.entityConstructor).forEach(col => colsToUpdate.push(col));
       }
-
-      const parent = this.collections.find(p => p.entityConstructor === c.parentEntityConstructor);
-      c.segments = parent?.segments.concat(c.name) || [];
-      getWhereImParent(c.entityConstructor).forEach(col => colsToUpdate.push(col));
     }
+    return;
   };
 
   public getRepository = (param: IEntityConstructor) => {
