@@ -40,6 +40,7 @@ export interface RepositoryMetadata {
 export interface MetadataStorageConfig {
   validateModels: boolean;
   validatorOptions?: ValidatorOptions;
+  throwOnDuplicatedCollection?: boolean;
 }
 
 export class MetadataStorage {
@@ -49,6 +50,7 @@ export class MetadataStorage {
   public config: MetadataStorageConfig = {
     validateModels: false,
     validatorOptions: {},
+    throwOnDuplicatedCollection: true
   };
 
   public getCollection = (pathOrConstructor: string | IEntityConstructor) => {
@@ -91,11 +93,9 @@ export class MetadataStorage {
 
   public setCollection = (col: CollectionMetadata) => {
     const existing = this.getCollection(col.entityConstructor);
-
-    if (existing) {
+    if (existing && this.config.throwOnDuplicatedCollection == true) {
       throw new Error(`Collection with name ${existing.name} has already been registered`);
     }
-
     const colToAdd = {
       ...col,
       segments: [col.name],
